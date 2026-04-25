@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<script src="auth.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoBac — Subiectul III · Vecini & Formule</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;600&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e1117;--surface:#161b27;--surface2:#1e2535;--border:#2a3347;--accent:#e8a84c;--accent2:#5b9cf6;--accent3:#6bdb9e;--text:#d4ddf0;--text-dim:#7a8aaa;--text-bright:#eef2ff;--red:#f06060;--radius:12px;
+  --relief-mt:#8b5a3c;--relief-mt-bg:rgba(139,90,60,.14);
+  --relief-pod:#c9943a;--relief-pod-bg:rgba(201,148,58,.13);
+  --relief-camp:#5a8c5a;--relief-camp-bg:rgba(90,140,90,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Source Sans 3',sans-serif;min-height:100vh;overflow-x:hidden}
+header{background:linear-gradient(135deg,#0e1117,#131a2e);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;gap:1.5rem;height:64px;position:sticky;top:44px;z-index:200}
+/* Platform nav */
+.pnav{position:fixed;top:0;left:0;right:0;z-index:500;height:44px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(12,17,23,0.92);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'Outfit',sans-serif;}
+.pnav-logo{font-weight:800;font-size:17px;color:#e8e6e1;text-decoration:none;display:flex;align-items:center;gap:7px}
+.pnav-logo .pd{width:7px;height:7px;border-radius:50%;background:#00d4aa;box-shadow:0 0 10px #00d4aa}
+.pnav-logo em{font-style:normal;background:linear-gradient(135deg,#00d4aa,#5b9cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pnav-pills{display:flex;gap:3px;background:rgba(255,255,255,0.04);border-radius:10px;padding:3px;border:1px solid rgba(255,255,255,0.06)}
+.pnav-p{padding:5px 14px;border-radius:7px;font-weight:600;font-size:12px;color:rgba(232,230,225,0.55);text-decoration:none;transition:all .2s;white-space:nowrap}
+.pnav-p:hover{color:#e8e6e1;background:rgba(255,255,255,0.06)}
+.pnav-p.on{color:#0c1117;background:#00d4aa;box-shadow:0 2px 8px rgba(0,212,170,0.25)}
+@media(max-width:768px){.pnav-pills{gap:1px;padding:2px}.pnav-p{padding:4px 8px;font-size:11px}}
+body{padding-top:44px}
+.logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--accent);letter-spacing:-.02em;white-space:nowrap}
+.logo span{color:var(--accent2)}
+.header-sub{font-size:.78rem;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;border-left:1px solid var(--border);padding-left:1.5rem}
+/* TOP NAV */
+.top-nav{display:flex;align-items:center;gap:.4rem;margin-left:auto}
+.top-nav-item{position:relative}
+.top-nav-btn{display:flex;align-items:center;gap:.45rem;padding:.45rem 1rem;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.03);color:var(--text);font-family:'Source Sans 3',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap;letter-spacing:.01em}
+.top-nav-btn:hover{background:var(--surface2);border-color:rgba(232,168,76,.4);color:var(--accent)}
+.top-nav-btn.open{background:var(--surface2);border-color:var(--accent);color:var(--accent)}
+.top-nav-btn .caret{font-size:.65rem;transition:transform .2s;opacity:.6}
+.top-nav-btn.open .caret{transform:rotate(180deg);opacity:1}
+.top-dropdown{position:absolute;top:calc(100% + 8px);left:0;min-width:220px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.45);overflow:hidden;display:none;z-index:300;animation:dropIn .18s ease}
+.top-dropdown.open{display:block}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.dropdown-label{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);padding:.65rem 1rem .3rem;font-weight:700}
+.dropdown-item{display:flex;align-items:center;gap:.65rem;padding:.6rem 1rem;border:none;background:none;color:var(--text);font-family:'Source Sans 3',sans-serif;font-size:.875rem;cursor:pointer;width:100%;text-align:left;transition:background .14s,color .14s}
+.dropdown-item:hover{background:var(--surface2);color:var(--accent)}
+.dropdown-item .di-icon{width:18px;text-align:center;flex-shrink:0;font-size:1rem}
+.dropdown-item .di-desc{font-size:.75rem;color:var(--text-dim);margin-top:.05rem}
+.dropdown-sep{border:none;border-top:1px solid var(--border);margin:.25rem 0}
+.app{display:flex;min-height:calc(100vh - 64px)}
+.sidebar{width:260px;min-width:260px;background:var(--surface);border-right:1px solid var(--border);padding:1.5rem 0;display:flex;flex-direction:column;gap:.1rem;overflow-y:auto}
+.sidebar-label{font-size:.67rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);padding:1rem 1.25rem .4rem;font-weight:600}
+.nav-btn{display:flex;align-items:center;gap:.75rem;padding:.65rem 1.25rem;border:none;background:none;color:var(--text);font-family:'Source Sans 3',sans-serif;font-size:.92rem;cursor:pointer;width:100%;text-align:left;transition:background .15s,color .15s;position:relative}
+.nav-btn .icon{width:20px;text-align:center;flex-shrink:0}
+.nav-btn:hover{background:var(--surface2);color:var(--text-bright)}
+.nav-btn.active{background:linear-gradient(90deg,rgba(232,168,76,.13),transparent);color:var(--accent);font-weight:600}
+.nav-btn.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);border-radius:0 2px 2px 0}
+.nav-btn .badge{margin-left:auto;font-size:.68rem;background:var(--surface2);color:var(--text-dim);border:1px solid var(--border);border-radius:20px;padding:1px 7px;font-weight:600}
+.sub-nav{display:none;flex-direction:column}
+.sub-nav.open{display:flex}
+.sub-btn{display:flex;align-items:center;gap:.6rem;padding:.42rem 1.25rem .42rem 3rem;border:none;background:none;color:var(--text-dim);font-family:'Source Sans 3',sans-serif;font-size:.85rem;cursor:pointer;width:100%;text-align:left;transition:color .15s,background .15s}
+.sub-btn:hover{color:var(--text);background:var(--surface2)}
+.sub-btn.active{color:var(--accent);font-weight:600}
+.main{flex:1;overflow-y:auto;padding:2rem 2.5rem}
+.section{display:none;animation:fadeIn .28s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.page-header{margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--text-bright)}
+.page-header p{color:var(--text-dim);margin-top:.35rem;font-size:.93rem}
+.page-tag{display:inline-block;font-size:.69rem;letter-spacing:.1em;text-transform:uppercase;background:rgba(91,156,246,.1);color:var(--accent2);border:1px solid rgba(91,156,246,.25);border-radius:20px;padding:2px 10px;margin-bottom:.5rem;font-weight:600}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+/* NEIGHBOR CARDS */
+.neighbor-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .2s,transform .2s}
+.neighbor-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.nc-header{display:flex;align-items:center;gap:.75rem;padding:1rem 1.25rem;background:var(--surface2);border-bottom:1px solid var(--border)}
+.nc-flag{font-size:1.6rem}
+.nc-title{flex:1}
+.nc-title h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--text-bright);line-height:1.2}
+.nc-title .nc-sub{font-size:.78rem;color:var(--text-dim)}
+.ue-badge{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.ue-badge.ue{background:rgba(91,156,246,.12);color:var(--accent2);border:1px solid rgba(91,156,246,.3)}
+.ue-badge.non-ue{background:rgba(240,96,96,.1);color:var(--red);border:1px solid rgba(240,96,96,.3)}
+.nc-body{padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.7rem}
+.nc-block-label{font-size:.67rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;margin-bottom:.25rem}
+.nc-block-content{font-size:.85rem;color:var(--text);line-height:1.6}
+.nc-block-content .cap{color:var(--text-bright);font-weight:600}
+.nc-block-content ul{list-style:none;padding:0}
+.nc-block-content ul li{padding:.1rem 0;display:flex;align-items:baseline;gap:.4rem}
+.nc-block-content ul li::before{content:'·';color:var(--accent);font-size:1rem;flex-shrink:0}
+.nc-divider{border:none;border-top:1px solid var(--border)}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem}
+.chip{font-size:.75rem;background:rgba(107,219,158,.08);color:var(--accent3);border:1px solid rgba(107,219,158,.2);border-radius:20px;padding:2px 9px}
+.map-wrapper{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem}
+.map-wrapper h2{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--accent);margin-bottom:1rem}
+/* RELIEF — blocuri specifice de relief în carduri */
+.relief-block{display:flex;flex-direction:column;gap:.4rem}
+.relief-block .rb-label{font-size:.67rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;display:flex;align-items:center;gap:.4rem}
+.relief-block .rb-label .rb-dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+.relief-block.mt .rb-label{color:var(--relief-mt)}
+.relief-block.mt .rb-label .rb-dot{background:var(--relief-mt);box-shadow:0 0 0 1px rgba(139,90,60,.4)}
+.relief-block.pod .rb-label{color:var(--relief-pod)}
+.relief-block.pod .rb-label .rb-dot{background:var(--relief-pod);box-shadow:0 0 0 1px rgba(201,148,58,.4)}
+.relief-block.camp .rb-label{color:var(--relief-camp)}
+.relief-block.camp .rb-label .rb-dot{background:var(--relief-camp);box-shadow:0 0 0 1px rgba(90,140,90,.4)}
+.relief-block ul{list-style:none;padding:0;font-size:.84rem;line-height:1.55}
+.relief-block ul li{padding:.12rem 0;display:flex;align-items:baseline;gap:.4rem;color:var(--text)}
+.relief-block ul li::before{content:'▸';font-size:.7rem;flex-shrink:0;opacity:.7}
+.relief-block.mt ul li::before{color:var(--relief-mt)}
+.relief-block.pod ul li::before{color:var(--relief-pod)}
+.relief-block.camp ul li::before{color:var(--relief-camp)}
+.relief-block ul li .ru-name{color:var(--text-bright);font-weight:600}
+.relief-block ul li .ru-meta{color:var(--text-dim);font-size:.78rem}
+/* Limită cu România */
+.border-ro{background:linear-gradient(90deg,rgba(232,168,76,.06),rgba(232,168,76,.02));border:1px solid rgba(232,168,76,.2);border-radius:8px;padding:.7rem .9rem;font-size:.83rem;line-height:1.6;color:var(--text)}
+.border-ro strong{color:var(--accent)}
+.border-ro .br-label{font-size:.67rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;margin-bottom:.3rem;display:block}
+/* Card „Continuități geografice" */
+.continuity-card{background:linear-gradient(135deg,var(--surface),rgba(232,168,76,.04));border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem}
+.continuity-card .cc-head{padding:1rem 1.25rem;background:var(--surface2);border-bottom:1px solid var(--border)}
+.continuity-card .cc-head h2{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--accent);display:flex;align-items:center;gap:.55rem}
+.continuity-card .cc-head .cc-sub{font-size:.78rem;color:var(--text-dim);margin-top:.15rem}
+.continuity-card .cc-body{padding:1rem 1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.bridge-row{display:flex;align-items:center;gap:.65rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.65rem .8rem;font-size:.82rem;line-height:1.4;transition:border-color .2s}
+.bridge-row:hover{border-color:rgba(232,168,76,.4)}
+.bridge-row .br-ro{color:var(--accent);font-weight:600;flex:1}
+.bridge-row .br-arrow{color:var(--text-dim);font-size:1rem;flex-shrink:0}
+.bridge-row .br-vec{color:var(--text-bright);flex:1;text-align:right;font-weight:500}
+.bridge-row .br-flag{font-size:1.05rem;flex-shrink:0}
+.bridge-row .br-note{display:block;font-size:.72rem;color:var(--text-dim);margin-top:.15rem;font-weight:400}
+.leaflet-container{background:#0a0f1a}
+.leaflet-popup-content-wrapper{background:#fafafa;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.leaflet-popup-content{margin:10px 14px;font-size:.85rem}
+.leaflet-popup-tip{background:#fafafa}
+.leaflet-control-attribution{background:rgba(20,25,40,.85)!important;color:#7a8aaa!important;font-size:10px!important}
+.leaflet-control-attribution a{color:#5b9cf6!important}
+.leaflet-control-zoom a{background:#161b27!important;color:#e8a84c!important;border-color:#2a3347!important;width:34px!important;height:34px!important;line-height:34px!important;font-size:20px!important}
+.leaflet-control-zoom a:hover{background:#1e2535!important}
+.leaflet-touch .leaflet-control-zoom a{width:40px!important;height:40px!important;line-height:40px!important}
+.custom-tooltip{background:rgba(20,25,40,.95)!important;border:1px solid #e8a84c!important;color:#fff!important;box-shadow:0 4px 12px rgba(0,0,0,.5)!important}
+.custom-tooltip::before{border-top-color:#e8a84c!important}
+.leaflet-tooltip{background:rgba(20,25,40,.95);border:1px solid #e8a84c;color:#fff;padding:4px 8px}
+.relief-marker,.capital-marker,.ro-label{background:transparent!important;border:none!important}
+@media(max-width:650px){
+  .map-wrapper{padding:1rem .75rem}
+  .map-wrapper h2{font-size:.95rem}
+  #leaflet-map{height:clamp(340px,65vh,500px)!important}
+  .relief-marker div{font-size:9.5px!important;padding:2px 6px!important}
+}
+@media(max-width:900px){.continuity-card .cc-body{grid-template-columns:1fr}}
+/* FORMULA TABS */
+.tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem}
+.tab-btn{padding:.45rem 1.1rem;border:1px solid transparent;border-radius:8px;background:none;color:var(--text-dim);font-family:'Source Sans 3',sans-serif;font-size:.85rem;cursor:pointer;transition:all .15s;font-weight:600}
+.tab-btn:hover{background:var(--surface2);color:var(--text)}
+.tab-btn.active{background:rgba(232,168,76,.12);border-color:rgba(232,168,76,.4);color:var(--accent)}
+.formula-group{display:none}
+.formula-group.active{display:flex;flex-direction:column;gap:1.25rem}
+/* FORMULA CARD */
+.formula-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .2s}
+.formula-card:hover{border-color:rgba(232,168,76,.35)}
+.fc-header{background:var(--surface2);border-bottom:1px solid var(--border);padding:1rem 1.25rem;display:flex;align-items:flex-start;gap:.75rem}
+.fc-header h2{font-family:'Playfair Display',serif;font-size:1.08rem;color:var(--text-bright);line-height:1.3}
+.fc-icon{font-size:1.3rem;flex-shrink:0;margin-top:1px}
+.fc-body{padding:1.25rem;display:flex;flex-direction:column;gap:1rem}
+.definition{font-size:.875rem;color:var(--text-dim);line-height:1.7;border-left:2px solid var(--border);padding-left:.85rem}
+.definition strong{color:var(--text)}
+.formula-box{background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:.85rem 1.2rem;font-family:'Fira Mono',monospace;font-size:1.05rem;color:var(--accent);letter-spacing:.03em}
+.formula-terms{display:flex;flex-direction:column;gap:.28rem;background:rgba(91,156,246,.04);border:1px solid rgba(91,156,246,.12);border-radius:8px;padding:.75rem 1rem}
+.term-row{display:flex;gap:.75rem;font-size:.84rem;align-items:baseline}
+.term-sym{font-family:'Fira Mono',monospace;color:var(--accent2);min-width:95px;font-size:.82rem;flex-shrink:0}
+.term-def{color:var(--text-dim);line-height:1.5}
+.example-box{background:rgba(107,219,158,.05);border:1px solid rgba(107,219,158,.2);border-radius:8px;padding:.85rem 1rem;font-size:.855rem}
+.ex-label{font-size:.69rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent3);font-weight:700;margin-bottom:.45rem}
+.example-box p{color:var(--text);line-height:1.7;margin-bottom:.2rem}
+.example-box .result{font-family:'Fira Mono',monospace;color:var(--accent3);font-weight:500;font-size:.92rem;margin-top:.3rem}
+.example-box .note{font-size:.8rem;color:var(--text-dim);margin-top:.3rem}
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;background:var(--surface);border:1px dashed var(--border);border-radius:var(--radius);color:var(--text-dim);text-align:center;gap:.8rem}
+.placeholder .icon-big{font-size:3rem}
+.placeholder h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--text)}
+.placeholder p{font-size:.88rem;max-width:340px;line-height:1.6}
+.pill-soon{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;background:rgba(232,168,76,.1);color:var(--accent);border:1px solid rgba(232,168,76,.25);border-radius:20px;padding:2px 10px;font-weight:700}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr}.sidebar{width:220px;min-width:220px}.main{padding:1.25rem}}
+@media(max-width:650px){.sidebar{display:none}}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" crossorigin="anonymous"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js" crossorigin="anonymous"></script>
+<meta name="theme-color" content="#0c1117">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2722%27 fill=%27%230c1117%27/%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2726%27 fill=%27none%27 stroke=%27%2300d4aa%27 stroke-width=%275%27/%3E%3Cpath d=%27M24 50h52M50 24v52%27 stroke=%27%2300d4aa%27 stroke-width=%273.5%27 opacity=%27.45%27/%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%275%27 fill=%27%23f5a623%27/%3E%3C/svg%3E">
+</head>
+<body>
+<nav class="pnav">
+  <a href="index.html" class="pnav-logo"><span class="pd"></span>Geo<em>Bac</em></a>
+  <div class="pnav-pills">
+    <a href="europa.html" class="pnav-p">🌍 Europa</a>
+    <a href="romania.html" class="pnav-p">🗺 România</a>
+    <a href="vecini.html" class="pnav-p on">🤝 Vecini</a>
+  </div>
+</nav>
+<header>
+  <div class="logo">Geo<span>Bac</span></div>
+  <div class="header-sub">Geografie &middot; Bacalaureat</div>
+  <nav class="top-nav">
+    <div class="top-nav-item">
+      <button class="top-nav-btn" id="btn-subIII" onclick="toggleDropdown('dd-subIII','btn-subIII')">
+        &#128218; Subiectul III <span class="caret">&#9660;</span>
+      </button>
+      <div class="top-dropdown" id="dd-subIII">
+        <div class="dropdown-label">Materie disponibila</div>
+        <button class="dropdown-item" onclick="navTo('vecini');closeAll()">
+          <span class="di-icon">&#127758;</span>
+          <div><div>Vecinii Romaniei</div><div class="di-desc">5 state vecine, frontiere, Marea Neagra</div></div>
+        </button>
+        <button class="dropdown-item" onclick="navTo('relief-vecini');closeAll()">
+          <span class="di-icon">&#9968;</span>
+          <div><div>Relieful vecinilor</div><div class="di-desc">Mun&#539;i, podi&#537;uri, c&#226;mpii &#537;i continuit&#259;&#539;i cu Rom&#226;nia</div></div>
+        </button>
+        <button class="dropdown-item" onclick="navTo('formule');closeAll()">
+          <span class="di-icon">&#128208;</span>
+          <div><div>Formule geografice</div><div class="di-desc">Populatie, clima, hidrologie, economie</div></div>
+        </button>
+        <hr class="dropdown-sep">
+        <div class="dropdown-label">In curand</div>
+        <button class="dropdown-item" onclick="navTo('relief');closeAll()" style="opacity:.5;cursor:default">
+          <span class="di-icon">&#9968;</span><div><div>Relieful Rom&#226;niei</div></div>
+        </button>
+        <button class="dropdown-item" onclick="navTo('clima-sec');closeAll()" style="opacity:.5;cursor:default">
+          <span class="di-icon">&#127780;</span><div><div>Clima</div></div>
+        </button>
+        <button class="dropdown-item" onclick="navTo('hidrografie');closeAll()" style="opacity:.5;cursor:default">
+          <span class="di-icon">&#128167;</span><div><div>Hidrografie</div></div>
+        </button>
+        <button class="dropdown-item" onclick="navTo('populatie-sec');closeAll()" style="opacity:.5;cursor:default">
+          <span class="di-icon">&#128101;</span><div><div>Populatie</div></div>
+        </button>
+        <button class="dropdown-item" onclick="navTo('industrie');closeAll()" style="opacity:.5;cursor:default">
+          <span class="di-icon">&#127981;</span><div><div>Industrie &amp; Economie</div></div>
+        </button>
+        <button class="dropdown-item" onclick="navTo('ue');closeAll()" style="opacity:.5;cursor:default">
+          <span class="di-icon">&#127466;&#127482;</span><div><div>Romania in UE &amp; NATO</div></div>
+        </button>
+      </div>
+    </div>
+    <div class="top-nav-item">
+      <button class="top-nav-btn" onclick="navTo('formule')">
+        &#128208; Formule geografice
+      </button>
+    </div>
+  </nav>
+</header>
+<div class="app">
+  <nav class="sidebar">
+    <div class="sidebar-label">Capitole</div>
+    <button class="nav-btn active" onclick="showSection('vecini',this)"><span class="icon">🌍</span>Vecinii României<span class="badge">5</span></button>
+    <button class="nav-btn" onclick="showSection('relief-vecini',this)"><span class="icon">⛰️</span>Relieful vecinilor<span class="badge">5</span></button>
+    <button class="nav-btn" onclick="toggleSub('sub-formule',this)"><span class="icon">📐</span>Formule de calcul<span class="badge">8</span></button>
+    <div class="sub-nav" id="sub-formule">
+      <button class="sub-btn" onclick="goFormule('populatie')">Populație</button>
+      <button class="sub-btn" onclick="goFormule('clima')">Climă</button>
+      <button class="sub-btn" onclick="goFormule('hidrologie')">Hidrologie</button>
+      <button class="sub-btn" onclick="goFormule('economie')">Economie</button>
+    </div>
+    <div class="sidebar-label" style="margin-top:.5rem">În curând</div>
+    <button class="nav-btn" onclick="showSection('relief',this)"><span class="icon">⛰️</span>Relieful României</button>
+    <button class="nav-btn" onclick="showSection('clima-sec',this)"><span class="icon">🌤️</span>Climă</button>
+    <button class="nav-btn" onclick="showSection('hidrografie',this)"><span class="icon">💧</span>Hidrografie</button>
+    <button class="nav-btn" onclick="showSection('populatie-sec',this)"><span class="icon">👥</span>Populație</button>
+    <button class="nav-btn" onclick="showSection('industrie',this)"><span class="icon">🏭</span>Industrie &amp; Economie</button>
+    <button class="nav-btn" onclick="showSection('ue',this)"><span class="icon">🇪🇺</span>România în UE &amp; NATO</button>
+  </nav>
+
+  <main class="main">
+
+<!-- ═══════════ VECINI ═══════════ -->
+<section class="section active" id="sec-vecini">
+  <div class="page-header">
+    <div class="page-tag">Geografie fizică &amp; umană</div>
+    <h1>Vecinii României</h1>
+    <p>România are <strong>5 state vecine</strong> cu frontiere terestre și fluviale, plus ieșire la <strong>Marea Neagră</strong>.</p>
+  </div>
+
+  <div class="map-wrapper">
+    <h2>🗺️ Harta vecinilor României</h2>
+
+    <!-- Legenda UE -->
+    <div style="display:flex;gap:1.2rem;margin-bottom:.9rem;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--text)">
+        <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(91,156,246,.3);border:1.5px solid #5b9cf6"></span>
+        Stat membru UE
+      </div>
+      <div style="display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--text)">
+        <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(240,96,96,.3);border:1.5px solid #f06060"></span>
+        Stat non-UE
+      </div>
+      <div style="display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--text)">
+        <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(232,168,76,.28);border:1.5px solid #e8a84c"></span>
+        România
+      </div>
+    </div>
+
+    <!-- Toggle layers -->
+    <div style="display:flex;gap:.5rem;margin-bottom:.9rem;flex-wrap:wrap;align-items:center">
+      <span style="font-size:.74rem;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-right:.3rem">Stil hartă:</span>
+      <button class="tab-btn active" id="vec-layer-osm" onclick="setVeciniMapLayer('osm')" style="padding:.35rem .85rem;font-size:.78rem">📍 Stradal (OSM)</button>
+      <button class="tab-btn" id="vec-layer-topo" onclick="setVeciniMapLayer('topo')" style="padding:.35rem .85rem;font-size:.78rem">🏔️ Topografic</button>
+      <button class="tab-btn" id="vec-layer-satellite" onclick="setVeciniMapLayer('satellite')" style="padding:.35rem .85rem;font-size:.78rem">🛰️ Satelit</button>
+    </div>
+
+    <div id="leaflet-vecini-map" style="width:100%;height:clamp(380px,68vh,560px);min-height:380px;border-radius:10px;background:#0a0f1a;overflow:hidden;border:1px solid var(--border);touch-action:pan-x pan-y"></div>
+
+    <p style="font-size:.75rem;color:var(--text-dim);margin-top:.75rem;text-align:center">
+      Hartă reală cu granițe politice oficiale. Click pe o țară pentru detalii despre frontieră. Culoare aurie = România, albastru = UE, roșu = non-UE.
+    </p>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:1.5rem">
+
+    <!-- UCRAINA -->
+    <div class="neighbor-card">
+      <div class="nc-header"><div class="nc-flag">🇺🇦</div><div class="nc-title"><h3>Ucraina</h3><div class="nc-sub">Nord &amp; Nord-Est · ~649 km · terestră + fluvială</div></div><span class="ue-badge non-ue">non-UE</span></div>
+      <div class="nc-body">
+        <div><div class="nc-block-label">🏛️ Capitală</div><div class="nc-block-content"><span class="cap">Kiev (Kyiv)</span></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">🏙️ Cele mai importante 5 orașe</div><div class="nc-block-content"><ul><li>Kiev (Kyiv)</li><li>Harkov</li><li>Odesa</li><li>Dnipro</li><li>Lvov (Liov)</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">🌊 Cele mai importante 5 râuri</div><div class="nc-block-content"><ul><li>Nipru</li><li>Tisa (graniță cu România)</li><li>Nistru</li><li>Prut</li><li>Dunărea (brațul Chilia)</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">⛰️ Cele mai importante 5 unități de relief</div><div class="nc-block-content"><ul><li>Carpații Ukrainieni (M-ții Maramureșului)</li><li>Câmpia Ucrainei de Est</li><li>Podișul Podoliei</li><li>Câmpia Mării Negre</li><li>Munții Crimeii</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">⚙️ Cele mai importante resurse de subsol</div><div class="nc-block-content"><div class="chips"><span class="chip">Cărbune (Donbas)</span><span class="chip">Minereu de fier</span><span class="chip">Mangan</span><span class="chip">Petrol</span><span class="chip">Gaze naturale</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- MOLDOVA -->
+    <div class="neighbor-card">
+      <div class="nc-header"><div class="nc-flag">🇲🇩</div><div class="nc-title"><h3>Republica Moldova</h3><div class="nc-sub">Est · ~681 km · fluvială (râul Prut)</div></div><span class="ue-badge non-ue">non-UE</span></div>
+      <div class="nc-body">
+        <div><div class="nc-block-label">🏛️ Capitală</div><div class="nc-block-content"><span class="cap">Chișinău</span></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">🏙️ Cele mai importante 5 orașe</div><div class="nc-block-content"><ul><li>Chișinău</li><li>Bălți</li><li>Tiraspol</li><li>Bender (Tighina)</li><li>Cahul</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">🌊 Cele mai importante 5 râuri</div><div class="nc-block-content"><ul><li>Prut (graniță cu România)</li><li>Nistru</li><li>Răut</li><li>Bâc</li><li>Ialpug</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">⛰️ Cele mai importante 5 unități de relief</div><div class="nc-block-content"><ul><li>Câmpia Moldovei de Sud</li><li>Podișul Moldovei Centrale</li><li>Codrii (dealuri centrale)</li><li>Câmpia Nistrului de Jos</li><li>Câmpia Prutului de Jos</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">⚙️ Cele mai importante resurse de subsol</div><div class="nc-block-content"><div class="chips"><span class="chip">Calcar</span><span class="chip">Gips</span><span class="chip">Argilă</span><span class="chip">Nisip și pietriș</span><span class="chip">Ape minerale</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- BULGARIA -->
+    <div class="neighbor-card">
+      <div class="nc-header"><div class="nc-flag">🇧🇬</div><div class="nc-title"><h3>Bulgaria</h3><div class="nc-sub">Sud · ~631 km · fluvială (Dunărea) + terestră</div></div><span class="ue-badge ue">UE</span></div>
+      <div class="nc-body">
+        <div><div class="nc-block-label">🏛️ Capitală</div><div class="nc-block-content"><span class="cap">Sofia</span></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">🏙️ Cele mai importante 5 orașe</div><div class="nc-block-content"><ul><li>Sofia</li><li>Plovdiv</li><li>Varna</li><li>Burgas</li><li>Ruse</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">🌊 Cele mai importante 5 râuri</div><div class="nc-block-content"><ul><li>Dunărea (graniță cu România)</li><li>Marița</li><li>Iskar</li><li>Struma</li><li>Tundzha</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">⛰️ Cele mai importante 5 unități de relief</div><div class="nc-block-content"><ul><li>Munții Balcani (Stara Planina)</li><li>Câmpia Dunării de Nord</li><li>Munții Rodopi</li><li>Podișul Dobrogei Bulgare</li><li>Câmpia Traciei</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">⚙️ Cele mai importante resurse de subsol</div><div class="nc-block-content"><div class="chips"><span class="chip">Cărbune brun</span><span class="chip">Cupru</span><span class="chip">Plumb &amp; Zinc</span><span class="chip">Minereu de fier</span><span class="chip">Bauxită</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- SERBIA -->
+    <div class="neighbor-card">
+      <div class="nc-header"><div class="nc-flag">🇷🇸</div><div class="nc-title"><h3>Serbia</h3><div class="nc-sub">Sud-Vest · ~546 km · terestră + Dunărea</div></div><span class="ue-badge non-ue">non-UE</span></div>
+      <div class="nc-body">
+        <div><div class="nc-block-label">🏛️ Capitală</div><div class="nc-block-content"><span class="cap">Belgrad</span></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">🏙️ Cele mai importante 5 orașe</div><div class="nc-block-content"><ul><li>Belgrad</li><li>Novi Sad</li><li>Niș</li><li>Kragujevac</li><li>Subotica</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">🌊 Cele mai importante 5 râuri</div><div class="nc-block-content"><ul><li>Dunărea (Porțile de Fier)</li><li>Sava</li><li>Morava de Vest</li><li>Tisa</li><li>Drina</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">⛰️ Cele mai importante 5 unități de relief</div><div class="nc-block-content"><ul><li>Câmpia Panonică (Voivodina)</li><li>Munții Dinarici</li><li>Munții Banatului Sârbesc</li><li>Podișul Șumadija</li><li>Defileul Porților de Fier</li></ul></div></div>
+        <hr class="nc-divider">
+        <div><div class="nc-block-label">⚙️ Cele mai importante resurse de subsol</div><div class="nc-block-content"><div class="chips"><span class="chip">Cupru (Bor)</span><span class="chip">Cărbune</span><span class="chip">Petrol</span><span class="chip">Plumb &amp; Zinc</span><span class="chip">Bauxită</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- UNGARIA – full width -->
+    <div class="neighbor-card" style="grid-column:1 / -1">
+      <div class="nc-header"><div class="nc-flag">🇭🇺</div><div class="nc-title"><h3>Ungaria</h3><div class="nc-sub">Vest · ~448 km · exclusiv terestră (cea mai scurtă frontieră)</div></div><span class="ue-badge ue">UE</span></div>
+      <div class="nc-body">
+        <div class="grid-2" style="gap:1rem">
+          <div style="display:flex;flex-direction:column;gap:.7rem">
+            <div><div class="nc-block-label">🏛️ Capitală</div><div class="nc-block-content"><span class="cap">Budapesta</span></div></div>
+            <hr class="nc-divider">
+            <div><div class="nc-block-label">🏙️ Cele mai importante 5 orașe</div><div class="nc-block-content"><ul><li>Budapesta</li><li>Debrețin</li><li>Miskolc</li><li>Pécs</li><li>Győr</li></ul></div></div>
+            <hr class="nc-divider">
+            <div><div class="nc-block-label">🌊 Cele mai importante 5 râuri</div><div class="nc-block-content"><ul><li>Dunărea</li><li>Tisa</li><li>Mureș (izvor în România)</li><li>Someș (izvor în România)</li><li>Raba</li></ul></div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:.7rem">
+            <div><div class="nc-block-label">⛰️ Cele mai importante 5 unități de relief</div><div class="nc-block-content"><ul><li>Câmpia Mare — Alföld (Câmpia Pannonică)</li><li>Câmpia Mică — Kisalföld</li><li>Munții Mátra (cel mai înalt vârf)</li><li>Dealurile Transdanubiei</li><li>Zona lacului Balaton</li></ul></div></div>
+            <hr class="nc-divider">
+            <div><div class="nc-block-label">⚙️ Cele mai importante resurse de subsol</div><div class="nc-block-content"><div class="chips"><span class="chip">Bauxită</span><span class="chip">Cărbune brun</span><span class="chip">Gaze naturale</span><span class="chip">Petrol</span><span class="chip">Mangan</span></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid-2 vecini -->
+
+  <div class="map-wrapper">
+    <h2>🌊 Marea Neagră — acces maritim</h2>
+    <p style="font-size:.9rem;line-height:1.85;color:var(--text)">
+      România are ieșire la <strong>Marea Neagră</strong> printr-un litoral de <strong>~245 km</strong> (județul Constanța).
+      Principalele porturi: <strong>Constanța</strong> (cel mai mare port la Marea Neagră), <strong>Mangalia</strong>, <strong>Midia</strong>.<br>
+      Delta Dunării se varsă prin 3 brațe: <strong>Chilia</strong> (nord, graniță cu Ucraina, cel mai mare debit),
+      <strong>Sulina</strong> (mijloc, navigabil, cel mai scurt) și <strong>Sf. Gheorghe</strong> (sud, cel mai sălbatic).
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════ RELIEFUL VECINILOR ═══════════ -->
+<section class="section" id="sec-relief-vecini">
+  <div class="page-header">
+    <div class="page-tag">Geografie fizică</div>
+    <h1>Relieful vecinilor României</h1>
+    <p>Marile unități de relief ale celor <strong>5 state vecine</strong> și modul în care se <strong>continuă</strong> peste granița României.</p>
+  </div>
+
+  <!-- HARTA RELIEF — Leaflet cu tile-uri fizice reale -->
+  <div class="map-wrapper">
+    <h2>🗺️ Harta fizică a vecinilor României</h2>
+
+    <!-- Controale layer -->
+    <div style="display:flex;gap:.5rem;margin-bottom:.9rem;flex-wrap:wrap;align-items:center">
+      <span style="font-size:.74rem;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-right:.3rem">Stil hartă:</span>
+      <button class="tab-btn active" id="map-layer-osm" onclick="setMapLayer('osm')" style="padding:.35rem .85rem;font-size:.78rem">📍 Stradal (OSM)</button>
+      <button class="tab-btn" id="map-layer-topo" onclick="setMapLayer('topo')" style="padding:.35rem .85rem;font-size:.78rem">🏔️ Topografic</button>
+      <button class="tab-btn" id="map-layer-satellite" onclick="setMapLayer('satellite')" style="padding:.35rem .85rem;font-size:.78rem">🛰️ Satelit</button>
+      <button class="tab-btn" id="map-layer-shaded" onclick="setMapLayer('shaded')" style="padding:.35rem .85rem;font-size:.78rem">🌄 Relief umbrit</button>
+    </div>
+
+    <!-- Toggle uri de relief -->
+    <div style="display:flex;gap:.4rem;margin-bottom:.9rem;flex-wrap:wrap;align-items:center">
+      <span style="font-size:.74rem;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-right:.3rem">Afișează:</span>
+      <label style="display:inline-flex;align-items:center;gap:.35rem;font-size:.8rem;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="toggle-ro" checked onchange="toggleLayer('ro',this.checked)"> Graniţa României
+      </label>
+      <label style="display:inline-flex;align-items:center;gap:.35rem;font-size:.8rem;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="toggle-vec" checked onchange="toggleLayer('vec',this.checked)"> Graniţele vecinilor
+      </label>
+      <label style="display:inline-flex;align-items:center;gap:.35rem;font-size:.8rem;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="toggle-relief-markers" checked onchange="toggleLayer('reliefmk',this.checked)"> Etichete unităţi de relief
+      </label>
+      <label style="display:inline-flex;align-items:center;gap:.35rem;font-size:.8rem;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="toggle-caps" checked onchange="toggleLayer('caps',this.checked)"> Capitale
+      </label>
+    </div>
+
+    <div id="leaflet-map" style="width:100%;height:clamp(380px,70vh,580px);min-height:380px;border-radius:10px;background:#0a0f1a;overflow:hidden;border:1px solid var(--border);touch-action:pan-x pan-y"></div>
+
+    <p style="font-size:.75rem;color:var(--text-dim);margin-top:.75rem;text-align:center">
+      Hartă cu tile-uri reale — © <a href="https://opentopomap.org" target="_blank" style="color:var(--accent2)">OpenTopoMap</a> (CC-BY-SA), © <a href="https://www.openstreetmap.org/copyright" target="_blank" style="color:var(--accent2)">OpenStreetMap</a>, © Esri. Folosește rotița mouse-ului pentru zoom, click pe marker pentru detalii.
+    </p>
+  </div>
+
+  <!-- CARDURI RELIEF PER ȚARĂ -->
+  <div class="grid-2" style="margin-bottom:1.5rem">
+
+    <!-- ═══ UCRAINA — relief ═══ -->
+    <div class="neighbor-card">
+      <div class="nc-header">
+        <div class="nc-flag">🇺🇦</div>
+        <div class="nc-title"><h3>Ucraina</h3><div class="nc-sub">Relief predominant de câmpie · Carpați în vest</div></div>
+        <span class="ue-badge non-ue">non-UE</span>
+      </div>
+      <div class="nc-body">
+        <div class="relief-block mt">
+          <div class="rb-label"><span class="rb-dot"></span>Munți</div>
+          <ul>
+            <li><span class="ru-name">Carpații Ucraineni (M-ții Maramureșului)</span><br><span class="ru-meta">Vf. Hoverla — 2.061 m · prelungesc Carpații Orientali spre N</span></li>
+            <li><span class="ru-name">Munții Crimeei</span><br><span class="ru-meta">Sud, peninsulă · Vf. Roman-Koș — 1.545 m</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="relief-block pod">
+          <div class="rb-label"><span class="rb-dot"></span>Podișuri</div>
+          <ul>
+            <li><span class="ru-name">Podișul Podoliei</span><br><span class="ru-meta">NV-ul țării · 300–400 m · prelungit spre Pod. Moldovei</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="relief-block camp">
+          <div class="rb-label"><span class="rb-dot"></span>Câmpii</div>
+          <ul>
+            <li><span class="ru-name">Câmpia Ucrainei de Est</span><br><span class="ru-meta">Cea mai întinsă unitate · cernoziomuri fertile</span></li>
+            <li><span class="ru-name">Câmpia Mării Negre</span><br><span class="ru-meta">Sudul țării · prelungită spre Delta Dunării</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="border-ro">
+          <div class="br-label">🤝 Limită cu România</div>
+          <strong>M-ții Maramureșului (UA)</strong> ↔ <strong>Carpații Orientali (RO)</strong> — același lanț muntos. <strong>Câmpia Mării Negre</strong> se continuă cu <strong>Delta Dunării</strong> și nordul Dobrogei.
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MOLDOVA — relief ═══ -->
+    <div class="neighbor-card">
+      <div class="nc-header">
+        <div class="nc-flag">🇲🇩</div>
+        <div class="nc-title"><h3>Republica Moldova</h3><div class="nc-sub">Relief de podiș și câmpie · fără munți</div></div>
+        <span class="ue-badge non-ue">non-UE</span>
+      </div>
+      <div class="nc-body">
+        <div class="relief-block mt">
+          <div class="rb-label"><span class="rb-dot"></span>Munți</div>
+          <ul>
+            <li style="color:var(--text-dim);font-style:italic"><span style="color:var(--text-dim)">Lipsesc — altitudine maximă ~430 m</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="relief-block pod">
+          <div class="rb-label"><span class="rb-dot"></span>Podișuri și dealuri</div>
+          <ul>
+            <li><span class="ru-name">Podișul Moldovei Centrale (Codrii)</span><br><span class="ru-meta">Vf. Bălănești — 430 m · cel mai înalt punct al țării</span></li>
+            <li><span class="ru-name">Podișul Nistrului</span><br><span class="ru-meta">NE · prelungire a Pod. Podoliei (Ucraina)</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="relief-block camp">
+          <div class="rb-label"><span class="rb-dot"></span>Câmpii</div>
+          <ul>
+            <li><span class="ru-name">Câmpia Bălților (Stepa Bălților)</span><br><span class="ru-meta">Nord · cernoziomuri</span></li>
+            <li><span class="ru-name">Câmpia Moldovei de Sud (Bugeacul)</span><br><span class="ru-meta">Sud · stepă</span></li>
+            <li><span class="ru-name">Câmpia Prutului de Jos / Nistrului de Jos</span><br><span class="ru-meta">Lunci joase de-a lungul râurilor</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="border-ro">
+          <div class="br-label">🤝 Limită cu România</div>
+          <strong>Podișul Moldovei Centrale (MD)</strong> ↔ <strong>Podișul Moldovei (RO)</strong> — aceeași unitate geomorfologică, separată doar de râul Prut. <strong>Câmpia Prutului de Jos</strong> se continuă peste graniță.
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BULGARIA — relief ═══ -->
+    <div class="neighbor-card">
+      <div class="nc-header">
+        <div class="nc-flag">🇧🇬</div>
+        <div class="nc-title"><h3>Bulgaria</h3><div class="nc-sub">Relief variat: câmpii nordice + lanțuri muntoase sudice</div></div>
+        <span class="ue-badge ue">UE</span>
+      </div>
+      <div class="nc-body">
+        <div class="relief-block mt">
+          <div class="rb-label"><span class="rb-dot"></span>Munți</div>
+          <ul>
+            <li><span class="ru-name">Munții Balcani (Stara Planina)</span><br><span class="ru-meta">Vf. Botev — 2.376 m · lanțul principal, dă numele Peninsulei Balcanice</span></li>
+            <li><span class="ru-name">Munții Rodopi</span><br><span class="ru-meta">Vf. Musala — 2.925 m · cel mai înalt vârf din Pen. Balcanică</span></li>
+            <li><span class="ru-name">Munții Pirin · Rila</span><br><span class="ru-meta">SV · masive granitice înalte</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="relief-block pod">
+          <div class="rb-label"><span class="rb-dot"></span>Podișuri</div>
+          <ul>
+            <li><span class="ru-name">Podișul Dobrogei Bulgare (Ludogorie)</span><br><span class="ru-meta">NE · platou calcaros</span></li>
+            <li><span class="ru-name">Podișul Predbalcanic</span><br><span class="ru-meta">Trecere între Câmpie și Balcani</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="relief-block camp">
+          <div class="rb-label"><span class="rb-dot"></span>Câmpii</div>
+          <ul>
+            <li><span class="ru-name">Câmpia Dunării de Nord</span><br><span class="ru-meta">De-a lungul Dunării · oglinda Câmpiei Române</span></li>
+            <li><span class="ru-name">Câmpia Traciei (a Mariței)</span><br><span class="ru-meta">Sud, între Balcani și Rodopi</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="border-ro">
+          <div class="br-label">🤝 Limită cu România</div>
+          <strong>Câmpia Dunării de Nord (BG)</strong> ↔ <strong>Câmpia Română (RO)</strong> — separate doar de Dunăre. <strong>Podișul Dobrogei Bulgare</strong> ↔ <strong>Podișul Dobrogei de Sud</strong> — aceeași unitate.
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SERBIA — relief ═══ -->
+    <div class="neighbor-card">
+      <div class="nc-header">
+        <div class="nc-flag">🇷🇸</div>
+        <div class="nc-title"><h3>Serbia</h3><div class="nc-sub">Câmpie panonică în nord · munți în sud</div></div>
+        <span class="ue-badge non-ue">non-UE</span>
+      </div>
+      <div class="nc-body">
+        <div class="relief-block mt">
+          <div class="rb-label"><span class="rb-dot"></span>Munți</div>
+          <ul>
+            <li><span class="ru-name">Munții Banatului Sârbesc</span><br><span class="ru-meta">NE · prelungesc M-ții Banatului din România</span></li>
+            <li><span class="ru-name">Munții Dinarici</span><br><span class="ru-meta">V · lanț alpin spre Adriatica</span></li>
+            <li><span class="ru-name">Munții Carpato-Balcanici</span><br><span class="ru-meta">E · fac legătura între Carpați și Balcani</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="relief-block pod">
+          <div class="rb-label"><span class="rb-dot"></span>Podișuri și defilee</div>
+          <ul>
+            <li><span class="ru-name">Podișul Šumadija</span><br><span class="ru-meta">Centru · dealuri și platouri</span></li>
+            <li><span class="ru-name">Defileul Porților de Fier</span><br><span class="ru-meta">Cel mai mare defileu european · graniță cu RO</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="relief-block camp">
+          <div class="rb-label"><span class="rb-dot"></span>Câmpii</div>
+          <ul>
+            <li><span class="ru-name">Câmpia Panonică (Voivodina)</span><br><span class="ru-meta">Nord · continuare a Câmpiei Pannonice</span></li>
+          </ul>
+        </div>
+        <hr class="nc-divider">
+        <div class="border-ro">
+          <div class="br-label">🤝 Limită cu România</div>
+          <strong>M-ții Banatului Sârbesc (RS)</strong> ↔ <strong>M-ții Banatului (RO, Carpații Occidentali)</strong> — același masiv, despărțit de Dunăre la Porțile de Fier. <strong>Câmpia Voivodinei</strong> ↔ <strong>Câmpia de Vest</strong>.
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ UNGARIA — relief — full width ═══ -->
+    <div class="neighbor-card" style="grid-column:1 / -1">
+      <div class="nc-header">
+        <div class="nc-flag">🇭🇺</div>
+        <div class="nc-title"><h3>Ungaria</h3><div class="nc-sub">Relief predominant de câmpie · munți doar în nord</div></div>
+        <span class="ue-badge ue">UE</span>
+      </div>
+      <div class="nc-body">
+        <div class="grid-2" style="gap:1rem">
+          <div style="display:flex;flex-direction:column;gap:.7rem">
+            <div class="relief-block mt">
+              <div class="rb-label"><span class="rb-dot"></span>Munți</div>
+              <ul>
+                <li><span class="ru-name">Munții Mátra</span><br><span class="ru-meta">Nord · Vf. Kékes — 1.014 m · cel mai înalt vârf al Ungariei</span></li>
+                <li><span class="ru-name">Munții Bükk · Zemplén</span><br><span class="ru-meta">NE · masive vulcanice scunde</span></li>
+              </ul>
+            </div>
+            <hr class="nc-divider">
+            <div class="relief-block pod">
+              <div class="rb-label"><span class="rb-dot"></span>Podișuri și dealuri</div>
+              <ul>
+                <li><span class="ru-name">Dealurile Transdanubiei (Dunántúl)</span><br><span class="ru-meta">V de Dunăre · zonă colinară</span></li>
+                <li><span class="ru-name">Munții Bakony · Zona Lacului Balaton</span><br><span class="ru-meta">Cel mai mare lac din Europa Centrală</span></li>
+              </ul>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:.7rem">
+            <div class="relief-block camp">
+              <div class="rb-label"><span class="rb-dot"></span>Câmpii</div>
+              <ul>
+                <li><span class="ru-name">Câmpia Mare — Alföld (Câmpia Pannonică)</span><br><span class="ru-meta">E · cea mai întinsă · continuare a Câmpiei de Vest a României</span></li>
+                <li><span class="ru-name">Câmpia Mică — Kisalföld</span><br><span class="ru-meta">NV · spre granița cu Slovacia</span></li>
+              </ul>
+            </div>
+            <hr class="nc-divider">
+            <div class="border-ro">
+              <div class="br-label">🤝 Limită cu România</div>
+              <strong>Câmpia Pannonică / Alföld (HU)</strong> ↔ <strong>Câmpia de Vest (RO)</strong> — aceeași unitate morfologică, separată administrativ. Râurile <strong>Mureș, Someș, Crișuri</strong> izvorăsc din Carpați și se varsă în Tisa, traversând granița.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid-2 relief -->
+
+  <!-- ══ CARD CONTINUITĂȚI GEOGRAFICE ══ -->
+  <div class="continuity-card">
+    <div class="cc-head">
+      <h2>🔗 Continuități geografice peste graniță</h2>
+      <div class="cc-sub">Cum se prelungesc unitățile de relief ale României în țările vecine — element esențial la Subiectul III.</div>
+    </div>
+    <div class="cc-body">
+
+      <div class="bridge-row">
+        <span class="br-flag">🇷🇴</span>
+        <div class="br-ro">Carpații Orientali</div>
+        <span class="br-arrow">↔</span>
+        <div class="br-vec">M-ții Maramureșului<span class="br-note">același lanț carpatic</span></div>
+        <span class="br-flag">🇺🇦</span>
+      </div>
+
+      <div class="bridge-row">
+        <span class="br-flag">🇷🇴</span>
+        <div class="br-ro">Câmpia de Vest</div>
+        <span class="br-arrow">↔</span>
+        <div class="br-vec">Câmpia Pannonică (Alföld)<span class="br-note">aceeași unitate morfologică</span></div>
+        <span class="br-flag">🇭🇺</span>
+      </div>
+
+      <div class="bridge-row">
+        <span class="br-flag">🇷🇴</span>
+        <div class="br-ro">M-ții Banatului<br><span style="font-size:.7rem;color:var(--text-dim);font-weight:400">(Carpații Occidentali)</span></div>
+        <span class="br-arrow">↔</span>
+        <div class="br-vec">M-ții Banatului Sârbesc<span class="br-note">despărțiți de Porțile de Fier</span></div>
+        <span class="br-flag">🇷🇸</span>
+      </div>
+
+      <div class="bridge-row">
+        <span class="br-flag">🇷🇴</span>
+        <div class="br-ro">Câmpia de Vest<br><span style="font-size:.7rem;color:var(--text-dim);font-weight:400">(sectorul sudic)</span></div>
+        <span class="br-arrow">↔</span>
+        <div class="br-vec">Câmpia Voivodinei<span class="br-note">extinderea Câmpiei Pannonice</span></div>
+        <span class="br-flag">🇷🇸</span>
+      </div>
+
+      <div class="bridge-row">
+        <span class="br-flag">🇷🇴</span>
+        <div class="br-ro">Câmpia Română</div>
+        <span class="br-arrow">↔</span>
+        <div class="br-vec">Câmpia Dunării de Nord<span class="br-note">despărțite doar de Dunăre</span></div>
+        <span class="br-flag">🇧🇬</span>
+      </div>
+
+      <div class="bridge-row">
+        <span class="br-flag">🇷🇴</span>
+        <div class="br-ro">Podișul Dobrogei de Sud</div>
+        <span class="br-arrow">↔</span>
+        <div class="br-vec">Podișul Dobrogei Bulgare<span class="br-note">(Ludogorie) — aceeași unitate</span></div>
+        <span class="br-flag">🇧🇬</span>
+      </div>
+
+      <div class="bridge-row">
+        <span class="br-flag">🇷🇴</span>
+        <div class="br-ro">Podișul Moldovei</div>
+        <span class="br-arrow">↔</span>
+        <div class="br-vec">Pod. Moldovei Centrale (Codrii)<span class="br-note">despărțite de râul Prut</span></div>
+        <span class="br-flag">🇲🇩</span>
+      </div>
+
+      <div class="bridge-row">
+        <span class="br-flag">🇷🇴</span>
+        <div class="br-ro">Delta Dunării<br><span style="font-size:.7rem;color:var(--text-dim);font-weight:400">+ Câmpia Siretului Inf.</span></div>
+        <span class="br-arrow">↔</span>
+        <div class="br-vec">Câmpia Mării Negre<span class="br-note">litoralul nord-vest pontic</span></div>
+        <span class="br-flag">🇺🇦</span>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════ FORMULE ═══════════ -->
+<section class="section" id="sec-formule">
+  <div class="page-header">
+    <div class="page-tag">Matematică aplicată în geografie</div>
+    <h1>Formule de calcul</h1>
+    <p>Toate formulele esențiale pentru bacalaureat — definiții, termeni explicați și exemple rezolvate.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tbtn-populatie" onclick="setTab('populatie',this)">👥 Populație</button>
+    <button class="tab-btn" id="tbtn-clima" onclick="setTab('clima',this)">🌡️ Climă</button>
+    <button class="tab-btn" id="tbtn-hidrologie" onclick="setTab('hidrologie',this)">💧 Hidrologie</button>
+    <button class="tab-btn" id="tbtn-economie" onclick="setTab('economie',this)">📊 Economie</button>
+  </div>
+
+  <!-- POPULAȚIE -->
+  <div class="formula-group active" id="fg-populatie">
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">📈</span><h2>Sporul Natural (Bilanțul Natural)</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Diferența dintre numărul nașterilor și numărul deceselor înregistrate într-un an, la nivelul unei populații. <em>Pozitiv</em> → natalitate &gt; mortalitate; <em>Negativ</em> → scădere naturală a populației.</div>
+        <div class="formula-box">SN = N − D &nbsp;&nbsp;&nbsp;(‰)</div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">SN</span><span class="term-def">= Sporul Natural (‰)</span></div>
+          <div class="term-row"><span class="term-sym">N</span><span class="term-def">= Rata natalității (nașteri la 1.000 loc./an)</span></div>
+          <div class="term-row"><span class="term-sym">D</span><span class="term-def">= Rata mortalității (decese la 1.000 loc./an)</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Exemplu rezolvat</div>
+          <p>Natalitate = <strong>10‰</strong>, Mortalitate = <strong>13‰</strong></p>
+          <p class="result">SN = 10 − 13 = <strong>−3‰</strong> → spor natural negativ</p>
+          <p class="note">La 1.000 de locuitori, populația scade cu 3 persoane/an. Cazul tipic al României actuale.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">👤</span><h2>Densitatea Populației</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Numărul mediu de locuitori pe km². Indicator al gradului de populare a unui teritoriu. Valori mari = zone dens populate; valori mici = zone slab populate.</div>
+        <div class="formula-box">D = P / S &nbsp;&nbsp;&nbsp;(loc/km²)</div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">D</span><span class="term-def">= Densitatea populației (loc/km²)</span></div>
+          <div class="term-row"><span class="term-sym">P</span><span class="term-def">= Populația totală (nr. locuitori)</span></div>
+          <div class="term-row"><span class="term-sym">S</span><span class="term-def">= Suprafața teritoriului (km²)</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Exemplu rezolvat</div>
+          <p>România: P ≈ <strong>19.000.000</strong> loc., S = <strong>237.500 km²</strong></p>
+          <p class="result">D = 19.000.000 / 237.500 ≈ <strong>80 loc/km²</strong></p>
+          <p class="note">Media mondială ≈ 60 loc/km²; media UE ≈ 108 loc/km².</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">✈️</span><h2>Sporul Migratoriu (Soldul Migrator)</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Diferența dintre numărul imigranților (intră) și numărul emigranților (pleacă) dintr-un teritoriu, într-un an. <em>Pozitiv</em> → imigrare dominantă; <em>Negativ</em> → emigrare dominantă.</div>
+        <div class="formula-box">SM = I − E</div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">SM</span><span class="term-def">= Sporul Migratoriu</span></div>
+          <div class="term-row"><span class="term-sym">I</span><span class="term-def">= Numărul imigranților (intră în teritoriu)</span></div>
+          <div class="term-row"><span class="term-sym">E</span><span class="term-def">= Numărul emigranților (pleacă din teritoriu)</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Exemplu rezolvat</div>
+          <p>Imigrați: <strong>5.000</strong>, Emigrați: <strong>20.000</strong></p>
+          <p class="result">SM = 5.000 − 20.000 = <strong>−15.000</strong> → sold migrator negativ</p>
+          <p class="note">Caracteristic României post-1990: emigrare masivă spre Italia, Germania, Spania.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">📊</span><h2>Sporul Total (Bilanțul Demografic)</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Variația reală a populației, cumulând mișcarea naturală și mișcarea migratorie. Cel mai complet indicator demografic al unui teritoriu.</div>
+        <div class="formula-box">ST = SN + SM</div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">ST</span><span class="term-def">= Sporul Total (variația reală a populației)</span></div>
+          <div class="term-row"><span class="term-sym">SN</span><span class="term-def">= Sporul Natural (N − D)</span></div>
+          <div class="term-row"><span class="term-sym">SM</span><span class="term-def">= Sporul Migratoriu (I − E)</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Exemplu</div>
+          <p>SN = <strong>−3‰</strong>, SM = <strong>−15.000</strong> persoane</p>
+          <p class="result">ST negativ → populația scade atât natural cât și prin emigrare.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /fg-populatie -->
+
+  <!-- CLIMĂ -->
+  <div class="formula-group" id="fg-clima">
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">🌡️</span><h2>Temperatura Medie Anuală</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Media aritmetică a temperaturilor medii lunare pe parcursul unui an calendaristic, la o stație meteorologică.</div>
+        <div class="formula-box">T<sub>med</sub> = (T₁ + T₂ + ... + T₁₂) / 12</div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">T<sub>med</sub></span><span class="term-def">= Temperatura medie anuală (°C)</span></div>
+          <div class="term-row"><span class="term-sym">T₁–T₁₂</span><span class="term-def">= Temperaturile medii ale celor 12 luni (°C)</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Exemplu rezolvat</div>
+          <p>Suma temperaturilor medii lunare = <strong>132°C</strong></p>
+          <p class="result">T<sub>med</sub> = 132 / 12 = <strong>11°C</strong></p>
+          <p class="note">Tipic pentru câmpiile sudice ale României. Vf. Omu: ≈ −2,5°C.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">📉</span><h2>Amplitudinea Termică</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Diferența dintre temperatura medie a celei mai calde luni și cea mai reci luni dintr-un an. Valori mari → climat continental; valori mici → climat oceanic/maritim.</div>
+        <div class="formula-box">A = T<sub>max</sub> − T<sub>min</sub></div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">A</span><span class="term-def">= Amplitudinea termică (°C)</span></div>
+          <div class="term-row"><span class="term-sym">T<sub>max</sub></span><span class="term-def">= Temp. medie a celei mai calde luni (iulie)</span></div>
+          <div class="term-row"><span class="term-sym">T<sub>min</sub></span><span class="term-def">= Temp. medie a celei mai reci luni (ianuarie)</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Exemplu rezolvat</div>
+          <p>București: iulie = <strong>23°C</strong>, ianuarie = <strong>−3°C</strong></p>
+          <p class="result">A = 23 − (−3) = <strong>26°C</strong> → climat continental accentuat</p>
+          <p class="note">Londra: A ≈ 13°C (climat oceanic temperat).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">🏔️</span><h2>Gradientul Termic Vertical</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Scăderea temperaturii odată cu creșterea altitudinii. Temperatura scade cu <strong>0,5°C</strong> la fiecare 100 m altitudine câștigați. Stă la baza etajării climatice și a vegetației.</div>
+        <div class="formula-box">ΔT = 0,5°C × (ΔH / 100)</div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">ΔT</span><span class="term-def">= Diferența de temperatură (°C)</span></div>
+          <div class="term-row"><span class="term-sym">ΔH</span><span class="term-def">= Diferența de altitudine (m)</span></div>
+          <div class="term-row"><span class="term-sym">0,5°C</span><span class="term-def">= Gradient termic mediu / 100 m</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Exemplu rezolvat</div>
+          <p>Sinaia (800 m) → T = <strong>15°C</strong>. Estimare Vf. Omu (2.507 m):</p>
+          <p>ΔH = 2.507 − 800 = 1.707 m</p>
+          <p class="result">ΔT = 0,5 × 17,07 ≈ 8,5°C → T<sub>Omu</sub> ≈ <strong>6,5°C</strong></p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /fg-clima -->
+
+  <!-- HIDROLOGIE -->
+  <div class="formula-group" id="fg-hidrologie">
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">💧</span><h2>Debitul unui Râu</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Volumul de apă care trece printr-o secțiune transversală a cursului de apă în unitatea de timp. Principal indicator al resurselor hidrice. Unitate: m³/s.</div>
+        <div class="formula-box">Q = S × v &nbsp;&nbsp;&nbsp;(m³/s)</div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">Q</span><span class="term-def">= Debitul (m³/s)</span></div>
+          <div class="term-row"><span class="term-sym">S</span><span class="term-def">= Secțiunea transversală a albiei (m²)</span></div>
+          <div class="term-row"><span class="term-sym">v</span><span class="term-def">= Viteza de curgere a apei (m/s)</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Date de referință</div>
+          <p>Dunărea la Sulina: <strong>~6.500 m³/s</strong> · Siret: <strong>~226 m³/s</strong> · Olt: <strong>~175 m³/s</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">🌧️</span><h2>Scurgerea Specifică</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Contribuția fiecărui km² din bazinul hidrografic la formarea debitului unui râu. Crește cu altitudinea și precipitațiile.</div>
+        <div class="formula-box">q = Q / A &nbsp;&nbsp;&nbsp;(l/s·km²)</div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">q</span><span class="term-def">= Scurgerea specifică (l/s·km²)</span></div>
+          <div class="term-row"><span class="term-sym">Q</span><span class="term-def">= Debitul (l/s)</span></div>
+          <div class="term-row"><span class="term-sym">A</span><span class="term-def">= Suprafața bazinului hidrografic (km²)</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Valori orientative</div>
+          <p>Carpați: <strong>≥ 20 l/s·km²</strong> &nbsp;|&nbsp; Câmpia Bărăganului: <strong>&lt; 2 l/s·km²</strong></p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /fg-hidrologie -->
+
+  <!-- ECONOMIE -->
+  <div class="formula-group" id="fg-economie">
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">🏙️</span><h2>Gradul de Urbanizare</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Ponderea procentuală a populației urbane din totalul populației unui teritoriu. Indicator al nivelului de dezvoltare economică și socială.</div>
+        <div class="formula-box">GU = (P<sub>urban</sub> / P<sub>total</sub>) × 100 &nbsp;&nbsp;&nbsp;(%)</div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">GU</span><span class="term-def">= Gradul de urbanizare (%)</span></div>
+          <div class="term-row"><span class="term-sym">P<sub>urban</sub></span><span class="term-def">= Populația din mediul urban</span></div>
+          <div class="term-row"><span class="term-sym">P<sub>total</sub></span><span class="term-def">= Populația totală a teritoriului</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Exemplu rezolvat</div>
+          <p>P<sub>urban</sub> ≈ <strong>10.000.000</strong>, P<sub>total</sub> ≈ <strong>19.000.000</strong></p>
+          <p class="result">GU = (10.000.000 / 19.000.000) × 100 ≈ <strong>52%</strong></p>
+          <p class="note">Media UE ≈ 75% — România are grad de urbanizare relativ scăzut.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">📦</span><h2>Bilanțul Comercial</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Diferența dintre valoarea exporturilor și valoarea importurilor unui stat într-un an. <em>Activ/excedent</em> dacă Ex &gt; Im; <em>Pasiv/deficit</em> dacă Im &gt; Ex.</div>
+        <div class="formula-box">BC = Ex − Im</div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">BC</span><span class="term-def">= Bilanțul comercial</span></div>
+          <div class="term-row"><span class="term-sym">Ex</span><span class="term-def">= Valoarea exporturilor</span></div>
+          <div class="term-row"><span class="term-sym">Im</span><span class="term-def">= Valoarea importurilor</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Exemplu rezolvat</div>
+          <p>Export = <strong>80 mld. €</strong>, Import = <strong>95 mld. €</strong></p>
+          <p class="result">BC = 80 − 95 = <strong>−15 mld. €</strong> → deficit comercial</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-card">
+      <div class="fc-header"><span class="fc-icon">⚡</span><h2>Consumul de Energie per Capita</h2></div>
+      <div class="fc-body">
+        <div class="definition"><strong>Definiție:</strong> Cantitatea medie de energie consumată de un locuitor al unui stat într-un an. Indicator al nivelului de industrializare și al standardului de viață.</div>
+        <div class="formula-box">CE<sub>pc</sub> = CE<sub>total</sub> / P &nbsp;&nbsp;&nbsp;(kWh/loc/an)</div>
+        <div class="formula-terms">
+          <div class="term-row"><span class="term-sym">CE<sub>pc</sub></span><span class="term-def">= Consum energie per capita (kWh/loc/an)</span></div>
+          <div class="term-row"><span class="term-sym">CE<sub>total</sub></span><span class="term-def">= Consumul total de energie al țării</span></div>
+          <div class="term-row"><span class="term-sym">P</span><span class="term-def">= Populația totală</span></div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">📝 Valori comparative</div>
+          <p>SUA: <strong>~12.000 kWh</strong> · Germania: <strong>~6.500 kWh</strong> · România: <strong>~2.500 kWh</strong>/loc/an</p>
+          <p class="note">România se situează sub media UE la consumul de energie per capita.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /fg-economie -->
+
+</section><!-- /sec-formule -->
+
+<!-- ═══ PLACEHOLDERS ═══ -->
+<section class="section" id="sec-relief">
+  <div class="page-header"><div class="page-tag">Geografie fizică</div><h1>Relieful României</h1></div>
+  <div class="placeholder"><div class="icon-big">⛰️</div><h3>Capitol în lucru</h3><p>Carpații Orientali, Meridionali și Occidentali, Subcarpații, Podișuri, Câmpii — clasificare Posea &amp; Badea (1984).</p><span class="pill-soon">În curând</span></div>
+</section>
+<section class="section" id="sec-clima-sec">
+  <div class="page-header"><div class="page-tag">Geografie fizică</div><h1>Clima României</h1></div>
+  <div class="placeholder"><div class="icon-big">🌤️</div><h3>Capitol în lucru</h3><p>Factorii genetici ai climei, etajarea climatică, tipuri de climă, precipitații, vânturi.</p><span class="pill-soon">În curând</span></div>
+</section>
+<section class="section" id="sec-hidrografie">
+  <div class="page-header"><div class="page-tag">Geografie fizică</div><h1>Hidrografia României</h1></div>
+  <div class="placeholder"><div class="icon-big">💧</div><h3>Capitol în lucru</h3><p>Dunărea, bazinele hidrografice, lacurile, apele subterane, Delta Dunării.</p><span class="pill-soon">În curând</span></div>
+</section>
+<section class="section" id="sec-populatie-sec">
+  <div class="page-header"><div class="page-tag">Geografie umană</div><h1>Populația României</h1></div>
+  <div class="placeholder"><div class="icon-big">👥</div><h3>Capitol în lucru</h3><p>Evoluție demografică, structuri, repartiție geografică, migrații, rețeaua de localități.</p><span class="pill-soon">În curând</span></div>
+</section>
+<section class="section" id="sec-industrie">
+  <div class="page-header"><div class="page-tag">Geografie economică</div><h1>Industrie &amp; Economie</h1></div>
+  <div class="placeholder"><div class="icon-big">🏭</div><h3>Capitol în lucru</h3><p>Industria energetică, extractivă, prelucrătoare, agricultura, transporturile, turismul.</p><span class="pill-soon">În curând</span></div>
+</section>
+<section class="section" id="sec-ue">
+  <div class="page-header"><div class="page-tag">Geopolitică</div><h1>România în UE &amp; NATO</h1></div>
+  <div class="placeholder"><div class="icon-big">🇪🇺</div><h3>Capitol în lucru</h3><p>Integrarea europeană, instituțiile UE, rolul României în NATO, relații internaționale.</p><span class="pill-soon">În curând</span></div>
+</section>
+
+  </main>
+</div>
+
+<script>
+function toggleDropdown(ddId, btnId) {
+  const dd = document.getElementById(ddId);
+  const btn = document.getElementById(btnId);
+  const isOpen = dd.classList.contains('open');
+  closeAll();
+  if (!isOpen) { dd.classList.add('open'); btn.classList.add('open'); }
+}
+function closeAll() {
+  document.querySelectorAll('.top-dropdown').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.top-nav-btn').forEach(b => b.classList.remove('open'));
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.top-nav-item')) closeAll();
+});
+function navTo(id) {
+  showSection(id, null);
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+}
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  if (btn && btn.classList.contains('nav-btn')) btn.classList.add('active');
+}
+
+function toggleSub(id, btn) {
+  document.getElementById(id).classList.toggle('open');
+  showSection('formule', btn);
+}
+
+function goFormule(tab) {
+  showSection('formule', null);
+  setTab(tab, null);
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    if (b.textContent.trim().startsWith('Formule')) b.classList.add('active');
+  });
+}
+
+function setTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.formula-group').forEach(g => g.classList.remove('active'));
+  document.getElementById('fg-' + tab).classList.add('active');
+  const tbtn = btn || document.getElementById('tbtn-' + tab);
+  if (tbtn) tbtn.classList.add('active');
+}
+</script>
+
+
+
+<!-- Global error overlay (shows any JS error visibly, especially on mobile where no console) -->
+<div id="js-error-overlay" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#8a0000;color:#fff;padding:12px 16px;font-family:monospace;font-size:12px;line-height:1.4;max-height:40vh;overflow:auto;border-bottom:2px solid #f06060;box-shadow:0 4px 12px rgba(0,0,0,.6)">
+  <div style="display:flex;justify-content:space-between;align-items:start;gap:10px">
+    <div><strong style="font-size:13px">⚠ Eroare JavaScript</strong><div id="js-error-msg" style="margin-top:6px;word-break:break-word"></div></div>
+    <button onclick="document.getElementById('js-error-overlay').style.display='none'" style="background:rgba(255,255,255,.2);border:1px solid #fff;color:#fff;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:inherit;flex-shrink:0">✕</button>
+  </div>
+</div>
+<script>
+(function() {
+  function showErr(msg) {
+    try {
+      var el = document.getElementById('js-error-msg');
+      var overlay = document.getElementById('js-error-overlay');
+      if (el && overlay) {
+        var existing = el.innerHTML;
+        el.innerHTML = (existing ? existing + '<hr style="border:0;border-top:1px solid rgba(255,255,255,.3);margin:6px 0">' : '') + msg;
+        overlay.style.display = 'block';
+      }
+    } catch(e) {}
+  }
+  window.addEventListener('error', function(ev) {
+    var m = (ev.message || 'unknown') + ' @ ' + (ev.filename ? ev.filename.split('/').pop() : 'inline') + ':' + (ev.lineno || '?') + ':' + (ev.colno || '?');
+    showErr(m);
+  });
+  window.addEventListener('unhandledrejection', function(ev) {
+    showErr('Promise rejected: ' + (ev.reason && ev.reason.message || ev.reason || 'unknown'));
+  });
+  window.__showJsError = showErr;
+})();
+</script>
+
+<!-- Date GeoJSON pentru granițele RO + vecini (inline, ca backup dacă tile-ul nu le marchează) -->
+<script id="borders-data" type="application/json">
+{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"Bulgaria","iso":"BG"},"geometry":{"type":"Polygon","coordinates":[[[28.59,43.74],[28.56,43.5],[28.47,43.39],[28.13,43.4],[27.93,43.19],[27.89,42.75],[27.48,42.47],[27.71,42.35],[28.01,41.97],[27.53,41.92],[27.24,42.09],[26.62,41.96],[26.32,41.72],[26.11,41.73],[26.14,41.39],[25.92,41.31],[25.25,41.24],[24.99,41.36],[24.77,41.36],[24.49,41.56],[22.92,41.34],[23.0,41.74],[22.84,41.99],[22.34,42.31],[22.52,42.44],[22.44,42.63],[22.47,42.84],[22.71,42.88],[22.98,43.19],[22.55,43.45],[22.37,43.78],[22.42,44.01],[22.6,44.08],[22.71,44.24],[23.03,44.08],[22.87,43.95],[22.92,43.83],[23.22,43.87],[25.5,43.67],[26.22,44.01],[27.09,44.17],[27.43,44.02],[27.88,43.99],[28.05,43.82],[28.22,43.77],[28.59,43.74]]]}},{"type":"Feature","properties":{"name":"Hungary","iso":"HU"},"geometry":{"type":"Polygon","coordinates":[[[16.09,46.86],[16.45,47.01],[16.44,47.4],[16.68,47.54],[16.42,47.67],[16.59,47.75],[16.79,47.68],[17.07,47.71],[17.04,47.87],[17.17,48.01],[17.76,47.77],[18.72,47.79],[18.79,48.0],[19.47,48.11],[19.63,48.22],[19.95,48.15],[20.33,48.3],[20.49,48.53],[21.38,48.55],[21.77,48.34],[22.25,48.41],[22.35,48.26],[22.84,48.06],[22.88,47.95],[22.61,47.77],[22.29,47.73],[22.0,47.51],[22.0,47.4],[21.66,47.04],[21.5,46.7],[21.32,46.61],[21.26,46.41],[21.04,46.24],[20.84,46.26],[20.61,46.13],[20.24,46.11],[19.53,46.16],[19.28,46.0],[18.67,45.91],[18.36,45.75],[17.81,45.79],[17.31,46.0],[16.87,46.34],[16.52,46.5],[16.28,46.86],[16.09,46.86]]]}},{"type":"Feature","properties":{"name":"Moldova","iso":"MD"},"geometry":{"type":"Polygon","coordinates":[[[28.21,45.45],[28.07,45.6],[28.16,45.65],[28.1,45.97],[28.24,46.64],[28.07,46.98],[27.61,47.34],[26.98,48.16],[26.64,48.29],[26.85,48.39],[27.23,48.37],[27.55,48.48],[28.29,48.24],[28.46,48.09],[28.53,48.15],[28.77,48.12],[28.92,47.95],[29.13,47.96],[29.21,47.77],[29.13,47.49],[29.54,47.27],[29.57,46.96],[29.88,46.83],[29.92,46.54],[30.13,46.42],[29.84,46.35],[29.71,46.45],[29.61,46.4],[29.3,46.47],[29.2,46.38],[29.19,46.52],[28.96,46.46],[29.01,46.18],[28.95,46.05],[28.49,45.67],[28.5,45.52],[28.21,45.45]]]}},{"type":"Feature","properties":{"name":"Romania","iso":"RO"},"geometry":{"type":"Polygon","coordinates":[[[28.59,43.74],[28.22,43.77],[28.05,43.82],[27.88,43.99],[27.43,44.02],[27.09,44.17],[26.22,44.01],[25.5,43.67],[23.22,43.87],[22.92,43.83],[22.87,43.95],[23.03,44.08],[22.49,44.44],[22.72,44.61],[22.5,44.71],[22.09,44.54],[21.36,44.83],[21.53,44.9],[21.35,45.01],[21.49,45.15],[20.79,45.47],[20.77,45.75],[20.24,46.11],[21.12,46.28],[22.0,47.4],[22.0,47.51],[22.29,47.73],[22.61,47.77],[23.14,48.09],[24.18,47.91],[24.58,47.93],[24.89,47.72],[25.46,47.91],[26.16,47.99],[26.31,48.2],[26.79,48.26],[27.08,48.05],[27.61,47.34],[28.07,46.98],[28.24,46.64],[28.1,45.97],[28.16,45.65],[28.07,45.6],[28.21,45.45],[28.45,45.29],[28.76,45.23],[28.78,45.31],[29.4,45.42],[29.71,45.26],[29.56,44.84],[29.05,44.76],[29.1,44.98],[28.89,44.92],[28.93,44.81],[28.81,44.57],[28.89,44.57],[28.65,44.3],[28.59,43.74]]]}},{"type":"Feature","properties":{"name":"Serbia","iso":"RS"},"geometry":{"type":"Polygon","coordinates":[[[22.71,44.24],[22.6,44.08],[22.42,44.01],[22.37,43.78],[22.55,43.45],[22.98,43.19],[22.94,43.1],[22.71,42.88],[22.47,42.84],[22.44,42.63],[22.53,42.48],[22.42,42.33],[21.56,42.25],[21.52,42.33],[21.75,42.67],[21.39,42.75],[21.4,42.83],[20.8,43.26],[20.62,43.2],[20.62,43.03],[20.34,42.83],[20.27,42.94],[19.61,43.17],[19.22,43.45],[19.25,43.58],[19.45,43.56],[19.5,43.64],[19.25,43.97],[19.58,44.04],[19.12,44.36],[19.35,44.88],[19.0,44.9],[19.09,44.93],[19.06,45.14],[19.14,45.2],[19.4,45.21],[19.0,45.4],[19.06,45.51],[18.92,45.6],[18.84,45.84],[19.07,46.01],[19.28,46.0],[19.53,46.16],[20.21,46.13],[20.77,45.75],[20.79,45.47],[21.49,45.15],[21.35,45.01],[21.53,44.9],[21.36,44.83],[22.09,44.54],[22.5,44.71],[22.64,44.65],[22.73,44.57],[22.55,44.54],[22.49,44.44],[22.71,44.24]]]}},{"type":"Feature","properties":{"name":"Ukraine","iso":"UA"},"geometry":{"type":"MultiPolygon","coordinates":[[[[23.66,51.31],[23.61,51.61],[23.71,51.64],[23.98,51.59],[24.36,51.87],[25.79,51.92],[27.14,51.75],[27.3,51.6],[27.69,51.57],[27.7,51.48],[27.86,51.59],[28.18,51.61],[28.6,51.54],[28.73,51.43],[29.1,51.63],[29.35,51.38],[30.16,51.48],[30.54,51.27],[30.63,51.36],[30.53,51.6],[30.58,51.69],[30.98,52.05],[31.57,52.11],[32.12,52.05],[32.28,52.11],[32.44,52.31],[32.81,52.25],[33.15,52.34],[33.74,52.34],[33.92,52.25],[34.11,51.98],[34.4,51.78],[34.38,51.72],[34.12,51.68],[34.27,51.34],[34.21,51.26],[34.71,51.17],[35.06,51.2],[35.16,51.06],[35.31,51.04],[35.44,50.73],[35.41,50.54],[35.59,50.37],[36.12,50.41],[36.62,50.21],[37.42,50.41],[37.7,50.11],[38.05,49.92],[38.26,50.05],[38.92,49.82],[39.17,49.86],[39.78,49.57],[40.08,49.58],[40.11,49.25],[39.89,49.06],[39.69,49.01],[40.0,48.82],[39.79,48.81],[39.64,48.59],[39.84,48.54],[39.85,48.3],[39.96,48.24],[39.74,47.84],[38.9,47.86],[38.64,47.67],[38.29,47.56],[38.21,47.09],[37.54,47.07],[37.34,46.92],[37.05,46.88],[36.79,46.71],[36.56,46.76],[36.28,46.66],[35.83,46.62],[35.4,46.38],[35.2,46.17],[35.01,46.11],[35.28,46.28],[35.23,46.44],[35.06,46.27],[34.85,46.19],[34.86,45.99],[35.0,45.73],[34.8,45.79],[34.69,45.98],[34.45,45.97],[34.35,46.06],[33.81,46.21],[33.66,46.22],[33.59,46.1],[33.43,46.06],[33.2,46.18],[32.48,46.08],[31.83,46.28],[31.78,46.32],[31.99,46.36],[32.01,46.43],[31.55,46.55],[32.36,46.47],[32.58,46.62],[32.35,46.56],[32.04,46.64],[31.94,46.78],[31.94,46.98],[31.76,47.21],[31.91,46.93],[31.87,46.65],[31.53,46.66],[31.56,46.78],[31.4,46.63],[30.8,46.55],[30.66,46.27],[30.22,45.87],[29.63,45.72],[29.71,45.26],[29.4,45.42],[28.78,45.31],[28.76,45.23],[28.45,45.29],[28.21,45.45],[28.5,45.52],[28.49,45.67],[28.95,46.05],[29.01,46.18],[28.96,46.46],[29.19,46.52],[29.2,46.38],[29.3,46.47],[29.61,46.4],[29.71,46.45],[29.84,46.35],[30.13,46.42],[29.92,46.54],[29.88,46.83],[29.57,46.96],[29.54,47.27],[29.13,47.49],[29.21,47.77],[29.13,47.96],[28.92,47.95],[28.77,48.12],[28.53,48.15],[28.46,48.09],[28.29,48.24],[27.55,48.48],[27.23,48.37],[26.85,48.39],[26.31,48.2],[26.16,47.99],[25.46,47.91],[24.89,47.72],[24.48,47.95],[24.18,47.91],[23.14,48.09],[22.88,47.95],[22.77,48.11],[22.58,48.13],[22.35,48.26],[22.25,48.41],[22.13,48.41],[22.14,48.57],[22.54,49.07],[22.85,49.06],[22.71,49.17],[22.65,49.54],[22.71,49.61],[23.71,50.38],[23.97,50.41],[24.09,50.53],[23.98,50.79],[24.1,50.87],[23.66,51.31]]],[[[31.64,46.27],[32.15,46.15],[31.56,46.26],[31.51,46.37],[31.64,46.27]]]]}}]}
+</script>
+
+<!-- Relief markers - coordonate reale ale principalelor unități de relief din vecini -->
+<script id="relief-markers-data" type="application/json">
+[
+  {"name":"Munții Maramureșului","kind":"mt","country":"🇺🇦 Ucraina","lat":48.15,"lng":24.50,"detail":"Vf. Hoverla 2.061 m — cel mai înalt din Carpații Ucraineni, prelungire a Carpaților Orientali."},
+  {"name":"Podișul Podoliei","kind":"pod","country":"🇺🇦 Ucraina","lat":49.20,"lng":26.50,"detail":"300–400 m · Se continuă cu Podișul Moldovei (RO)."},
+  {"name":"Munții Crimeei","kind":"mt","country":"🇺🇦 Ucraina","lat":44.60,"lng":34.30,"detail":"Vf. Roman-Koș 1.545 m · Peninsula Crimeea."},
+  {"name":"Câmpia Mării Negre","kind":"camp","country":"🇺🇦 Ucraina","lat":46.50,"lng":32.00,"detail":"Cernoziomuri fertile · Se continuă cu Delta Dunării (RO)."},
+
+  {"name":"Podișul Moldovei Centrale (Codrii)","kind":"pod","country":"🇲🇩 R. Moldova","lat":47.30,"lng":28.30,"detail":"Vf. Bălănești 430 m — cel mai înalt punct al Moldovei. Aceeași unitate ca Pod. Moldovei (RO)."},
+  {"name":"Câmpia Bălților","kind":"camp","country":"🇲🇩 R. Moldova","lat":47.90,"lng":27.80,"detail":"Nord · Stepa Bălților · cernoziomuri."},
+  {"name":"Câmpia Moldovei de Sud (Bugeacul)","kind":"camp","country":"🇲🇩 R. Moldova","lat":46.10,"lng":28.60,"detail":"Stepă sudică."},
+
+  {"name":"Munții Balcani (Stara Planina)","kind":"mt","country":"🇧🇬 Bulgaria","lat":42.80,"lng":25.00,"detail":"Vf. Botev 2.376 m — lanțul principal, dă numele Peninsulei Balcanice."},
+  {"name":"Munții Rodopi","kind":"mt","country":"🇧🇬 Bulgaria","lat":41.70,"lng":25.00,"detail":"Masiv granitic · vecin cu Munții Rila (Vf. Musala 2.925 m — cel mai înalt din Pen. Balcanică)."},
+  {"name":"Câmpia Dunării de Nord","kind":"camp","country":"🇧🇬 Bulgaria","lat":43.70,"lng":25.00,"detail":"De-a lungul Dunării · oglinda Câmpiei Române peste fluviu."},
+  {"name":"Câmpia Traciei","kind":"camp","country":"🇧🇬 Bulgaria","lat":42.10,"lng":25.80,"detail":"Între Balcani și Rodopi · Valea Mariței."},
+  {"name":"Podișul Dobrogei Bulgare (Ludogorie)","kind":"pod","country":"🇧🇬 Bulgaria","lat":43.70,"lng":27.00,"detail":"Platou calcaros · aceeași unitate cu Pod. Dobrogei de Sud (RO)."},
+
+  {"name":"Câmpia Panonică (Voivodina)","kind":"camp","country":"🇷🇸 Serbia","lat":45.30,"lng":20.00,"detail":"Continuare a Câmpiei Pannonice · Dunăre + Tisa + Sava."},
+  {"name":"Munții Banatului Sârbesc","kind":"mt","country":"🇷🇸 Serbia","lat":44.60,"lng":21.90,"detail":"Prelungesc Munții Banatului (RO) · despărțiți de Porțile de Fier."},
+  {"name":"Munții Dinarici","kind":"mt","country":"🇷🇸 Serbia","lat":43.50,"lng":19.50,"detail":"Lanț alpin spre Adriatica."},
+  {"name":"Podișul Šumadija","kind":"pod","country":"🇷🇸 Serbia","lat":44.00,"lng":20.80,"detail":"Centrul Serbiei · dealuri și platouri."},
+  {"name":"Defileul Porților de Fier","kind":"mt","country":"🇷🇸 Serbia","lat":44.67,"lng":22.25,"detail":"Cel mai mare defileu european · graniță cu RO."},
+
+  {"name":"Câmpia Mare — Alföld (Câmpia Pannonică)","kind":"camp","country":"🇭🇺 Ungaria","lat":47.10,"lng":20.50,"detail":"Cea mai întinsă unitate din Ungaria. Continuare directă a Câmpiei de Vest (RO)."},
+  {"name":"Câmpia Mică — Kisalföld","kind":"camp","country":"🇭🇺 Ungaria","lat":47.65,"lng":17.30,"detail":"NV · spre granița cu Slovacia."},
+  {"name":"Munții Mátra","kind":"mt","country":"🇭🇺 Ungaria","lat":47.87,"lng":20.00,"detail":"Vf. Kékes 1.014 m — cel mai înalt vârf al Ungariei."},
+  {"name":"Dealurile Transdanubiei (Dunántúl)","kind":"pod","country":"🇭🇺 Ungaria","lat":47.00,"lng":18.00,"detail":"V de Dunăre · zonă colinară."},
+  {"name":"Lacul Balaton","kind":"camp","country":"🇭🇺 Ungaria","lat":46.85,"lng":17.75,"detail":"Cel mai mare lac din Europa Centrală (594 km²)."}
+]
+</script>
+
+<script>
+// ================== Leaflet map for vecini relief ==================
+(function() {
+  var mapInstance = null;
+  var currentTileLayer = null;
+  var layers = { ro: null, vec: null, reliefmk: null, caps: null };
+
+  var tileProviders = {
+    osm: {
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      options: {
+        maxZoom: 19,
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        subdomains: 'abc'
+      }
+    },
+    topo: {
+      url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+      options: {
+        maxZoom: 17,
+        attribution: '© <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
+        subdomains: 'abc'
+      }
+    },
+    satellite: {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      options: {
+        maxZoom: 18,
+        attribution: 'Tiles © Esri — Source: Esri, Maxar, GeoEye, Earthstar Geographics'
+      }
+    },
+    shaded: {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}',
+      options: {
+        maxZoom: 13,
+        attribution: 'Tiles © Esri'
+      }
+    }
+  };
+
+  // Ordinea de fallback: dacă primul eșuează, încearcă următorul
+  var reliefFallbackOrder = ['osm', 'topo', 'satellite', 'shaded'];
+
+  // Status banner local (duplicate per IIFE scope)
+  function setReliefStatus(html, kind) {
+    var c = document.getElementById('leaflet-map');
+    if (!c) return;
+    var bar = c.querySelector('.map-status-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.className = 'map-status-bar';
+      bar.style.cssText = 'position:absolute;top:8px;left:8px;right:8px;padding:8px 12px;border-radius:6px;font-family:monospace;font-size:11px;line-height:1.4;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.5);pointer-events:none';
+      c.style.position = 'relative';
+      c.appendChild(bar);
+    }
+    var colors = {
+      info: 'background:rgba(91,156,246,.92);color:#fff;border:1px solid #5b9cf6',
+      ok:   'background:rgba(107,219,158,.92);color:#000;border:1px solid #6bdb9e',
+      err:  'background:rgba(240,96,96,.95);color:#fff;border:1px solid #f06060'
+    };
+    bar.style.cssText += ';' + (colors[kind] || colors.info);
+    bar.innerHTML = html;
+  }
+  function clearReliefStatus() {
+    var c = document.getElementById('leaflet-map');
+    if (!c) return;
+    var bar = c.querySelector('.map-status-bar');
+    if (bar) bar.remove();
+  }
+
+  var lTriesRelief = 0;
+  function initMap() {
+    if (mapInstance) return;
+    if (typeof L === 'undefined') {
+      lTriesRelief++;
+      if (lTriesRelief < 50) {
+        setReliefStatus('⏳ Se încarcă Leaflet... (încercare ' + lTriesRelief + '/50)', 'info');
+        setTimeout(initMap, 200);
+      } else {
+        setReliefStatus('⚠ Leaflet.js nu s-a putut încărca după 10s.<br>Posibil CDN blocat.', 'err');
+      }
+      return;
+    }
+    var el = document.getElementById('leaflet-map');
+    if (!el) return;
+
+    setReliefStatus('✓ Leaflet OK. Se inițializează harta...', 'info');
+    try {
+      mapInstance = L.map('leaflet-map', {
+        center: [46.0, 25.5],
+        zoom: 6,
+        minZoom: 5,
+        maxZoom: 13,
+        zoomControl: true,
+        scrollWheelZoom: true,
+        attributionControl: true
+      });
+    } catch(e) {
+      setReliefStatus('⚠ Eroare L.map(): ' + (e && e.message || e), 'err');
+      return;
+    }
+
+    setTileLayer('osm');
+    try { addBorders(); } catch(e) { setReliefStatus('⚠ addBorders: '+(e.message||e), 'err'); }
+    try { addReliefMarkers(); } catch(e) { setReliefStatus('⚠ addReliefMarkers: '+(e.message||e), 'err'); }
+    try { addCapitals(); } catch(e) { setReliefStatus('⚠ addCapitals: '+(e.message||e), 'err'); }
+  }
+
+  function setTileLayer(name, isAutoFallback) {
+    if (!mapInstance) return;
+    if (currentTileLayer) mapInstance.removeLayer(currentTileLayer);
+    var cfg = tileProviders[name];
+    if (!cfg) return;
+    setReliefStatus('⏳ Se încarcă tile-uri (' + name + ')...', 'info');
+    currentTileLayer = L.tileLayer(cfg.url, cfg.options);
+    var tileErrors = 0, tileLoads = 0, fallbackDone = false;
+
+    function tryFallback(reason) {
+      if (fallbackDone) return;
+      fallbackDone = true;
+      var idx = reliefFallbackOrder.indexOf(name);
+      var nextName = (idx >= 0 && idx < reliefFallbackOrder.length - 1) ? reliefFallbackOrder[idx+1] : null;
+      if (nextName) {
+        setReliefStatus('⚠ ' + reason + '<br>Se încearcă automat: <strong>' + nextName + '</strong>', 'info');
+        setTimeout(function(){ setTileLayer(nextName, true); }, 500);
+      } else {
+        setReliefStatus('⚠ Toate sursele de tile-uri sunt blocate pe această rețea.<br>Verifică conexiunea sau încearcă altă rețea.', 'err');
+      }
+    }
+
+    currentTileLayer.on('tileerror', function() {
+      tileErrors++;
+      if (tileErrors >= 3 && tileLoads === 0) {
+        tryFallback('Tile-uri blocate: ' + cfg.url.split('/')[2]);
+      }
+    });
+    currentTileLayer.on('tileload', function() {
+      tileLoads++;
+      if (tileLoads === 1) clearReliefStatus();
+    });
+    currentTileLayer.addTo(mapInstance);
+
+    // Safety timeout: dacă în 4s nu s-a încărcat NICIUN tile, fallback
+    setTimeout(function() {
+      if (tileLoads === 0 && !fallbackDone) {
+        tryFallback('Timeout 4s: ' + cfg.url.split('/')[2] + ' nu răspunde');
+      }
+    }, 4000);
+
+    // Update button states
+    ['osm','topo','satellite','shaded'].forEach(function(n) {
+      var b = document.getElementById('map-layer-'+n);
+      if (b) b.classList.toggle('active', n === name);
+    });
+  }
+  window.setMapLayer = function(name) { setTileLayer(name, false); };
+
+  function addBorders() {
+    var dataEl = document.getElementById('borders-data');
+    if (!dataEl) return;
+    var data = JSON.parse(dataEl.textContent);
+
+    // Romania — thick gold outline
+    var ro = { type: 'FeatureCollection', features: data.features.filter(function(f){ return f.properties.name === 'Romania'; }) };
+    var vec = { type: 'FeatureCollection', features: data.features.filter(function(f){ return f.properties.name !== 'Romania'; }) };
+
+    layers.ro = L.geoJSON(ro, {
+      style: {
+        color: '#e8a84c',
+        weight: 3.5,
+        opacity: 1,
+        fillColor: '#e8a84c',
+        fillOpacity: 0.06,
+        dashArray: null
+      }
+    }).addTo(mapInstance);
+
+    // Add "ROMÂNIA" label at its centroid
+    var c = layers.ro.getBounds().getCenter();
+    var roLabel = L.marker(c, {
+      icon: L.divIcon({
+        className: 'ro-label',
+        html: '<div style="font-family:\'Playfair Display\',serif;font-size:18px;font-weight:900;color:#e8a84c;letter-spacing:.18em;text-shadow:0 0 3px #000,0 0 3px #000,0 0 6px #000,1px 1px 0 #000,-1px -1px 0 #000;white-space:nowrap;pointer-events:none">ROMÂNIA</div>',
+        iconSize: [140, 30],
+        iconAnchor: [70, 15]
+      }),
+      interactive: false,
+      keyboard: false
+    }).addTo(mapInstance);
+    layers.ro.roLabel = roLabel;
+
+    // Neighbors — thinner gold dashed outline
+    layers.vec = L.geoJSON(vec, {
+      style: {
+        color: '#f0c07a',
+        weight: 1.8,
+        opacity: 0.85,
+        fill: false,
+        dashArray: '5,4'
+      },
+      onEachFeature: function(feature, layer) {
+        var flagMap = {'Ukraine':'🇺🇦','Hungary':'🇭🇺','Serbia':'🇷🇸','Bulgaria':'🇧🇬','Moldova':'🇲🇩'};
+        var roNameMap = {'Ukraine':'Ucraina','Hungary':'Ungaria','Serbia':'Serbia','Bulgaria':'Bulgaria','Moldova':'Republica Moldova'};
+        var name = feature.properties.name;
+        layer.bindTooltip(
+          '<div style="font-family:\'Playfair Display\',serif;font-size:13px;font-weight:700;color:#e8a84c">' +
+          (flagMap[name]||'') + ' ' + (roNameMap[name]||name) + '</div>',
+          { sticky: true, direction: 'top', className: 'custom-tooltip' }
+        );
+      }
+    }).addTo(mapInstance);
+  }
+
+  function addReliefMarkers() {
+    var dataEl = document.getElementById('relief-markers-data');
+    if (!dataEl) return;
+    var markers = JSON.parse(dataEl.textContent);
+
+    var kindStyle = {
+      mt:   { emoji: '⛰️', color: '#8b5a3c', bg: 'rgba(139,90,60,.95)',  typeLabel:'Munți' },
+      pod:  { emoji: '🏞️', color: '#c9943a', bg: 'rgba(201,148,58,.95)', typeLabel:'Podiș / Dealuri' },
+      camp: { emoji: '🌾', color: '#5a8c5a', bg: 'rgba(90,140,90,.95)',  typeLabel:'Câmpie' }
+    };
+
+    var grp = L.layerGroup();
+    markers.forEach(function(m) {
+      var s = kindStyle[m.kind] || kindStyle.mt;
+      var icon = L.divIcon({
+        className: 'relief-marker',
+        html: '<div style="display:inline-block;background:'+s.bg+';color:#fff;border:1.5px solid #fff;border-radius:14px;padding:3px 8px;font-family:\'Source Sans 3\',sans-serif;font-size:10.5px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.6);letter-spacing:.02em;cursor:pointer">'+s.emoji+' '+m.name+'</div>',
+        iconSize: null,
+        iconAnchor: [0, 0]
+      });
+      var mk = L.marker([m.lat, m.lng], { icon: icon });
+      mk.bindPopup(
+        '<div style="font-family:\'Source Sans 3\',sans-serif;min-width:220px">' +
+          '<div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:'+s.color+';font-weight:700;margin-bottom:4px">'+s.emoji+' '+s.typeLabel+'</div>' +
+          '<div style="font-family:\'Playfair Display\',serif;font-size:15px;font-weight:700;color:#1a1a1a;line-height:1.2;margin-bottom:3px">'+m.name+'</div>' +
+          '<div style="font-size:.72rem;color:#666;margin-bottom:6px">'+m.country+'</div>' +
+          '<div style="font-size:.8rem;color:#333;line-height:1.5">'+m.detail+'</div>' +
+        '</div>',
+        { maxWidth: 300, className: 'relief-popup' }
+      );
+      grp.addLayer(mk);
+    });
+    layers.reliefmk = grp;
+    grp.addTo(mapInstance);
+  }
+
+  function addCapitals() {
+    var caps = [
+      {name:'București',lat:44.4268,lng:26.1025,flag:'🇷🇴',country:'România',isRO:true},
+      {name:'Kiev',lat:50.4501,lng:30.5234,flag:'🇺🇦',country:'Ucraina'},
+      {name:'Budapesta',lat:47.4979,lng:19.0402,flag:'🇭🇺',country:'Ungaria'},
+      {name:'Belgrad',lat:44.7866,lng:20.4489,flag:'🇷🇸',country:'Serbia'},
+      {name:'Sofia',lat:42.6977,lng:23.3219,flag:'🇧🇬',country:'Bulgaria'},
+      {name:'Chișinău',lat:47.0105,lng:28.8638,flag:'🇲🇩',country:'R. Moldova'}
+    ];
+    var grp = L.layerGroup();
+    caps.forEach(function(c) {
+      var dotColor = c.isRO ? '#e8a84c' : '#5b9cf6';
+      var ringColor = c.isRO ? '#fff' : '#fff';
+      var icon = L.divIcon({
+        className: 'capital-marker',
+        html:
+          '<div style="position:relative">' +
+            '<div style="width:12px;height:12px;border-radius:50%;background:'+dotColor+';border:2.5px solid '+ringColor+';box-shadow:0 0 0 1px rgba(0,0,0,.5),0 2px 5px rgba(0,0,0,.6)"></div>' +
+            '<div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(20,25,40,.92);color:#fff;font-family:\'Source Sans 3\',sans-serif;font-size:11px;font-weight:700;padding:2px 7px;border-radius:3px;border:1px solid '+dotColor+';white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.5)">'+c.flag+' '+c.name+'</div>' +
+          '</div>',
+        iconSize: [12, 12], iconAnchor: [6, 6]
+      });
+      var mk = L.marker([c.lat, c.lng], { icon: icon, zIndexOffset: 1000 });
+      mk.bindPopup('<div style="font-family:\'Source Sans 3\',sans-serif"><strong>'+c.flag+' '+c.name+'</strong><br><span style="color:#666">Capitala '+c.country+'</span></div>');
+      grp.addLayer(mk);
+    });
+    layers.caps = grp;
+    grp.addTo(mapInstance);
+  }
+
+  window.toggleLayer = function(name, show) {
+    var layer = layers[name];
+    if (!layer || !mapInstance) return;
+    if (show) {
+      if (!mapInstance.hasLayer(layer)) layer.addTo(mapInstance);
+      if (name === 'ro' && layer.roLabel && !mapInstance.hasLayer(layer.roLabel)) layer.roLabel.addTo(mapInstance);
+    } else {
+      if (mapInstance.hasLayer(layer)) mapInstance.removeLayer(layer);
+      if (name === 'ro' && layer.roLabel && mapInstance.hasLayer(layer.roLabel)) mapInstance.removeLayer(layer.roLabel);
+    }
+  };
+
+  // Kick the map repeatedly after it becomes visible — on mobile the container
+  // often has zero dimensions at first paint. invalidateSize() must be called
+  // AFTER layout settles. We do it in an escalating schedule.
+  function kickMap() {
+    if (!mapInstance) return;
+    var el = document.getElementById('leaflet-map');
+    if (!el) return;
+    if (el.clientWidth === 0 || el.clientHeight === 0) {
+      // Container not laid out yet — retry
+      return;
+    }
+    mapInstance.invalidateSize(true);
+  }
+
+  function ensureMap() {
+    var sec = document.getElementById('sec-relief-vecini');
+    if (!sec || !sec.classList.contains('active')) return;
+    initMap();
+    // Escalating kicks so we hit the moment the container actually has size
+    [30, 120, 300, 600, 1000].forEach(function(ms) {
+      setTimeout(kickMap, ms);
+    });
+    // Also kick on next animation frames
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(function() { requestAnimationFrame(kickMap); });
+    }
+  }
+
+  // Hook into ALL navigation entry points (sidebar + dropdown both call showSection via navTo)
+  var origShowSection = window.showSection;
+  if (origShowSection) {
+    window.showSection = function(id, btn) {
+      origShowSection(id, btn);
+      if (id === 'relief-vecini') ensureMap();
+    };
+  }
+
+  // If section is already active on load (e.g. deep link, or default state)
+  document.addEventListener('DOMContentLoaded', ensureMap);
+  if (document.readyState !== 'loading') ensureMap();
+
+  // Extra safety: IntersectionObserver fires whenever the map container
+  // actually enters the viewport/becomes visible. Works reliably on mobile.
+  if (typeof IntersectionObserver !== 'undefined') {
+    var tryObserve = function() {
+      var el = document.getElementById('leaflet-map');
+      if (!el) { setTimeout(tryObserve, 200); return; }
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            initMap();
+            kickMap();
+            // one more after layout fully settles
+            setTimeout(kickMap, 250);
+          }
+        });
+      }, { threshold: 0.01 });
+      io.observe(el);
+    };
+    tryObserve();
+  }
+
+  // Re-invalidate on resize AND orientationchange (mobile rotation)
+  var resizeTimer;
+  function handleResize() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(kickMap, 150);
+  }
+  window.addEventListener('resize', handleResize);
+  window.addEventListener('orientationchange', function() {
+    setTimeout(kickMap, 200);
+    setTimeout(kickMap, 500);
+  });
+})();
+</script>
+
+<!-- ============ Leaflet map for "Vecinii României" section ============ -->
+<script>
+(function() {
+  var vMap = null;
+  var vTile = null;
+  var vLayers = { countries: null, caps: null };
+
+  var vTileProviders = {
+    osm: {
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      options: {
+        maxZoom: 19,
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        subdomains: 'abc'
+      }
+    },
+    topo: {
+      url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+      options: {
+        maxZoom: 17,
+        attribution: '© <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
+        subdomains: 'abc'
+      }
+    },
+    satellite: {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      options: {
+        maxZoom: 18,
+        attribution: 'Tiles © Esri'
+      }
+    }
+  };
+
+  var veciniFallbackOrder = ['osm', 'topo', 'satellite'];
+
+  // Detalii țări (frontieră, lungime, tip)
+  var countryInfo = {
+    'Romania':  { flag:'🇷🇴', nameRo:'România', ue:'ro', info:'5 vecini · ieșire la Marea Neagră (~245 km)' },
+    'Ukraine':  { flag:'🇺🇦', nameRo:'Ucraina', ue:'non-ue', info:'Frontieră: ~649 km — terestră + fluvială (Nord & Nord-Est)' },
+    'Hungary':  { flag:'🇭🇺', nameRo:'Ungaria', ue:'ue', info:'Frontieră: ~448 km — exclusiv terestră (cea mai scurtă)' },
+    'Serbia':   { flag:'🇷🇸', nameRo:'Serbia', ue:'non-ue', info:'Frontieră: ~546 km — terestră + Dunărea (Porțile de Fier)' },
+    'Bulgaria': { flag:'🇧🇬', nameRo:'Bulgaria', ue:'ue', info:'Frontieră: ~631 km — fluvială (Dunărea) + terestră' },
+    'Moldova':  { flag:'🇲🇩', nameRo:'Republica Moldova', ue:'non-ue', info:'Frontieră: ~681 km — fluvială (râul Prut)' }
+  };
+
+  var ueStyle = {
+    'ro':     { color:'#e8a84c', weight:3.2, fillColor:'#e8a84c', fillOpacity:0.28 },
+    'ue':     { color:'#5b9cf6', weight:2.2, fillColor:'#5b9cf6', fillOpacity:0.22 },
+    'non-ue': { color:'#f06060', weight:2.2, fillColor:'#f06060', fillOpacity:0.22 }
+  };
+
+  // === Status banner overlay ===
+  function setStatus(containerId, html, kind) {
+    var c = document.getElementById(containerId);
+    if (!c) return;
+    var bar = c.querySelector('.map-status-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.className = 'map-status-bar';
+      bar.style.cssText = 'position:absolute;top:8px;left:8px;right:8px;padding:8px 12px;border-radius:6px;font-family:monospace;font-size:11px;line-height:1.4;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.5);pointer-events:none';
+      c.style.position = 'relative';
+      c.appendChild(bar);
+    }
+    var colors = {
+      info: 'background:rgba(91,156,246,.92);color:#fff;border:1px solid #5b9cf6',
+      ok:   'background:rgba(107,219,158,.92);color:#000;border:1px solid #6bdb9e',
+      err:  'background:rgba(240,96,96,.95);color:#fff;border:1px solid #f06060'
+    };
+    bar.style.cssText += ';' + (colors[kind] || colors.info);
+    bar.innerHTML = html;
+  }
+  function clearStatus(containerId) {
+    var c = document.getElementById(containerId);
+    if (!c) return;
+    var bar = c.querySelector('.map-status-bar');
+    if (bar) bar.remove();
+  }
+
+  var lTriesVecini = 0;
+  function initVeciniMap() {
+    if (vMap) return;
+    if (typeof L === 'undefined') {
+      lTriesVecini++;
+      if (lTriesVecini < 50) { // 50 * 200ms = 10s
+        setStatus('leaflet-vecini-map', '⏳ Se încarcă Leaflet... (încercare ' + lTriesVecini + '/50)', 'info');
+        setTimeout(initVeciniMap, 200);
+      } else {
+        setStatus('leaflet-vecini-map',
+          '⚠ Leaflet.js nu s-a putut încărca după 10s.<br>Posibil CDN blocat (cdnjs.cloudflare.com).<br>Verifică conexiunea sau încearcă altă rețea.',
+          'err');
+      }
+      return;
+    }
+    var el = document.getElementById('leaflet-vecini-map');
+    if (!el) return;
+
+    setStatus('leaflet-vecini-map', '✓ Leaflet OK. Se inițializează harta...', 'info');
+
+    try {
+      vMap = L.map('leaflet-vecini-map', {
+        center: [46.0, 25.5],
+        zoom: 6,
+        minZoom: 4,
+        maxZoom: 12,
+        scrollWheelZoom: true
+      });
+    } catch(e) {
+      setStatus('leaflet-vecini-map', '⚠ Eroare L.map(): ' + (e && e.message || e), 'err');
+      return;
+    }
+
+    setVTileLayer('osm');
+    try { addVeciniCountries(); } catch(e) {
+      setStatus('leaflet-vecini-map', '⚠ addVeciniCountries: ' + (e.message||e), 'err');
+    }
+    try { addVeciniCapitals(); } catch(e) {
+      setStatus('leaflet-vecini-map', '⚠ addVeciniCapitals: ' + (e.message||e), 'err');
+    }
+  }
+
+  function setVTileLayer(name, isAutoFallback) {
+    if (!vMap) return;
+    if (vTile) vMap.removeLayer(vTile);
+    var cfg = vTileProviders[name];
+    if (!cfg) return;
+    setStatus('leaflet-vecini-map', '⏳ Se încarcă tile-uri (' + name + ')...', 'info');
+    vTile = L.tileLayer(cfg.url, cfg.options);
+    var tileErrors = 0, tileLoads = 0, fallbackDone = false;
+
+    function tryFallbackV(reason) {
+      if (fallbackDone) return;
+      fallbackDone = true;
+      var idx = veciniFallbackOrder.indexOf(name);
+      var nextName = (idx >= 0 && idx < veciniFallbackOrder.length - 1) ? veciniFallbackOrder[idx+1] : null;
+      if (nextName) {
+        setStatus('leaflet-vecini-map', '⚠ ' + reason + '<br>Se încearcă automat: <strong>' + nextName + '</strong>', 'info');
+        setTimeout(function(){ setVTileLayer(nextName, true); }, 500);
+      } else {
+        setStatus('leaflet-vecini-map', '⚠ Toate sursele de tile-uri sunt blocate pe această rețea.<br>Verifică conexiunea.', 'err');
+      }
+    }
+
+    vTile.on('tileerror', function(ev) {
+      tileErrors++;
+      if (tileErrors >= 3 && tileLoads === 0) {
+        tryFallbackV('Tile-uri blocate: ' + cfg.url.split('/')[2]);
+      }
+    });
+    vTile.on('tileload', function() {
+      tileLoads++;
+      if (tileLoads === 1) clearStatus('leaflet-vecini-map');
+    });
+    vTile.addTo(vMap);
+
+    setTimeout(function() {
+      if (tileLoads === 0 && !fallbackDone) {
+        tryFallbackV('Timeout 4s: ' + cfg.url.split('/')[2] + ' nu răspunde');
+      }
+    }, 4000);
+
+    ['osm','topo','satellite'].forEach(function(n) {
+      var b = document.getElementById('vec-layer-'+n);
+      if (b) b.classList.toggle('active', n === name);
+    });
+  }
+  window.setVeciniMapLayer = function(name) { setVTileLayer(name, false); };
+
+  function addVeciniCountries() {
+    var dataEl = document.getElementById('borders-data');
+    if (!dataEl) return;
+    var data = JSON.parse(dataEl.textContent);
+
+    vLayers.countries = L.geoJSON(data, {
+      style: function(feature) {
+        var info = countryInfo[feature.properties.name];
+        if (!info) return { color:'#3a4660', weight:1, fillOpacity:0 };
+        var s = ueStyle[info.ue];
+        return {
+          color: s.color, weight: s.weight, opacity: 1,
+          fillColor: s.fillColor, fillOpacity: s.fillOpacity,
+          dashArray: info.ue === 'ro' ? null : '4,3'
+        };
+      },
+      onEachFeature: function(feature, layer) {
+        var info = countryInfo[feature.properties.name];
+        if (!info) return;
+        var badgeStyle = info.ue === 'ue'
+          ? 'background:rgba(91,156,246,.15);color:#5b9cf6;border:1px solid rgba(91,156,246,.4)'
+          : info.ue === 'non-ue'
+            ? 'background:rgba(240,96,96,.12);color:#f06060;border:1px solid rgba(240,96,96,.4)'
+            : 'background:rgba(232,168,76,.15);color:#e8a84c;border:1px solid rgba(232,168,76,.4)';
+        var badge = info.ue === 'ue' ? 'UE' : info.ue === 'non-ue' ? 'non-UE' : 'România';
+        layer.bindPopup(
+          '<div style="font-family:\'Source Sans 3\',sans-serif;min-width:220px">' +
+            '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">' +
+              '<span style="font-size:1.4rem">'+info.flag+'</span>' +
+              '<div style="font-family:\'Playfair Display\',serif;font-size:1rem;font-weight:700;color:#1a1a1a;flex:1">'+info.nameRo+'</div>' +
+              '<span style="font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:10px;'+badgeStyle+'">'+badge+'</span>' +
+            '</div>' +
+            '<div style="font-size:.82rem;color:#555;line-height:1.45">'+info.info+'</div>' +
+          '</div>',
+          { maxWidth: 300 }
+        );
+        layer.bindTooltip(
+          '<div style="font-size:12px;font-weight:700">'+info.flag+' '+info.nameRo+'</div>',
+          { sticky:true, direction:'top', className:'custom-tooltip' }
+        );
+        layer.on('mouseover', function() {
+          this.setStyle({ weight: (ueStyle[info.ue].weight + 1.5), fillOpacity: ueStyle[info.ue].fillOpacity + 0.12 });
+        });
+        layer.on('mouseout', function() {
+          vLayers.countries.resetStyle(this);
+        });
+      }
+    }).addTo(vMap);
+  }
+
+  function addVeciniCapitals() {
+    var caps = [
+      {name:'București',lat:44.4268,lng:26.1025,flag:'🇷🇴',country:'România',isRO:true},
+      {name:'Kiev',lat:50.4501,lng:30.5234,flag:'🇺🇦',country:'Ucraina'},
+      {name:'Budapesta',lat:47.4979,lng:19.0402,flag:'🇭🇺',country:'Ungaria'},
+      {name:'Belgrad',lat:44.7866,lng:20.4489,flag:'🇷🇸',country:'Serbia'},
+      {name:'Sofia',lat:42.6977,lng:23.3219,flag:'🇧🇬',country:'Bulgaria'},
+      {name:'Chișinău',lat:47.0105,lng:28.8638,flag:'🇲🇩',country:'R. Moldova'}
+    ];
+    var grp = L.layerGroup();
+    caps.forEach(function(c) {
+      var dotColor = c.isRO ? '#e8a84c' : '#fff';
+      var icon = L.divIcon({
+        className: 'capital-marker',
+        html:
+          '<div style="position:relative">' +
+            '<div style="width:13px;height:13px;border-radius:50%;background:'+dotColor+';border:2.5px solid #1a1a1a;box-shadow:0 0 0 1.5px '+dotColor+',0 2px 5px rgba(0,0,0,.7)"></div>' +
+            '<div style="position:absolute;top:17px;left:50%;transform:translateX(-50%);background:rgba(20,25,40,.92);color:#fff;font-family:\'Source Sans 3\',sans-serif;font-size:11px;font-weight:700;padding:2px 7px;border-radius:3px;border:1px solid '+dotColor+';white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.5)">'+c.flag+' '+c.name+'</div>' +
+          '</div>',
+        iconSize: [13, 13], iconAnchor: [6, 6]
+      });
+      var mk = L.marker([c.lat, c.lng], { icon: icon, zIndexOffset: 1000 });
+      mk.bindPopup('<div style="font-family:\'Source Sans 3\',sans-serif"><strong>'+c.flag+' '+c.name+'</strong><br><span style="color:#666">Capitala '+c.country+'</span></div>');
+      grp.addLayer(mk);
+    });
+    vLayers.caps = grp;
+    grp.addTo(vMap);
+  }
+
+  function kickVMap() {
+    if (!vMap) return;
+    var el = document.getElementById('leaflet-vecini-map');
+    if (!el || el.clientWidth === 0 || el.clientHeight === 0) return;
+    vMap.invalidateSize(true);
+  }
+
+  function ensureVMap() {
+    var sec = document.getElementById('sec-vecini');
+    if (!sec || !sec.classList.contains('active')) return;
+    initVeciniMap();
+    [30,120,300,600,1000].forEach(function(ms){ setTimeout(kickVMap, ms); });
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(function(){ requestAnimationFrame(kickVMap); });
+    }
+  }
+
+  // Hook into ALL navigation paths
+  var origShow = window.showSection;
+  if (origShow && !origShow.__veciniHooked) {
+    window.showSection = function(id, btn) {
+      origShow(id, btn);
+      if (id === 'vecini') ensureVMap();
+    };
+    window.showSection.__veciniHooked = true;
+  }
+
+  // Init on load (vecini is the default active section)
+  document.addEventListener('DOMContentLoaded', ensureVMap);
+  if (document.readyState !== 'loading') ensureVMap();
+
+  // IntersectionObserver fallback
+  if (typeof IntersectionObserver !== 'undefined') {
+    var tryObs = function() {
+      var el = document.getElementById('leaflet-vecini-map');
+      if (!el) { setTimeout(tryObs, 200); return; }
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            initVeciniMap();
+            kickVMap();
+            setTimeout(kickVMap, 250);
+          }
+        });
+      }, { threshold: 0.01 });
+      io.observe(el);
+    };
+    tryObs();
+  }
+
+  // Resize + orientation
+  var rt;
+  window.addEventListener('resize', function() {
+    clearTimeout(rt); rt = setTimeout(kickVMap, 150);
+  });
+  window.addEventListener('orientationchange', function() {
+    setTimeout(kickVMap, 200); setTimeout(kickVMap, 500);
+  });
+})();
+</script>
+
+</body>
+</html>
