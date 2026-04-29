@@ -11,6 +11,7 @@
   var isEuropa = HERE === 'europa.html';
   var isRomania = HERE === 'romania.html';
   var isVecini = HERE === 'vecini.html';
+  var isSubiecte = HERE === 'subiecte.html';
   var isMap = isEuropa || isRomania; // pages that need header + dark theme
 
   // ─── Fonts ───
@@ -120,9 +121,10 @@
 
   // ─── Build platform nav ───
   var pages = [
-    { href: 'europa.html',  label: '\u{1F30D} Europa',  file: 'europa.html' },
-    { href: 'romania.html', label: '\u{1F5FA} România', file: 'romania.html' },
-    { href: 'vecini.html',  label: '\u{1F91D} Vecini',  file: 'vecini.html' }
+    { href: 'europa.html',   label: '\u{1F30D} Europa',    file: 'europa.html' },
+    { href: 'romania.html',  label: '\u{1F5FA} România',   file: 'romania.html' },
+    { href: 'vecini.html',   label: '\u{1F91D} Vecini',    file: 'vecini.html' },
+    { href: 'subiecte.html', label: '\u{1F4C4} Subiecte',  file: 'subiecte.html' }
   ];
 
   var nav = document.createElement('nav');
