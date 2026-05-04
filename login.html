@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Intră în cont · GeoBac</title>
+<meta name="description" content="Intră în contul tău GeoBac.">
+<meta name="theme-color" content="#0c1117">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230c1117'/%3E%3Ccircle cx='50' cy='50' r='26' fill='none' stroke='%2300d4aa' stroke-width='5'/%3E%3Cpath d='M24 50h52M50 24v52' stroke='%2300d4aa' stroke-width='3.5' opacity='.45'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%23f5a623'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0c1117;--surface:rgba(255,255,255,0.04);--surface2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8e6e1;--text2:rgba(232,230,225,0.65);--text3:rgba(232,230,225,0.40);
+  --teal:#00d4aa;--amber:#f5a623;--coral:#ff6b6b;--blue:#5b9cf6;
+  --font:'Outfit',sans-serif;--body:'DM Sans',sans-serif;
+}
+html,body{height:100%;}
+body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;line-height:1.6;}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;
+  background:radial-gradient(ellipse 60% 40% at 30% 15%,rgba(0,212,170,0.08) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 70% 85%,rgba(91,156,246,0.06) 0%,transparent 55%),var(--bg);}
+
+nav{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;max-width:1200px;width:100%;margin:0 auto;}
+.logo{font-family:var(--font);font-weight:800;font-size:20px;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;}
+.logo span{background:linear-gradient(135deg,var(--teal),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal);}
+.back{font-family:var(--font);font-size:13px;color:var(--text3);text-decoration:none;font-weight:500;transition:color 0.2s;}
+.back:hover{color:var(--teal);}
+
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;}
+.card{max-width:460px;width:100%;padding:44px 36px;border-radius:22px;background:var(--surface);border:1px solid var(--border2);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+
+.card-head{text-align:center;margin-bottom:32px;}
+.card-icon{width:56px;height:56px;margin:0 auto 16px;border-radius:16px;background:linear-gradient(135deg,rgba(0,212,170,0.2),rgba(91,156,246,0.15));border:1px solid rgba(0,212,170,0.25);display:flex;align-items:center;justify-content:center;font-size:26px;}
+.card h1{font-family:var(--font);font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
+.card .sub{color:var(--text2);font-size:14px;}
+
+.field{margin-bottom:16px;}
+label{display:block;font-family:var(--font);font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;}
+input{width:100%;padding:14px 16px;border-radius:10px;font-family:var(--body);font-size:15px;font-weight:500;color:var(--text);background:rgba(0,0,0,0.3);border:1px solid var(--border2);outline:none;transition:all 0.2s;}
+input::placeholder{color:var(--text3);}
+input:focus{border-color:var(--teal);background:rgba(0,0,0,0.45);box-shadow:0 0 0 3px rgba(0,212,170,0.12);}
+
+.msg{padding:12px 14px;border-radius:9px;font-size:13px;margin-bottom:16px;display:none;align-items:center;gap:8px;}
+.msg.show{display:flex;}
+.msg.err{background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.3);color:var(--coral);}
+.msg.ok{background:rgba(0,212,170,0.12);border:1px solid rgba(0,212,170,0.3);color:var(--teal);}
+.msg .ico{font-size:16px;flex-shrink:0;}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:11px;font-family:var(--font);font-weight:700;font-size:15px;color:var(--bg);background:linear-gradient(135deg,var(--teal),#00b894);border:none;cursor:pointer;transition:all 0.3s;letter-spacing:0.2px;}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,212,170,0.35);}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+.forgot{text-align:right;margin-top:-8px;margin-bottom:16px;}
+.forgot a{font-size:12px;color:var(--text3);text-decoration:none;font-family:var(--font);}
+.forgot a:hover{color:var(--teal);}
+
+.divider{display:flex;align-items:center;gap:14px;margin:24px 0;color:var(--text3);font-family:var(--font);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border2);}
+
+.purchase-box{padding:18px;border-radius:12px;background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.18);text-align:center;}
+.purchase-box p{color:var(--text2);font-size:13.5px;margin-bottom:12px;line-height:1.55;}
+.purchase-box a{display:inline-flex;align-items:center;gap:6px;color:var(--amber);font-family:var(--font);font-size:14px;font-weight:700;text-decoration:none;}
+.purchase-box a:hover{text-decoration:underline;}
+
+.help{margin-top:20px;text-align:center;color:var(--text3);font-size:12px;line-height:1.55;}
+.help a{color:var(--text2);text-decoration:none;}
+.help a:hover{color:var(--teal);}
+
+footer{text-align:center;padding:22px;font-size:12px;color:var(--text3);}
+
+@media(max-width:520px){.card{padding:32px 22px;}.card h1{font-size:22px;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo"><span class="dot"></span>Geo<span>Bac</span></a>
+  <a href="index.html" class="back">← Înapoi</a>
+</nav>
+
+<main>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon">🔑</div>
+      <h1>Intră în cont</h1>
+      <p class="sub">Folosește emailul și parola setate după plată</p>
+    </div>
+
+    <div id="msg" class="msg"></div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="adresa@email.com" autocomplete="email" required>
+    </div>
+
+    <div class="field">
+      <label for="password">Parolă</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+    </div>
+
+    <div class="forgot"><a href="forgot.html">Ai uitat parola?</a></div>
+
+    <button class="btn" id="submitBtn" onclick="doLogin()">Intră în cont →</button>
+
+    <div class="divider">nu ai cont?</div>
+
+    <div class="purchase-box">
+      <p>Abonează-te pentru a primi acces.<br>99 lei/lună, anulezi oricând.</p>
+      <a href="index.html#cumpara">Începe abonamentul — 99 lei/lună →</a>
+    </div>
+
+    <div class="help">
+      Probleme cu accesul?<br>
+      Scrie-ne la <a href="mailto:contact@geo-bac.com">contact@geo-bac.com</a>
+    </div>
+  </div>
+</main>
+
+<footer>GeoBac · Elbrowse</footer>
+
+<script>
+var SUPABASE_URL = 'https://bxbefvelonocuheavsri.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4YmVmdmVsb25vY3VoZWF2c3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMTk5MzAsImV4cCI6MjA5Mjc5NTkzMH0.lRJX8JITWrBl1Mb6IeETtwBddTEOw7FI5isa9oGsGDA';
+var STORAGE_KEY = 'sb-bxbefvelonocuheavsri-auth-token';
+
+function showMsg(text, type){
+  var m = document.getElementById('msg');
+  m.className = 'msg show ' + type;
+  m.innerHTML = '<span class="ico">' + (type==='ok'?'✓':'✕') + '</span>' + text;
+}
+
+function hideMsg(){
+  document.getElementById('msg').className = 'msg';
+}
+
+// Deja logat? Redirect direct
+try {
+  var existing = localStorage.getItem(STORAGE_KEY);
+  if(existing){
+    var sess = JSON.parse(existing);
+    if(sess && sess.access_token && sess.expires_at && Date.now()/1000 < sess.expires_at){
+      var params = new URLSearchParams(location.search);
+      var returnTo = params.get('return') || 'europa.html';
+      var allowed = ['europa.html','romania.html','vecini.html','subiecte.html'];
+      if(allowed.indexOf(returnTo) === -1) returnTo = 'europa.html';
+      location.href = returnTo;
+    }
+  }
+} catch(e){}
+
+// Enter key submits
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Enter') doLogin();
+});
+
+function doLogin(){
+  var email = document.getElementById('email').value.trim();
+  var password = document.getElementById('password').value;
+  var btn = document.getElementById('submitBtn');
+
+  hideMsg();
+
+  if(!email || email.indexOf('@') === -1){
+    showMsg('Introdu un email valid.', 'err');
+    return;
+  }
+  if(!password || password.length < 6){
+    showMsg('Parola trebuie să aibă cel puțin 6 caractere.', 'err');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Se verifică...';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', SUPABASE_URL + '/auth/v1/token?grant_type=password', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+  xhr.timeout = 10000;
+
+  xhr.onload = function(){
+    try {
+      var data = JSON.parse(xhr.responseText);
+
+      if(xhr.status === 200 && data.access_token){
+        // Salveaza sesiunea
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        showMsg('Autentificat! Te redirecționăm...', 'ok');
+
+        setTimeout(function(){
+          var params = new URLSearchParams(location.search);
+          var returnTo = params.get('return') || 'europa.html';
+          var allowed = ['europa.html','romania.html','vecini.html','subiecte.html'];
+          if(allowed.indexOf(returnTo) === -1) returnTo = 'europa.html';
+          location.href = returnTo;
+        }, 800);
+
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Intră în cont →';
+        if(data.error_description && data.error_description.indexOf('Invalid') !== -1){
+          showMsg('Email sau parolă greșită.', 'err');
+        } else if(data.error_description && data.error_description.indexOf('confirmed') !== -1){
+          showMsg('Contul nu a fost confirmat. Verifică emailul.', 'err');
+        } else {
+          showMsg('Eroare: ' + (data.error_description || data.msg || 'Încearcă din nou.'), 'err');
+        }
+      }
+    } catch(e){
+      btn.disabled = false;
+      btn.textContent = 'Intră în cont →';
+      showMsg('Eroare de conexiune. Încearcă din nou.', 'err');
+    }
+  };
+
+  xhr.onerror = xhr.ontimeout = function(){
+    btn.disabled = false;
+    btn.textContent = 'Intră în cont →';
+    showMsg('Eroare de conexiune. Verifică internetul.', 'err');
+  };
+
+  xhr.send(JSON.stringify({email: email, password: password}));
+}
+</script>
+
+</body>
+</html>
