@@ -4,6 +4,7 @@
 
   var PROTECTED = ['europa','romania','vecini','exercitii','subiecte','subiecte-ani-precedenti'];
 
+  if(location.pathname.startsWith('/protected/')) return;
   var page = (location.pathname.split('/').pop() || '').toLowerCase().replace(/\.html$/,'');
   if(!PROTECTED.includes(page)) return;
 
