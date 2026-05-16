@@ -63,7 +63,8 @@ export async function onRequest(context) {
     return new Response('Eroare la încărcarea conținutului.', { status: 503 });
   }
 
-  const html = await fileRes.text();
+  const html = (await fileRes.text())
+  .replace('<head>', '<head><base href="/">');
 
   return new Response(html, {
     status: 200,
