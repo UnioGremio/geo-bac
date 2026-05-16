@@ -18,6 +18,7 @@ export async function onRequest(context) {
     return Response.redirect('/login.html?return=' + page, 302);
   }
 
+  // 1. Verifică tokenul cu Supabase Auth
   const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -34,6 +35,7 @@ export async function onRequest(context) {
     return Response.redirect('/login.html?return=' + page, 302);
   }
 
+  // 2. Verifică is_premium
   const profileRes = await fetch(
     `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}&select=is_premium&limit=1`,
     {
@@ -52,6 +54,7 @@ export async function onRequest(context) {
     return Response.redirect('/index.html?motiv=neplata', 302);
   }
 
+  // 3. Fetch fișier din Supabase Storage server-side
   const fileRes = await fetch(
     `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${page}.html`
   );
