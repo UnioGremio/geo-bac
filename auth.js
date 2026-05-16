@@ -2,7 +2,7 @@
   var SUPABASE_URL = 'https://bxbefvelonocuheavsri.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4YmVmdmVsb25vY3VoZWF2c3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMTk5MzAsImV4cCI6MjA5Mjc5NTkzMH0.lRJX8JITWrBl1Mb6IeETtwBddTEOw7FI5isa9oGsGDA';
 
-  var PROTECTED = ['europa','romania','vecini','exercitii','subiecte','subiecte-ani-precedenti'];
+  var PROTECTED = ['europa','romania','vecini','exercitii-harta','subiecte','subiecte-ani-precedenti'];
 
   if(location.pathname.startsWith('/protected/')) return;
   var page = (location.pathname.split('/').pop() || '').toLowerCase().replace(/\.html$/,'');
