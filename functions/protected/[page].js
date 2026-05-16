@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://bxbefvelonocuheavsri.supabase.co';
 const BUCKET = 'protected-pages';
-const ALLOWED = ['europa','romania','vecini','exercitii','subiecte','subiecte-ani-precedenti'];
+const ALLOWED = ['europa','romania','vecini','exercitii-harta','subiecte','subiecte-ani-precedenti'];
 
 export async function onRequest(context) {
   const { request, params, env } = context;
