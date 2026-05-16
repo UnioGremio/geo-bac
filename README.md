@@ -1,4 +1,4 @@
-# GeoBac — Fișiere de deploy
+# GeoBac — Fișiere de deploy 
 
 ## Conținut
 - `index.html` — landing page (gratuit, public)
