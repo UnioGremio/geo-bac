@@ -67,16 +67,19 @@ export async function onRequest(context) {
  );
 
  if (!signedRes.ok) {
-   return new Response('Eroare la generarea accesului.', { status: 503 });
- }
+    const errText = await signedRes.text();
+    return new Response('Sign error: ' + errText, { status: 503 });
+  }
 
- const { signedURL } = await signedRes.json();
+  const signedData = await signedRes.json();
+  const signedURL = signedData.signedURL || signedData.signedUrl || signedData.url || '';
+  
+  const fileRes = await fetch(`${SUPABASE_URL}${signedURL}`);
 
- const fileRes = await fetch(`${SUPABASE_URL}${signedURL}`);
+  if (!fileRes.ok) {
+    return new Response('File error: ' + fileRes.status + ' URL: ' + SUPABASE_URL + signedURL, { status: 503 });
+  }
 
- if (!fileRes.ok) {
-   return new Response('Eroare la încărcarea conținutului.', { status: 503 });
- }
 
  const html = (await fileRes.text())
    .replace('<head>', '<head><base href="/">');
