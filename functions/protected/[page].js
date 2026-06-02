@@ -74,7 +74,11 @@ export async function onRequest(context) {
   const signedData = await signedRes.json();
   const signedURL = signedData.signedURL || signedData.signedUrl || signedData.url || '';
   
-  const fileRes = await fetch(`${SUPABASE_URL}${signedURL}`);
+  const fullURL = signedURL.startsWith('/storage') 
+  ? `${SUPABASE_URL}${signedURL}`
+  : `${SUPABASE_URL}/storage/v1${signedURL}`;
+const fileRes = await fetch(fullURL);
+
 
   if (!fileRes.ok) {
     return new Response('File error: ' + fileRes.status + ' URL: ' + SUPABASE_URL + signedURL, { status: 503 });
