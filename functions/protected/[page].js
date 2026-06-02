@@ -81,8 +81,7 @@ const fileRes = await fetch(fullURL);
 
 
   if (!fileRes.ok) {
-    return new Response('File error: ' + fileRes.status + ' URL: ' + SUPABASE_URL + signedURL, { status: 503 });
-  }
+   return new Response('Eroare la încărcarea conținutului.', { status: 503 });
 
 
  const html = (await fileRes.text())
