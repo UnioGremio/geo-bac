@@ -68,7 +68,7 @@ export async function onRequest(context) {
 
  if (!signedRes.ok) {
     return new Response('Eroare la generarea accesului.', { status: 503 });
-
+ }
 
   const signedData = await signedRes.json();
   const signedURL = signedData.signedURL || signedData.signedUrl || signedData.url || '';
