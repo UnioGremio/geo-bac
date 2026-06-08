@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exerciții BAC · Geografie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c1117;--bg2:#111820;--bg3:#162030;
+  --teal:#00d4aa;--teal2:#00a882;--teal-dim:rgba(0,212,170,.12);
+  --gold:#f5a623;--gold-dim:rgba(245,166,35,.12);
+  --red:#ff4d6d;--green:#39d98a;
+  --txt:#dde5ee;--txt2:#7a9ab5;--txt3:#3a5a75;
+  --card:rgba(22,32,48,.85);--border:rgba(0,212,170,.13);
+  --radius:14px;--font:'Outfit',sans-serif;--serif:'Cinzel',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(0,212,170,.06) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 50% at 80% 80%,rgba(245,166,35,.04) 0%,transparent 55%);
+  pointer-events:none;z-index:0}
+
+header{position:relative;z-index:10;text-align:center;padding:36px 20px 26px;border-bottom:1px solid var(--border)}
+.hdr-sub{font-family:var(--serif);font-size:10px;letter-spacing:5px;color:var(--teal);text-transform:uppercase;margin-bottom:10px}
+header h1{font-family:var(--serif);font-size:clamp(20px,4vw,34px);font-weight:700;color:#fff;letter-spacing:2px;margin-bottom:6px}
+.hdr-desc{color:var(--txt2);font-size:12.5px}
+
+.score-bar{display:flex;align-items:center;justify-content:center;gap:20px;padding:12px 20px;position:relative;z-index:10}
+.score-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt2)}
+.score-num{font-size:18px;font-weight:700;color:var(--txt);font-family:var(--serif)}
+.score-num.ok{color:var(--green)}.score-num.bad{color:var(--red)}
+.score-sep{width:1px;height:28px;background:var(--border)}
+
+.tab-nav{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:16px 16px 0;position:relative;z-index:10}
+.tab-btn{display:flex;align-items:center;gap:7px;padding:9px 18px;background:var(--card);border:1.5px solid var(--border);border-radius:50px;color:var(--txt2);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:all .22s;white-space:nowrap}
+.tab-btn .ico{font-size:15px}
+.tab-btn:hover{border-color:var(--teal);color:var(--txt)}
+.tab-btn.active{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);font-weight:600}
+
+.section{display:none;padding:20px 16px 60px;max-width:880px;margin:0 auto;position:relative;z-index:5;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.section-title{font-family:var(--serif);font-size:14px;letter-spacing:3px;color:var(--teal);text-transform:uppercase;text-align:center;margin-bottom:20px}
+
+.chap-select{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
+.chap-btn{padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--txt2);font-size:11px;font-family:var(--font);cursor:pointer;transition:all .18s}
+.chap-btn:hover,.chap-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+
+/* GRILĂ */
+.q-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:12px;transition:border-color .2s}
+.q-card.correct{border-color:var(--green);background:rgba(57,217,138,.07)}
+.q-card.wrong{border-color:var(--red);background:rgba(255,77,109,.07)}
+.q-num{font-size:10px;color:var(--txt3);font-weight:600;letter-spacing:1px;margin-bottom:7px}
+.q-text{font-size:14px;color:var(--txt);line-height:1.6;margin-bottom:14px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+@media(max-width:520px){.opts{grid-template-columns:1fr}}
+.opt{display:flex;align-items:flex-start;gap:9px;padding:9px 13px;background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.07);border-radius:9px;cursor:pointer;transition:all .16s;font-size:12.5px;color:var(--txt2);text-align:left}
+.opt:hover{border-color:var(--teal);color:var(--txt);background:var(--teal-dim)}
+.opt.selected{border-color:var(--teal);color:var(--txt);background:var(--teal-dim)}
+.opt.correct-ans{border-color:var(--green)!important;background:rgba(57,217,138,.15)!important;color:var(--green)!important}
+.opt.wrong-ans{border-color:var(--red)!important;background:rgba(255,77,109,.12)!important;color:var(--red)!important}
+.opt-lbl{font-weight:700;color:var(--teal);min-width:16px;font-size:13px}
+.q-feedback{margin-top:9px;font-size:12px;padding:7px 11px;border-radius:7px;display:none}
+.q-feedback.show{display:block}
+.q-feedback.ok{background:rgba(57,217,138,.1);color:var(--green);border:1px solid rgba(57,217,138,.25)}
+.q-feedback.err{background:rgba(255,77,109,.1);color:#ff8099;border:1px solid rgba(255,77,109,.2)}
+
+/* ADEVĂRAT/FALS */
+.tf-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:10px;transition:all .2s}
+.tf-card.correct{border-color:var(--green);background:rgba(57,217,138,.07)}
+.tf-card.wrong{border-color:var(--red);background:rgba(255,77,109,.07)}
+.tf-text{font-size:13.5px;color:var(--txt);line-height:1.6;margin-bottom:12px}
+.tf-btns{display:flex;gap:8px}
+.tf-btn{flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--border);background:transparent;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .16s;color:var(--txt2)}
+.tf-btn.t:hover,.tf-btn.t.picked{border-color:var(--green);background:rgba(57,217,138,.15);color:var(--green)}
+.tf-btn.f:hover,.tf-btn.f.picked{border-color:var(--red);background:rgba(255,77,109,.12);color:var(--red)}
+.tf-btn.t.correct,.tf-btn.f.correct{border-color:var(--green);background:rgba(57,217,138,.2);color:var(--green)}
+.tf-btn.t.wrong,.tf-btn.f.wrong{border-color:var(--red);background:rgba(255,77,109,.15);color:var(--red)}
+
+/* POTRIVIRE */
+.match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+@media(max-width:540px){.match-wrap{grid-template-columns:1fr}}
+.match-col h4{font-size:10px;letter-spacing:2px;color:var(--txt3);text-transform:uppercase;margin-bottom:9px;text-align:center}
+.drag-item{background:var(--card);border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;margin-bottom:6px;font-size:12.5px;color:var(--txt);cursor:grab;transition:all .18s;user-select:none;display:flex;align-items:center;gap:8px}
+.drag-item:active{cursor:grabbing;transform:scale(.97)}
+.drag-item.dragging{opacity:.4;border-color:var(--teal)}
+.drag-item.matched{border-color:var(--green);background:rgba(57,217,138,.1);cursor:default}
+.drag-ico{font-size:15px}
+.drop-zone{background:rgba(0,212,170,.04);border:2px dashed rgba(0,212,170,.2);border-radius:9px;padding:9px 13px;margin-bottom:6px;min-height:42px;font-size:12.5px;color:var(--txt3);transition:all .18s;display:flex;align-items:center;gap:8px}
+.drop-zone.drag-over{border-color:var(--teal);background:var(--teal-dim);color:var(--teal)}
+.drop-zone.filled{border-style:solid;border-color:var(--border);color:var(--txt);background:var(--card)}
+.drop-zone.correct-drop{border-color:var(--green);background:rgba(57,217,138,.1)}
+.drop-zone.wrong-drop{border-color:var(--red);background:rgba(255,77,109,.1)}
+.drop-label{font-size:11px;color:var(--txt3);margin-bottom:3px}
+.match-set{margin-bottom:32px}
+.match-set-title{font-family:var(--serif);font-size:13px;color:var(--gold);margin-bottom:12px;letter-spacing:1px}
+
+/* BUTOANE */
+.check-btn{display:block;margin:16px auto;padding:10px 28px;background:transparent;border:1.5px solid var(--teal);border-radius:50px;color:var(--teal);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.check-btn:hover{background:var(--teal-dim)}
+.reset-btn{display:flex;align-items:center;gap:6px;margin:10px auto;padding:7px 18px;background:transparent;border:1.5px solid var(--border);border-radius:50px;color:var(--txt2);font-family:var(--font);font-size:11.5px;cursor:pointer;transition:all .18s}
+.reset-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* RESULT */
+.result-card{background:linear-gradient(135deg,rgba(0,212,170,.08),rgba(245,166,35,.05));border:1.5px solid var(--teal);border-radius:var(--radius);padding:22px;text-align:center;margin-top:14px;display:none}
+.result-card.show{display:block}
+.result-emoji{font-size:38px;margin-bottom:7px}
+.result-card h3{font-family:var(--serif);font-size:19px;color:var(--teal);margin-bottom:5px}
+.result-card p{color:var(--txt2);font-size:13px}
+.result-pct{font-size:38px;font-weight:700;color:var(--gold);font-family:var(--serif);margin:7px 0}
+
+/* LEGEND CHIPS */
+.chap-legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:18px}
+.chip{padding:3px 10px;border-radius:20px;font-size:10.5px;border:1px solid var(--border);color:var(--txt3)}
+
+footer{text-align:center;padding:18px;color:var(--txt3);font-size:11px;border-top:1px solid var(--border);position:relative;z-index:5}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-sub">Bacalaureat 2026</div>
+  <h1>Exerciții · Geografie</h1>
+  <p class="hdr-desc">Grilă · Adevărat/Fals · Potrivire — Programă completă BAC</p>
+</header>
+
+<div class="score-bar">
+  <div class="score-item"><span class="score-num ok" id="sc-ok">0</span><span>Corecte</span></div>
+  <div class="score-sep"></div>
+  <div class="score-item"><span class="score-num bad" id="sc-bad">0</span><span>Greșite</span></div>
+  <div class="score-sep"></div>
+  <div class="score-item"><span class="score-num" id="sc-total">0</span><span>Total</span></div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('grila',this)"><span class="ico">📝</span> Grilă</button>
+  <button class="tab-btn" onclick="showTab('tf',this)"><span class="ico">⚖️</span> Adevărat / Fals</button>
+  <button class="tab-btn" onclick="showTab('match',this)"><span class="ico">🔗</span> Potrivire</button>
+</div>
+
+<!-- ═══════ GRILĂ ═══════ -->
+<div class="section active" id="sec-grila">
+  <p class="section-title">Întrebări Grilă</p>
+  <div class="chap-select" id="grila-chaps"></div>
+  <div id="grila-container"></div>
+  <button class="reset-btn" onclick="renderGrila()">↺ Alt set de întrebări</button>
+  <div class="result-card" id="grila-result"></div>
+</div>
+
+<!-- ═══════ ADEVĂRAT/FALS ═══════ -->
+<div class="section" id="sec-tf">
+  <p class="section-title">Adevărat sau Fals</p>
+  <div class="chap-select" id="tf-chaps"></div>
+  <div id="tf-container"></div>
+  <button class="reset-btn" onclick="renderTF()">↺ Alt set de enunțuri</button>
+  <div class="result-card" id="tf-result"></div>
+</div>
+
+<!-- ═══════ POTRIVIRE ═══════ -->
+<div class="section" id="sec-match">
+  <p class="section-title">Potrivire — Drag &amp; Drop</p>
+  <div id="match-container"></div>
+  <button class="check-btn" onclick="checkMatch()">✓ Verifică potrivirile</button>
+  <button class="reset-btn" onclick="buildMatch()">↺ Regenerează</button>
+  <div class="result-card" id="match-result"></div>
+</div>
+
+<footer>GeoBac · Exerciții interactive · Programă BAC 2026 — Europa, România, Uniunea Europeană</footer>
+
+<script>
+/* ══ SCORE ══ */
+let totalOk=0,totalBad=0,totalAns=0;
+function addScore(ok){
+  ok?totalOk++:totalBad++;totalAns++;
+  document.getElementById('sc-ok').textContent=totalOk;
+  document.getElementById('sc-bad').textContent=totalBad;
+  document.getElementById('sc-total').textContent=totalAns;
+}
+function showTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ══════════════════════════════════════════════════════
+   BAZA DE DATE — GRILĂ
+   Capitole conform programei BAC 2026:
+   1. Relief (Romania + Europa)
+   2. Râuri & Lacuri (Romania)
+   3. Climă (Romania + Europa)
+   4. Vegetație, Faună & Soluri
+   5. Geografie umană (Populație & Orașe)
+   6. Economie & Resurse
+   7. State europene & Capital
+   8. Uniunea Europeană
+   9. Dunărea & Marea Neagră
+   10. Țări vecine României
+   11. Transport european
+══════════════════════════════════════════════════════ */
+const GRILA_DATA = {
+
+  "Relief România": [
+    {q:"Care este cel mai înalt vârf din România?",opts:["Pietrosu (2303m)","Moldoveanu (2544m)","Negoiu (2535m)","Omu (2505m)"],a:1},
+    {q:"Carpații Meridionali se mai numesc și:",opts:["Carpații de Curbură","Alpii Transilvaniei","Carpații Occidentali","Munții Banatului"],a:1},
+    {q:"Depresiunea colinară a Transilvaniei este situată:",opts:["La vest de Carpați","Între arcul Carpaților Orientali, Meridionali și Occidentali","La est de Carpați","În sudul României"],a:1},
+    {q:"Podișul Moldovei este mărginit la vest de:",opts:["Câmpia Română","Subcarpații Moldovei","Podișul Dobrogei","Munții Apuseni"],a:1},
+    {q:"Câmpia Română se întinde pe direcția:",opts:["Nord-Sud","Vest-Est","Nord-Vest — Sud-Est","Est-Vest, de la Dunăre spre poalele Carpaților"],a:3},
+    {q:"Munții Retezat aparțin:",opts:["Carpaților Orientali","Carpaților Meridionali","Carpaților Occidentali","Munților Dobrogei"],a:1},
+    {q:"Podișul Dobrogei este considerat cel mai vechi relief din România, de tip:",opts:["Hercinic","Alpin","Caledonian","Carpatic"],a:0},
+    {q:"Subcarpații sunt situați:",opts:["În centrul arcului carpatic","La exteriorul arcului carpatic","La interiorul arcului carpatic","Între Dunăre și Câmpia Română"],a:1},
+    {q:"Munții Apuseni fac parte din:",opts:["Carpații Meridionali","Carpații Orientali","Carpații Occidentali","Munții Banatului"],a:2},
+    {q:"Câmpia de Vest (Pannonică) este situată:",opts:["În nordul României","În sudul României","În vestul României","În estul României"],a:2},
+    {q:"Dealurile și Câmpia de Vest aparțin unității geografice numite:",opts:["Depresiunea Panonică","Câmpia Română","Podișul Moldovei","Delta Dunării"],a:0},
+    {q:"Vârful Pietrosu (2303 m) face parte din:",opts:["Munții Bucegi","Munții Rodnei","Munții Ceahlău","Munții Apuseni"],a:1},
+  ],
+
+  "Relief Europa": [
+    {q:"Cel mai înalt vârf din Europa (excluzând Caucazul) este:",opts:["Mont Blanc (4808m)","Elbrus (5642m)","Matterhorn (4478m)","Monte Rosa (4634m)"],a:0},
+    {q:"Câmpia Europei de Nord se întinde de la:",opts:["Pirinei la Alpi","Oceanul Atlantic la Munții Ural","Marea Nordului la Marea Baltică","Alpi la Carpați"],a:1},
+    {q:"Munții Scandinaviei (Alpii Scandinavi) sunt situați pe Peninsula:",opts:["Iberică","Italică","Scandinavă","Balcanică"],a:2},
+    {q:"Podișul Central Francez se află în:",opts:["Germania","Franța","Spania","Belgia"],a:1},
+    {q:"Munții Penini se află în:",opts:["Franța","Germania","Italia","Regatul Unit"],a:3},
+    {q:"Câmpia Panonică se întinde pe teritoriul:",opts:["Numai al Ungariei","Ungariei, Austriei și Cehiei","Ungariei, României, Serbiei și altor state","Poloniei și Germaniei"],a:2},
+    {q:"Alpii separă:",opts:["Franța de Spania","Europa Centrală de Peninsula Italică și sudul Europei","Polonia de Germania","Suedia de Norvegia"],a:1},
+    {q:"Munții Pirinei separă Peninsula Iberică de:",opts:["Franța","Italia","Europa Centrală","Regatul Unit"],a:0},
+  ],
+
+  "Râuri & Lacuri": [
+    {q:"Cel mai lung râu din România este:",opts:["Oltul","Prutul","Mureșul","Siretul"],a:2},
+    {q:"Dunărea are lungimea totală de:",opts:["1860 km","2860 km","3100 km","2100 km"],a:1},
+    {q:"Siretul este cel mai lung afluent intern al Dunării, cu o lungime de:",opts:["600 km","726 km","500 km","800 km"],a:1},
+    {q:"Prutul formează granița României cu:",opts:["Ucraina","Ungaria","Bulgaria","Republica Moldova"],a:3},
+    {q:"Cel mai mare lac natural din România este:",opts:["Lacul Roșu","Lacul Razelm","Lacul Snagov","Balta Albă"],a:1},
+    {q:"Lacul Sf. Ana este singurul lac vulcanic din România, aflat în:",opts:["Munții Apuseni","Munții Gurghiu","Munții Harghita","Munții Perșani"],a:2},
+    {q:"Delta Dunării se varsă în:",opts:["Marea Marmara","Marea Neagră","Marea Azov","Marea Mediterană"],a:1},
+    {q:"Mureșul este afluent al:",opts:["Dunării","Siretului","Tisei","Oltului"],a:2},
+    {q:"Oltul traversează Carpații Meridionali prin:",opts:["Pasul Predeal","Defileul Oltului (Turnu Roșu)","Pasul Bran","Culoarul Rucăr-Bran"],a:1},
+    {q:"Lacul Bicaz (Izvorul Muntelui) este un lac:",opts:["Natural glaciar","Vulcanic","De acumulare (antropic)","Liman fluvial"],a:2},
+    {q:"Jiul este afluent direct al:",opts:["Siretului","Mureșului","Dunării","Oltului"],a:2},
+    {q:"Lacul Razelm face parte din complexul lagunar:",opts:["Razim-Sinoe","Lacul Techirghiol","Delta Dunării propriu-zisă","Lacul Brăila"],a:0},
+  ],
+
+  "Climă România": [
+    {q:"Clima României este în general:",opts:["Mediteraneană","Oceanică","Temperat-continentală","Subpolară"],a:2},
+    {q:"Crivățul este un vânt care bate din direcția:",opts:["Vest","Sud-Vest","Nord-Est","Sud"],a:2},
+    {q:"Foehnul este caracterizat ca vânt:",opts:["Rece și umed","Cald și uscat","Rece și uscat","Cald și umed"],a:1},
+    {q:"Cea mai aridă regiune a României este:",opts:["Câmpia Română","Dobrogea","Podișul Moldovei","Câmpia de Vest"],a:1},
+    {q:"Precipitațiile cele mai bogate din România cad în:",opts:["Dobrogea","Câmpia Română","Munții Banatului și Munții Apuseni","Podișul Moldovei"],a:2},
+    {q:"Temperatura medie anuală la București este de aproximativ:",opts:["5-6°C","8-9°C","11-12°C","14-15°C"],a:2},
+    {q:"Briza de mare și briza de uscat sunt vânturi locale specifice:",opts:["Zonei montane","Litoralului Mării Negre","Câmpiei Române","Deltei Dunării"],a:1},
+    {q:"Influențele submediteraneene (mediteraneene) pătrund în România prin:",opts:["Nord-Est","Vest — Oltenia și Banat","Est — Dobrogea","Nord — Moldova"],a:1},
+    {q:"Temperatura medie anuală scade odată cu creșterea altitudinii cu aproximativ:",opts:["1°C la 1000 m","0.5°C la 100 m","0.6°C la 100 m","2°C la 100 m"],a:2},
+    {q:"Austrul (Austru) este un vânt cald și uscat care bate din direcția:",opts:["Nord-Est","Nord-Vest","Sud-Vest","Est"],a:2},
+  ],
+
+  "Climă Europa": [
+    {q:"Clima oceanică este specifică pentru:",opts:["Europa de Est","Europa de Vest (Franța, Regatul Unit, Irlanda)","Europa Nordică","Peninsula Balcanică"],a:1},
+    {q:"Clima mediteraneană se caracterizează prin:",opts:["Veri reci și ierni blânde","Veri calde și uscate, ierni blânde și umede","Precipitații uniforme tot anul","Ierni extrem de geroase"],a:1},
+    {q:"Clima continentală (temperaturi extreme) domină în:",opts:["Peninsula Iberică","Europa de Vest","Europa de Est și Rusia","Peninsula Scandinavă"],a:2},
+    {q:"Curentul Atlanticului de Nord (Golf Stream) influențează:",opts:["Clima Europei de Est","Clima Europei de Vest — o face mai blândă","Clima Mediteranei","Clima Rusiei"],a:1},
+    {q:"Vântul Mistral este specific zonei:",opts:["Spaniei","Frantei de Sud (Valea Ronului)","Italiei de Nord","Germaniei"],a:1},
+    {q:"Precipitațiile sunt cele mai reduse în Europa la:",opts:["Norvegia","Peninsula Iberică (interior)","Câmpia Panonică","Estul Europei și zona Caspică"],a:3},
+  ],
+
+  "Vegetație, Faună & Soluri": [
+    {q:"Etajul alpin (pajiști alpine) se află la altitudini:",opts:["500-1000 m","1000-1800 m","Peste 1800 m","Sub 500 m"],a:2},
+    {q:"Pădurile de molid (taiga) sunt specifice etajului:",opts:["Nemoboreal (fagului)","Boreal (molidului)","Subalpin","Stepei"],a:1},
+    {q:"Vegetația de stepă este specifică zonelor:",opts:["Montane","Dobrogei și Bărăganului","Dealurilor subcarpatice","Deltei Dunării"],a:1},
+    {q:"Rezervația Biosferei Delta Dunării a fost înscrisă în patrimoniul UNESCO în:",opts:["1999","1985","1991","2001"],a:2},
+    {q:"Solurile cernoziomice (cele mai fertile) sunt specifice:",opts:["Etajului montan","Câmpiei Române și Bărăganului","Deltei Dunării","Podișului Dobrogei"],a:1},
+    {q:"Zimbrul (Bison bonasus) există în România în:",opts:["Delta Dunării","Rezervații naturale din Carpați","Câmpia Română","Dobrogea"],a:1},
+    {q:"Pelicanii cuibăresc în România în zona:",opts:["Munților Apuseni","Litoralului Mării Negre","Deltei Dunării","Câmpiei de Vest"],a:2},
+    {q:"Solurile podzolice (acide, mai puțin fertile) sunt specifice:",opts:["Câmpiei Române","Etajului montan cu păduri de conifere","Zonelor de stepă","Luncilor râurilor"],a:1},
+    {q:"Pădurile de fag sunt caracteristice etajului:",opts:["Subalpin","Boreal","Nemoboreal (700-1400 m)","Câmpiei"],a:2},
+    {q:"Silvostepa este o zonă de tranziție între:",opts:["Pădure și munți","Stepă și pădure","Alpini și subalpin","Câmpie și dealuri"],a:1},
+  ],
+
+  "Populație & Orașe": [
+    {q:"Cel mai populat oraș din România este:",opts:["Cluj-Napoca","Iași","Timișoara","București"],a:3},
+    {q:"Populația României este de aproximativ (2023):",opts:["25 milioane","20 milioane","19 milioane","16 milioane"],a:2},
+    {q:"Cel mai mare județ ca suprafață din România este:",opts:["Timiș","Alba","Suceava","Bacău"],a:2},
+    {q:"Fenomenul de suburbanizare presupune:",opts:["Creșterea populației rurale","Migrarea din orașe spre zonele periurbane","Scăderea populației totale","Concentrarea în megaorașe"],a:1},
+    {q:"Care este cel mai dens populat oraș european (capital)?",opts:["Paris","Berlin","Londra","Moscova"],a:0},
+    {q:"Megaorașele (megapolis) sunt orașe cu peste:",opts:["1 milion locuitori","5 milioane locuitori","10 milioane locuitori","20 milioane locuitori"],a:2},
+    {q:"Sporul natural negativ înseamnă că:",opts:["Natalitatea > Mortalitatea","Mortalitatea > Natalitatea","Natalitatea = Mortalitatea","Populația crește rapid"],a:1},
+    {q:"Cel mai populat stat din Europa este:",opts:["Germania","Franța","Regatul Unit","Rusia"],a:3},
+    {q:"Rata de urbanizare în România este de aproximativ:",opts:["35%","55%","75%","90%"],a:1},
+    {q:"Migrația forței de muncă din România spre Occident a determinat:",opts:["Creșterea populației","Fenomenul de depopulare rurală și deficit demografic","Creșterea natalității","Urbanizare accelerată"],a:1},
+  ],
+
+  "Economie & Resurse": [
+    {q:"Cel mai important bazin carbonifer (huilă) din România este:",opts:["Oltenia","Banat","Petroșani (Valea Jiului)","Moldova Nouă"],a:2},
+    {q:"Principala regiune petroliferă din România este:",opts:["Transilvania","Muntenia și Oltenia","Moldova","Dobrogea"],a:1},
+    {q:"Cel mai mare producător de energie nucleară din Europa este:",opts:["Germania","România","Franța","Polonia"],a:2},
+    {q:"Centrala nuclearo-electrică din România se află la:",opts:["Cernavodă","Pitești","Craiova","Brăila"],a:0},
+    {q:"România este printre primii producători europeni de:",opts:["Fier","Petrol","Gaze naturale","Cărbune cocsificabil"],a:2},
+    {q:"Cel mai important port la Marea Neagră al României este:",opts:["Mangalia","Tulcea","Constanța","Sulina"],a:2},
+    {q:"Canalul Dunăre-Marea Neagră, inaugurat în 1984, are lungimea de:",opts:["54 km","64 km","94 km","74 km"],a:1},
+    {q:"Agricultura ocupă terenuri extinse în:",opts:["Delta Dunării","Câmpia Română și Câmpia de Vest","Zona montană","Dobrogea muntoasă"],a:1},
+    {q:"Cel mai mare lac de acumulare din România este:",opts:["Vidraru","Porțile de Fier I","Izvorul Muntelui (Bicaz)","Drăgan"],a:1},
+    {q:"Aurul și argintul se extrag din zona:",opts:["Subcarpaților Getici","Munților Apuseni (Brad, Zlatna, Roșia Montană)","Banatului","Carpaților Orientali"],a:1},
+  ],
+
+  "State Europene & Capitale": [
+    {q:"Capitala Franței este:",opts:["Lyon","Marseille","Paris","Bordeaux"],a:2},
+    {q:"Capitala Germaniei este:",opts:["München","Hamburg","Frankfurt","Berlin"],a:3},
+    {q:"Capitala Italiei este:",opts:["Milano","Roma","Napoli","Veneția"],a:1},
+    {q:"Capitala Spaniei este:",opts:["Barcelona","Valencia","Madrid","Sevilla"],a:2},
+    {q:"Capitala Greciei este:",opts:["Salonic","Atena","Patras","Heraklion"],a:1},
+    {q:"Capitala Austriei este:",opts:["Salzburg","Graz","Innsbruck","Viena"],a:3},
+    {q:"Capitala Portugaliei este:",opts:["Porto","Faro","Lisabona","Braga"],a:2},
+    {q:"Capitala Poloniei este:",opts:["Cracovia","Varșovia","Gdansk","Wroclaw"],a:1},
+    {q:"Capitala Ungariei este:",opts:["Debrețin","Pécs","Budapesta","Miskolc"],a:2},
+    {q:"Capitala Bulgariei este:",opts:["Varna","Plovdiv","Sofia","Burgas"],a:2},
+    {q:"Capitala Ucrainei este:",opts:["Harkov","Odessa","Lviv","Kyiv (Kiev)"],a:3},
+    {q:"Capitala Republicii Moldova este:",opts:["Bălți","Tiraspol","Chișinău","Cahul"],a:2},
+    {q:"Cel mai populat stat din Uniunea Europeană este:",opts:["Franța","Italia","Spania","Germania"],a:3},
+    {q:"Care stat nu este membrul Uniunii Europene?",opts:["Austria","Norvegia","Suedia","Finlanda"],a:1},
+    {q:"Capitala Serbiei este:",opts:["Novi Sad","Niș","Belgrad","Subotica"],a:2},
+    {q:"Capitala Norvegiei este:",opts:["Bergen","Stavanger","Trondheim","Oslo"],a:3},
+  ],
+
+  "Uniunea Europeană": [
+    {q:"Tratatul de la Roma, care a pus bazele Comunității Economice Europene, a fost semnat în:",opts:["1945","1951","1957","1963"],a:2},
+    {q:"Uniunea Europeană are în prezent (2024) un număr de:",opts:["25","27","28","30"],a:1},
+    {q:"România a aderat la Uniunea Europeană în:",opts:["2004","2005","2007","2010"],a:2},
+    {q:"Capitala (sediul principal) instituțiilor UE se află în:",opts:["Paris","Bruxelles","Amsterdam","Strasbourg"],a:1},
+    {q:"Moneda euro este folosită de state membre din zona:",opts:["Euratom","Schengen","Euro (zona euro)","NATO"],a:2},
+    {q:"Parlamentul European se află la:",opts:["Bruxelles","Luxemburg","Strasbourg și Bruxelles","Haga"],a:2},
+    {q:"Tratatul de la Maastricht (1992) a creat oficial:",opts:["CEE","NATO","Uniunea Europeană","Consiliul Europei"],a:2},
+    {q:"Care este cel mai mare stat ca suprafață din UE?",opts:["Germania","Spania","Franța","Suedia"],a:2},
+    {q:"Politica Agricolă Comună (PAC) a UE vizează:",opts:["Transportul internațional","Subvenționarea și reglementarea agriculturii","Politica de mediu","Politica energetică"],a:1},
+    {q:"Fondurile structurale și de coeziune ale UE sunt destinate:",opts:["Apărării","Reducerii disparităților regionale","Politicii externe","Educației exclusive"],a:1},
+    {q:"Curtea de Justiție a UE are sediul în:",opts:["Bruxelles","Strasbourg","Luxemburg","Amsterdam"],a:2},
+    {q:"România face parte din spațiul Schengen din:",opts:["2007","2011","2024","2015"],a:2},
+  ],
+
+  "Dunărea & Marea Neagră": [
+    {q:"Dunărea izvorăște din:",opts:["Alpii Elveției","Munții Pădurea Neagră (Germania)","Alpii Austriei","Pirineii Franței"],a:1},
+    {q:"Dunărea se varsă în Marea Neagră prin:",opts:["Un singur braț","Două brațe","Trei brațe principale (Chilia, Sulina, Sf. Gheorghe)","Patru brațe"],a:2},
+    {q:"Brațul Sulina al Deltei Dunării este:",opts:["Cel mai lung","Cel mai lat","Singurul canalizat și navigabil pentru nave maritime","Brațul sudic"],a:2},
+    {q:"Dunărea formează granița României cu:",opts:["Ucraina și Moldova","Bulgaria și Serbia","Ungaria","Toate cele trei"],a:1},
+    {q:"Marea Neagră comunică cu Marea Mediterană prin:",opts:["Canalul Suez","Strâmtoarea Bosfor, Marea Marmara, Strâmtoarea Dardanele","Strâmtoarea Kerci","Gibraltar"],a:1},
+    {q:"Litoralul românesc al Mării Negre are lungimea de aproximativ:",opts:["100 km","245 km","400 km","500 km"],a:1},
+    {q:"Cel mai important port la Dunăre din România este:",opts:["Brăila","Galați","Tulcea","Giurgiu"],a:1},
+    {q:"Dunărea traversează un defileu spectaculos la granița România-Serbia, numit:",opts:["Defileul Oltului","Porțile de Fier","Defileul Jiului","Cheile Bicazului"],a:1},
+    {q:"Statele riverane Mării Negre sunt:",opts:["România, Bulgaria, Turcia, Georgia, Rusia, Ucraina","România, Bulgaria, Grecia, Turcia","România, Bulgaria, Serbia, Turcia","România, Moldova, Ucraina, Turcia"],a:0},
+    {q:"Brațul Chilia al Deltei Dunării este cel mai:",opts:["Scurt","Navigabil","Lung și cu cel mai mare debit","Sudic"],a:2},
+  ],
+
+  "Țări Vecine & Regiuni Geografice": [
+    {q:"România se învecinează cu câte state?",opts:["4","5","6","7"],a:1},
+    {q:"Care din statele vecine României NU este membrul UE?",opts:["Bulgaria","Ungaria","Serbia","Moldova — ambele"],a:3},
+    {q:"La vest, România se învecinează cu:",opts:["Bulgaria și Serbia","Ungaria și Serbia","Ucraina și Moldova","Bulgaria și Moldova"],a:1},
+    {q:"Granița României cu Bulgaria este formată în principal de:",opts:["Munți","Dunăre","Prut","Siret"],a:1},
+    {q:"Capitala Serbiei — cel mai mare vecin vestic al României ca suprafață — este:",opts:["Zagreb","Ljubljana","Belgrad","Sarajevo"],a:2},
+    {q:"Dobrogea este mărginită la est de:",opts:["Dunăre","Prut","Marea Neagră","Siret"],a:2},
+    {q:"Regiunile de dezvoltare ale României sunt în număr de:",opts:["6","7","8","9"],a:2},
+    {q:"Cel mai mare stat vecin al României ca suprafață este:",opts:["Ungaria","Bulgaria","Ucraina","Serbia"],a:2},
+    {q:"Republica Moldova are ca limbă oficială:",opts:["Moldoveneasca","Rusa","Româna","Ucrainiana"],a:2},
+    {q:"Bulgaria iese la:",opts:["Marea Adriatică","Marea Neagră și Marea Egee","Marea Neagră","Marea Mediterană"],a:1},
+  ],
+
+  "Transport European": [
+    {q:"Cel mai lung pod rutier din Europa de Est, care traversează Dunărea, este:",opts:["Podul Fetești-Cernavodă","Podul de la Calafat-Vidin","Podul Giurgiu-Ruse","Podul Prieteniei"],a:0},
+    {q:"Coridoarele pan-europene de transport sunt în număr de:",opts:["5","7","10","12"],a:2},
+    {q:"Cel mai aglomerat aeroport din Europa este:",opts:["Frankfurt","Amsterdam Schiphol","Paris Charles de Gaulle","Londra Heathrow"],a:3},
+    {q:"Eurotunelul (Canalul Mânecii) leagă:",opts:["Franța de Belgia","Franța de Regatul Unit","Germania de Danemarca","Norvegia de Suedia"],a:1},
+    {q:"Portul Rotterdam (Olanda) este:",opts:["Cel mai mic din Europa","Cel mai mare port din Europa","Al doilea port european","Un port fluvial"],a:1},
+    {q:"Rețeaua TGV (tren de mare viteză) este specifică:",opts:["Germaniei","Italiei","Franței","Spaniei"],a:2},
+    {q:"Dunărea face parte din coridorul pan-european număr:",opts:["IV","VI","VII","X"],a:2},
+  ],
+
+  /* ── CAPITOL NOU: Râuri România – Orașe traversate ── */
+  "Râuri România – Orașe": [
+    {q:"Oltul traversează reședința de județ:",opts:["Sfântu Gheorghe","Focșani","Alexandria","Zalău"],a:0},
+    {q:"Prin Râmnicu Vâlcea trece râul:",opts:["Jiu","Lotru","Olt","Argeș"],a:2},
+    {q:"Prin Slatina (reșed. jud. Olt) trece râul:",opts:["Jiu","Argeș","Olt","Vedea"],a:2},
+    {q:"Jiul traversează reședința de județ:",opts:["Deva","Pitești","Târgu Jiu","Focșani"],a:2},
+    {q:"Prin Craiova trece râul:",opts:["Olt","Vedea","Jiu","Argeș"],a:2},
+    {q:"Bistrița trece prin reședința de județ:",opts:["Bacău","Piatra Neamț","Suceava","Focșani"],a:1},
+    {q:"Prin Cluj-Napoca trece râul:",opts:["Someșul Mare","Someșul Mic","Crișul Repede","Mureș"],a:1},
+    {q:"Mureșul traversează reședința de județ:",opts:["Cluj-Napoca","Oradea","Târgu Mureș","Sibiu"],a:2},
+    {q:"Prin Timișoara curge râul:",opts:["Mureș","Bega","Crișul Negru","Timiș"],a:1},
+    {q:"Dâmbovița traversează:",opts:["Ploiești","București","Pitești","Târgoviște"],a:1},
+    {q:"Prin Bacău trece râul:",opts:["Prut","Siret","Trotuș","Bistrița"],a:1},
+    {q:"Someșul Mic trece prin:",opts:["Dej","Baia Mare","Cluj-Napoca","Bistrița"],a:2},
+    {q:"Someșul Mare + Mic formează Someșul, care trece prin:",opts:["Satu Mare","Baia Mare","Oradea","Bistrița"],a:0},
+    {q:"Prutul este adiacent reședinței de județ:",opts:["Vaslui","Botoșani","Iași","Focșani"],a:2},
+    {q:"Prin Buzău trece râul:",opts:["Siret","Putna","Buzău","Ialomița"],a:2},
+    {q:"Crișul Repede trece prin:",opts:["Baia Mare","Oradea","Arad","Satu Mare"],a:1},
+    {q:"Jijia este afluent al:",opts:["Siretului","Prutului","Moldovei","Bistriței"],a:1},
+    {q:"Prin Focșani curge râul:",opts:["Siret","Putna","Milcov","Buzău"],a:2},
+    {q:"Argeșul trece prin reședința de județ:",opts:["Pitești","Curtea de Argeș","Câmpulung","Găești"],a:0},
+    {q:"Prin Târgoviște (jud. Dâmbovița) trece:",opts:["Argeș","Dâmbovița","Ialomița","Prahova"],a:1},
+    {q:"Siretul trece adiacent orașului:",opts:["Bacău","Iași","Buzău","Galați"],a:0},
+    {q:"Drobeta-Turnu Severin este situată pe:",opts:["Jiu","Timiș","Dunăre","Cerna"],a:2},
+    {q:"Miercurea Ciuc este situată pe râul:",opts:["Olt","Mureș","Trotuș","Crișul Repede"],a:0},
+    {q:"Sfântu Gheorghe (jud. Covasna) este pe râul:",opts:["Mureș","Olt","Trotuș","Buzău"],a:1},
+    {q:"Prin Sibiu trece râul:",opts:["Olt","Cibin","Lotru","Hârtibaciu"],a:1},
+    {q:"Bistrița se varsă în:",opts:["Dunăre direct","Siret","Prut","Moldova"],a:1},
+    {q:"Deva (reșed. jud. Hunedoara) este pe râul:",opts:["Jiu","Cerna","Mureș","Someșul Mic"],a:2},
+    {q:"Prin Arad trece râul:",opts:["Crișul Repede","Timiș","Mureș","Crișul Negru"],a:2},
+    {q:"Crisul Repede se varsă în:",opts:["Dunăre","Someș","Tisa (Criș)","Mureș"],a:2},
+    {q:"Prin Satu Mare trece râul:",opts:["Someșul Mare","Someș","Crișul Negru","Crișul Repede"],a:1},
+  ],
+
+  /* ── CAPITOL NOU: Județe & Reședințe ── */
+  "Județe & Reședințe": [
+    {q:"Reședința jud. Harghita este:",opts:["Sfântu Gheorghe","Miercurea Ciuc","Odorheiu Secuiesc","Toplița"],a:1},
+    {q:"Reședința jud. Covasna este:",opts:["Miercurea Ciuc","Sfântu Gheorghe","Brașov","Târgu Secuiesc"],a:1},
+    {q:"Reședința jud. Ilfov este:",opts:["Chitila","Voluntari","Buftea","Otopeni"],a:2},
+    {q:"Reședința jud. Sălaj este:",opts:["Șimleul Silvaniei","Jibou","Zalău","Cehu Silvaniei"],a:2},
+    {q:"Reședința jud. Mehedinți este:",opts:["Turnu Severin","Orșova","Drobeta-Turnu Severin","Strehaia"],a:2},
+    {q:"Reședința jud. Gorj este:",opts:["Rovinari","Motru","Târgu Jiu","Novaci"],a:2},
+    {q:"Reședința jud. Hunedoara este:",opts:["Hunedoara (oraș)","Petroșani","Orăștie","Deva"],a:3},
+    {q:"Reședința jud. Caraș-Severin este:",opts:["Caransebeș","Moldova Nouă","Reșița","Anina"],a:2},
+    {q:"Reședința jud. Bistrița-Năsăud este:",opts:["Năsăud","Bistrița","Bistrița-Năsăud","Dej"],a:1},
+    {q:"Reședința jud. Suceava este:",opts:["Câmpulung Moldovenesc","Fălticeni","Rădăuți","Suceava"],a:3},
+    {q:"Reședința jud. Vrancea este:",opts:["Adjud","Mărășești","Focșani","Panciu"],a:2},
+    {q:"Reședința jud. Teleorman este:",opts:["Turnu Măgurele","Zimnicea","Roșiorii de Vede","Alexandria"],a:3},
+    {q:"Reședința jud. Olt este:",opts:["Caracal","Corabia","Balș","Slatina"],a:3},
+    {q:"Reședința jud. Prahova este:",opts:["Câmpina","Sinaia","Ploiești","Bușteni"],a:2},
+    {q:"Reședința jud. Dâmbovița este:",opts:["Moreni","Pucioasa","Târgoviște","Găești"],a:2},
+    {q:"Reședința jud. Argeș este:",opts:["Câmpulung","Curtea de Argeș","Pitești","Mioveni"],a:2},
+    {q:"Reședința jud. Vâlcea este:",opts:["Drăgășani","Horezu","Băile Olănești","Râmnicu Vâlcea"],a:3},
+    {q:"Reședința jud. Sibiu este:",opts:["Mediaș","Cisnădie","Sibiu","Avrig"],a:2},
+    {q:"Reședința jud. Alba este:",opts:["Sebeș","Blaj","Aiud","Alba Iulia"],a:3},
+    {q:"Reședința jud. Mureș este:",opts:["Reghin","Sighișoara","Târgu Mureș","Luduș"],a:2},
+    {q:"Reședința jud. Maramureș este:",opts:["Sighetu Marmației","Vișeu de Sus","Baia Mare","Borșa"],a:2},
+    {q:"Reședința jud. Bihor este:",opts:["Beiuș","Salonta","Marghita","Oradea"],a:3},
+    {q:"Reședința jud. Arad este:",opts:["Lipova","Ineu","Arad","Curtici"],a:2},
+    {q:"Reședința jud. Timiș este:",opts:["Lugoj","Sânnicolau Mare","Timișoara","Jimbolia"],a:2},
+    {q:"Reședința jud. Brăila este:",opts:["Ianca","Făurei","Brăila","Însurăței"],a:2},
+    {q:"Reședința jud. Neamț este:",opts:["Roman","Bicaz","Piatra Neamț","Târgu Neamț"],a:2},
+    {q:"Reședința jud. Botoșani este:",opts:["Dorohoi","Darabani","Botoșani","Săveni"],a:2},
+    {q:"Reședința jud. Iași este:",opts:["Pașcani","Hârlău","Iași","Târgu Frumos"],a:2},
+    {q:"Reședința jud. Vaslui este:",opts:["Bârlad","Huși","Vaslui","Negrești"],a:2},
+    {q:"Reședința jud. Ialomița este:",opts:["Fetești","Urziceni","Slobozia","Țăndărei"],a:2},
+  ],
+
+  /* ── CAPITOL NOU: Vânturi Europene ── */
+  "Vânturi Europene": [
+    {q:"Crivățul bate din direcția:",opts:["Vest","Sud-Vest","Nord-Est","Sud"],a:2},
+    {q:"Crivățul bate în România mai ales în:",opts:["Câmpia Olteniei","Câmpia Bărăganului și Moldova","Zona montană","Dobrogea de Sud"],a:1},
+    {q:"Austrul este un vânt:",opts:["Rece din nord-est","Cald și uscat din vest/sud-vest","Continental din est","Polar din nord"],a:1},
+    {q:"Foehnul apare pe versanții:",opts:["De vânt (expuși)","De sub vânt – cald și uscat","De deasupra – rece","Nu are legătură cu munții"],a:1},
+    {q:"Sirocco aduce:",opts:["Aer polar umed","Aer cald și prafos din Sahara","Aer maritim rece","Aer alpin uscat"],a:1},
+    {q:"Bora este specifică:",opts:["Coastei atlantice","Coastei adriatice (Croația, Dalmația)","Coastei norvegiene","Coastei baltice"],a:1},
+    {q:"Mistralul bate prin văile:",opts:["Rinului (Germania)","Ronului – din Alpi spre Mediterana (S Franța)","Dunării","Ebro"],a:1},
+    {q:"Briza marină ziua bate:",opts:["De pe uscat spre mare","De pe mare spre uscat","Din munte","Fără direcție fixă"],a:1},
+    {q:"Briza de munte noaptea bate:",opts:["De pe vale spre vârf","De pe vârf spre vale","Orizontal pe creastă","Nu există noaptea"],a:1},
+    {q:"Tramontana este un vânt rece din nord în:",opts:["Grecia","NE Spaniei și Italia","Portugalia","Turcia"],a:1},
+    {q:"Meltemi este un vânt estival în:",opts:["Marea Baltică","Marea Egee (Grecia)","Marea Nordului","Marea Neagră"],a:1},
+    {q:"Vânturile de Vest (Westerlies) aduc climat:",opts:["Continental rece","Oceanic umed și blând","Tropical uscat","Arctic glacial"],a:1},
+    {q:"Curentul Golf (Gulf Stream) face clima Europei de Vest:",opts:["Mai rece","Mai umedă dar rece","Mai blândă","Tropicală"],a:2},
+    {q:"Foehnul în Alpi produce:",opts:["Ploi abundente","Topiri rapide ale zăpezii pe versanți adăpostiți","Ger puternic","Ninsori"],a:1},
+    {q:"Sirocco este caracteristic pentru:",opts:["Scandinavia","Bazinul mediteranean (dinspre Africa)","Europa de Est","Insulele Britanice"],a:1},
+  ],
+
+  /* ── CAPITOL NOU: Climă România ── */
+  "Climă România – Valori": [
+    {q:"Temperatura medie anuală în Câmpia Română este de cca:",opts:["0–4°C","4–8°C","10–11°C","15°C"],a:2},
+    {q:"Precipitații medii anuale în Câmpia Bărăganului:",opts:["800–900 mm","600–700 mm","400–500 mm","Peste 1000 mm"],a:2},
+    {q:"Precipitații medii anuale în zona montană înaltă (Carpați):",opts:["400–500 mm","600–700 mm","Peste 1000 mm","1500–2000 mm"],a:2},
+    {q:"Dobrogea are precipitații medii anuale de:",opts:["Peste 900 mm","700–800 mm","350–450 mm","200–300 mm"],a:2},
+    {q:"Temperatura medie iulie în Câmpia Română:",opts:["15–18°C","22–24°C","28–30°C","Peste 35°C"],a:1},
+    {q:"Temperatura medie ianuarie în Câmpia Română:",opts:["0 / −4°C","−8 / −10°C","−15°C","2–5°C"],a:0},
+    {q:"Precipitații medii anuale pe întreaga Românie (medie generală):",opts:["300 mm","~637 mm","1000 mm","1500 mm"],a:1},
+    {q:"Amplitudinea termică anuală în România:",opts:["~10°C","~15–20°C","~25–30°C","~5°C"],a:2},
+    {q:"Temperatura medie anuală în Delta Dunării:",opts:["6–8°C","9–10°C","~11–12°C","14–15°C"],a:2},
+    {q:"Precipitații medii anuale în Delta Dunării:",opts:["Peste 800 mm","600–700 mm","~400–450 mm","200–300 mm"],a:2},
+    {q:"Temperatura medie anuală în Depresiunea Transilvaniei:",opts:["Sub 0°C","4–6°C","~6–9°C","12°C"],a:2},
+    {q:"Precipitații medii anuale în Câmpia de Vest (Banat, Crișana):",opts:["300–400 mm","500–600 mm","~650–750 mm","900–1000 mm"],a:2},
+    {q:"Influențele submediteraneene în România sunt resimțite în:",opts:["Câmpia Bărăganului","Oltenia și Banat","Dobrogea","Moldova de Nord"],a:1},
+    {q:"Temperatura medie anuală în Munții Rodnei (peste 2200m):",opts:["10–12°C","4–6°C","~−2 – 0°C","0–2°C"],a:2},
+  ],
+
+  /* ── CAPITOL NOU: Capitale Europene Set 1 ── */
+  "Capitale Europene – Set 1": [
+    {q:"Capitala Albaniei este:",opts:["Shkodër","Durrës","Tirana","Vlorë"],a:2},
+    {q:"Capitala Andorrei este:",opts:["Andorra la Vella","Sant Julià","Escaldes","La Massana"],a:0},
+    {q:"Capitala Belarusului este:",opts:["Grodno","Brest","Vitebsk","Minsk"],a:3},
+    {q:"Capitala Belgiei este:",opts:["Liège","Anvers","Bruges","Bruxelles"],a:3},
+    {q:"Capitala Bosniei și Herțegovinei este:",opts:["Mostar","Banja Luka","Tuzla","Sarajevo"],a:3},
+    {q:"Capitala Cehiei este:",opts:["Brno","Ostrava","Plzeň","Praga"],a:3},
+    {q:"Capitala Ciprului este:",opts:["Limassol","Larnaca","Paphos","Nicosia"],a:3},
+    {q:"Capitala Croației este:",opts:["Split","Rijeka","Osijek","Zagreb"],a:3},
+    {q:"Capitala Danemarcei este:",opts:["Aarhus","Odense","Aalborg","Copenhaga"],a:3},
+    {q:"Capitala Estoniei este:",opts:["Tartu","Narva","Pärnu","Tallinn"],a:3},
+    {q:"Capitala Finlandei este:",opts:["Tampere","Turku","Oulu","Helsinki"],a:3},
+    {q:"Capitala Islandei este:",opts:["Akureyri","Keflavik","Selfoss","Reykjavik"],a:3},
+    {q:"Capitala Kosovo este:",opts:["Prizren","Mitrovica","Peja","Pristina"],a:3},
+    {q:"Capitala Letoniei este:",opts:["Daugavpils","Liepāja","Jelgava","Riga"],a:3},
+    {q:"Capitala Liechtensteinului este:",opts:["Schaan","Balzers","Triesen","Vaduz"],a:3},
+    {q:"Capitala Lituaniei este:",opts:["Kaunas","Klaipeda","Šiauliai","Vilnius"],a:3},
+    {q:"Capitala Luxemburgului este:",opts:["Esch-sur-Alzette","Differdange","Diekirch","Luxemburg"],a:3},
+    {q:"Capitala Macedoniei de Nord este:",opts:["Bitola","Ohrid","Tetovo","Skopje"],a:3},
+    {q:"Capitala Maltei este:",opts:["Birkirkara","Sliema","Mosta","Valletta"],a:3},
+    {q:"Capitala Moldovei este:",opts:["Bălți","Tiraspol","Cahul","Chișinău"],a:3},
+  ],
+
+  /* ── CAPITOL NOU: Capitale Europene Set 2 ── */
+  "Capitale Europene – Set 2": [
+    {q:"Capitala Monaco este:",opts:["Monte Carlo","La Condamine","Fontvieille","Monaco"],a:3},
+    {q:"Capitala Muntenegrului este:",opts:["Nikšić","Bar","Budva","Podgorica"],a:3},
+    {q:"Capitala Norvegiei este:",opts:["Bergen","Stavanger","Trondheim","Oslo"],a:3},
+    {q:"Capitala Olandei (oficial) este:",opts:["Rotterdam","Utrecht","Haga","Amsterdam"],a:3},
+    {q:"Capitala Poloniei este:",opts:["Cracovia","Gdańsk","Wrocław","Varșovia"],a:3},
+    {q:"Capitala Portugaliei este:",opts:["Porto","Braga","Faro","Lisabona"],a:3},
+    {q:"Capitala Regatului Unit este:",opts:["Edinburgh","Manchester","Birmingham","Londra"],a:3},
+    {q:"Capitala San Marinului este:",opts:["Serravalle","Borgo Maggiore","San Marino","Faetano"],a:2},
+    {q:"Capitala Serbiei este:",opts:["Novi Sad","Niș","Subotica","Belgrad"],a:3},
+    {q:"Capitala Slovaciei este:",opts:["Košice","Banská Bystrica","Prešov","Bratislava"],a:3},
+    {q:"Capitala Sloveniei este:",opts:["Maribor","Celje","Kranj","Ljubljana"],a:3},
+    {q:"Capitala Spaniei este:",opts:["Barcelona","Valencia","Sevilla","Madrid"],a:3},
+    {q:"Capitala Suediei este:",opts:["Göteborg","Malmö","Uppsala","Stockholm"],a:3},
+    {q:"Capitala Elveției este:",opts:["Zürich","Geneva","Basel","Berna"],a:3},
+    {q:"Capitala Ucrainei este:",opts:["Harkov","Odesa","Lviv","Kyiv (Kiev)"],a:3},
+    {q:"Capitala Ungariei este:",opts:["Debrecen","Miskolc","Pécs","Budapesta"],a:3},
+    {q:"Capitala Vaticanului este:",opts:["Roma","San Pietro","Città del Vaticano","Borgo"],a:2},
+    {q:"Care țară are capitala la Nicosia?",opts:["Malta","Cipru","Grecia","Turcia"],a:1},
+    {q:"Care stat are capitala Podgorica?",opts:["Kosovo","Bosnia","Serbia","Muntenegru"],a:3},
+    {q:"Care stat are capitala Andorra la Vella?",opts:["Monaco","San Marino","Andorra","Liechtenstein"],a:2},
+  ],
+
+  /* ── CAPITOL NOU: Râuri Europa ── */
+  "Râuri Europa": [
+    {q:"Cel mai lung fluviu din Europa este:",opts:["Dunărea","Rinul","Volga (3531 km)","Niprul"],a:2},
+    {q:"Volga se varsă în:",opts:["Marea Neagră","Marea Baltică","Marea Caspică","Oceanul Arctic"],a:2},
+    {q:"Rinul se varsă în:",opts:["Marea Baltică","Oceanul Atlantic","Marea Nordului","Marea Mediterană"],a:2},
+    {q:"Loara este cel mai lung fluviu din:",opts:["Germania","Franța","Spania","Belgia"],a:1},
+    {q:"Sena traversează:",opts:["Londra","Bruxelles","Paris","Lyon"],a:2},
+    {q:"Tamisa traversează:",opts:["Edinburgh","Manchester","Londra","Birmingham"],a:2},
+    {q:"Vistula este cel mai lung fluviu din:",opts:["Germania","Cehia","Polonia","Austria"],a:2},
+    {q:"Oder (Odra) formează granița dintre:",opts:["Cehia și Austria","Germania și Polonia","Polonia și Belarus","Franța și Germania"],a:1},
+    {q:"Rona (Rhône) leagă Lacul Geneva de:",opts:["Paris","Marsilia","Lyon","Nice"],a:1},
+    {q:"Fluviul Po este cel mai important din:",opts:["Spania","Franța","Italia","Germania"],a:2},
+    {q:"Elba traversează portul:",opts:["Rotterdam","Antwerp","Hamburg","Bremen"],a:2},
+    {q:"Niprul are lungimea de:",opts:["1870 km","2287 km","3531 km","1352 km"],a:1},
+    {q:"Dunărea traversează câte țări?",opts:["6","8","10","12"],a:2},
+    {q:"Tajo (Tagus) traversează capitalele:",opts:["Numai Lisabona","Numai Madrid","Madrid și Lisabona","Lisabona și Porto"],a:2},
+    {q:"Ebro este cel mai mare fluviu spaniol:",opts:["Ca lungime","Ca debit","Ca număr de afluenți","Ca bazin hidrografic"],a:1},
+  ],
+
+  /* ── CAPITOL NOU: Delta Dunării ── */
+  "Delta Dunării": [
+    {q:"Delta Dunării are suprafața totală de:",opts:["~2000 km²","~3440 km²","~5800 km²","~10000 km²"],a:2},
+    {q:"Delta Dunării este Rezervație UNESCO din:",opts:["1971","1985","1991","2000"],a:2},
+    {q:"Brațul cu cel mai mare debit (~58%) este:",opts:["Sulina","Sfântul Gheorghe","Chilia","Bala"],a:2},
+    {q:"Brațul navigabil pentru nave maritime este:",opts:["Chilia","Sfântul Gheorghe","Sulina","Bala"],a:2},
+    {q:"Cel mai estic punct al României este:",opts:["Galați","Tulcea","Sulina","Constanța"],a:2},
+    {q:"Cel mai mare masiv de stuf din lume se află în:",opts:["Amazon","Delta Dunării (~1700 km²)","Delta Nilului","Balta Brăilei"],a:1},
+    {q:"Lacul Razim-Sinoe are suprafața de:",opts:["~500 km²","~1000 km²","~1500 km²","~200 km²"],a:1},
+    {q:"Canal Dunăre–Marea Neagră are lungimea de:",opts:["40 km","64 km","80 km","100 km"],a:1},
+    {q:"Delta Dunării avansează în mare cu:",opts:["1–5 m/an","~30–40 m/an","100 m/an","200 m/an"],a:1},
+    {q:"Cel mai lung braț al Deltei Dunării este:",opts:["Sulina (71 km)","Sfântul Gheorghe","Chilia (120 km)","Bala"],a:2},
+  ],
+
+  /* ── CAPITOL NOU: Vulcanism & Ghețari ── */
+  "Vulcanism & Ghețari Europa": [
+    {q:"Cel mai activ vulcan din Europa este:",opts:["Stromboli","Vezuviu","Etna (Sicilia)","Hekla"],a:2},
+    {q:"Islanda se află pe rift-ul (divergența):",opts:["Africane-Euroasiatice","Nord-Americane și Euroasiatice","Pacifice-Euroasiatice","Arabice-Africane"],a:1},
+    {q:"Eyjafjallajökull, care a blocat aviația europeană în 2010, se află în:",opts:["Norvegia","Grecia","Islanda","Italia"],a:2},
+    {q:"Santorini (Grecia) a distrus civilizația minoică în:",opts:["79 d.Hr.","500 î.Hr.","~1627 î.Hr.","3000 î.Hr."],a:2},
+    {q:"Teide (3718 m), cel mai înalt vulcan din Spania, se află pe:",opts:["Mallorca","Gran Canaria","Tenerife","Lanzarote"],a:2},
+    {q:"Insulele Canare s-au format deasupra unui:",opts:["Rift oceanic","Hotspot oceanic","Zonă de subducție","Rift continental"],a:1},
+    {q:"Vatnajökull este cel mai mare ghețar din Europa, cu ~8100 km², aflat în:",opts:["Norvegia","Suedia","Islanda","Finlanda"],a:2},
+    {q:"Jostedalsbreen este cel mai mare ghețar continental din Europa continentală, în:",opts:["Suedia","Finlanda","Norvegia","Danemarca"],a:2},
+    {q:"Ghețarul alpin Aletsch (~82 km lungime) este în:",opts:["Franța","Austria","Elveția","Italia"],a:2},
+    {q:"Fiordurile norvegiene sunt văi:",opts:["Fluviale inundate","Glaciare din Pleistocen, inundate de mare","Tectonice","Vulcanice"],a:1},
+  ],
+
+  /* ── CAPITOL NOU: Geografie Umană ── */
+  "Geografie Umană – Formule": [
+    {q:"Densitatea populației = Populație ÷ Suprafață. Unitatea de măsură este:",opts:["km² / loc","loc / km²","loc × km²","% din total"],a:1},
+    {q:"Sporul natural = Natalitate – Mortalitate. Se măsoară în:",opts:["%","‰ (la mie)","loc/km²","milioane"],a:1},
+    {q:"Sporul total = Sporul natural +",opts:["Densitate","Sporul migratoriu (Imigrați – Emigrați)","Natalitate","Suprafață"],a:1},
+    {q:"Un spor natural negativ semnifică:",opts:["Natalitate > Mortalitate","Mortalitate > Natalitate","Emigrare > Imigrare","Creștere demografică"],a:1},
+    {q:"Densitatea populației României este de aproximativ:",opts:["40 loc/km²","~80 loc/km²","150 loc/km²","200 loc/km²"],a:1},
+    {q:"Cea mai slab populată țară din Europa (densitate) este:",opts:["Islanda (~3,6 loc/km²)","Norvegia","Finlanda","Suedia"],a:0},
+    {q:"Cea mai densă mare țară din Europa de Vest este:",opts:["Germania (~235 loc/km²)","Olanda (~431 loc/km²)","Franța","Belgia"],a:1},
+    {q:"România are un spor natural de aproximativ:",opts:["+5‰","0‰","−5‰","−15‰"],a:2},
+    {q:"Albania are cel mai ridicat spor natural din Europa, de aproximativ:",opts:["−7‰","+1‰","+6‰","+10‰"],a:2},
+    {q:"Bulgaria are cel mai mare spor natural negativ din UE, de aproximativ:",opts:["−1‰","−3‰","−5‰","−7‰"],a:3},
+    {q:"Remitențele românilor din diaspora se ridică anual la:",opts:["~1 mld EUR","~5 mld EUR","~14 mld EUR","~30 mld EUR"],a:2},
+    {q:"Estimativ câți români lucrează în afara țării?",opts:["500.000","1 milion","3–4 milioane","10 milioane"],a:2},
+  ],
+
+  "Subcarpații României": [
+    {q:"Subcarpații sunt dealuri cu altitudini de:",opts:["0–200 m","400–1000 m","1000–1500 m","1500–2000 m"],a:1},
+    {q:"Subcarpații Getici sunt cei mai extinși și cuprind județele:",opts:["Neamț, Bacău, Suceava","Vrancea, Buzău, Prahova","Argeș, Dâmbovița, Gorj, Vâlcea, Mehedinți","Cluj, Sibiu, Brașov"],a:2},
+    {q:"Focarul seismic Vrancea este localizat în:",opts:["Subcarpații Moldovei","Subcarpații de Curbură","Subcarpații Getici","Podișul Getic"],a:1},
+    {q:"Sarea se exploatează în Subcarpații Moldovei la:",opts:["Slănic-Prahova","Târgu Ocna și Moinești","Praid","Ocnele Mari"],a:1},
+    {q:"Subcarpații de Curbură se întind pe județele:",opts:["Neamț, Bacău","Vrancea, Buzău, Prahova","Argeș, Dâmbovița","Gorj, Vâlcea"],a:1},
+    {q:"Câmpina (petrol) se află în:",opts:["Subcarpații Moldovei","Subcarpații de Curbură (Prahova)","Subcarpații Getici","Podișul Getic"],a:1},
+    {q:"Slănic-Prahova (sare) se află în:",opts:["Subcarpații Moldovei","Subcarpații de Curbură","Subcarpații Getici","Câmpia Română"],a:1},
+    {q:"Petroșani (bazin carbonifer cu huilă) se află în:",opts:["Subcarpații de Curbură","Subcarpații Getici","Munții Retezat (Valea Jiului)","Subcarpații Moldovei"],a:2},
+    {q:"Altitudinile Subcarpăților variază între:",opts:["0–200 m","400–1000 m","1000–1500 m","1500–2000 m"],a:1},
+    {q:"Subcarpații Moldovei cuprind județele:",opts:["Neamț, Bacău, Suceava (margine)","Vrancea, Buzău","Argeș, Gorj","Cluj, Mureș"],a:0},
+  ],
+
+  "Podișuri & Depresiuni România": [
+    {q:"Cel mai bogat zăcământ de gaz metan din România este în:",opts:["Câmpia Română","Podișul Dobrogei","Câmpia Transilvaniei (Sarmaș, Cojocna, Bazna)","Subcarpați"],a:2},
+    {q:"Viticultură Târnave (Fetească Regală, Traminer) este specifică:",opts:["Podișului Someșan","Câmpiei Transilvaniei","Podișului Târnavelor","Dealurilor de Vest"],a:2},
+    {q:"Cea mai mare salinã din Europa se află la:",opts:["Sovata","Praid (Podișul Târnavelor)","Turda","Ocna Mureș"],a:1},
+    {q:"Podișul Dobrogei este delimitat de Dunăre (V și N) și:",opts:["Prut (E)","Siret (E)","Marea Neagră (E)","Câmpia Română (E)"],a:2},
+    {q:"Munții Măcinului (Dobrogea de Nord) s-au format în era:",opts:["Alpină","Caledoniana","Hercinică (~300 mil. ani)","Mezozoică"],a:2},
+    {q:"Cel mai înalt punct din Dobrogea este Vf. Țuțuiatu (467 m) în:",opts:["Podișul Casimcei","Munții Măcinului","Podișul Cobadin","Litoral"],a:1},
+    {q:"Canalul Dunăre–Marea Neagră traversează:",opts:["Dobrogea de Nord","Dobrogea de Sud","Delta Dunării","Balta Ialomiței"],a:1},
+    {q:"Cea mai mare așezare din Podișul Someșan (Transilvania NV) este:",opts:["Dej","Gherla","Cluj-Napoca (~320.000 loc.)","Zalău"],a:2},
+    {q:"Bucovina de Sus (mănăstirile UNESCO) face parte din:",opts:["Podișul Bârladului","Podișul Sucevei","Câmpia Moldovei","Subcarpații Moldovei"],a:1},
+    {q:"Podișul Moldovei are altitudini maxime de:",opts:["200 m","388 m","~688 m","1000 m"],a:2},
+  ],
+
+  "Câmpiile României – Detalii": [
+    {q:"Câmpia Română are suprafața de aproximativ:",opts:["10.000 km²","30.000 km²","~52.000 km²","80.000 km²"],a:2},
+    {q:"Câmpia Bărăganului se caracterizează prin:",opts:["Loess gros 3–10 m și cernoziomuri tipice","Terenuri mlăștinoase","Altitudini de 200–400 m","Păduri de fag"],a:0},
+    {q:"Riscul de deșertificare (nisipuri mobile) este specific:",opts:["Câmpiei Bărăganului","Câmpiei Olteniei (Dăbuleni)","Câmpiei Vlăsiei","Câmpiei Siretului"],a:1},
+    {q:"Câmpia Vlăsiei include capitala și lacurile:",opts:["Lacul Roșu și Bâlea","Snagov și Căldărușani","Razelm și Sinoe","Bicaz și Vidraru"],a:1},
+    {q:"Galați (siderurgie – ArcelorMittal) este în:",opts:["Câmpia Bărăganului","Câmpia Siretului Inferior","Câmpia Vlăsiei","Delta Dunării"],a:1},
+    {q:"Câmpia Banatului (Timișului) are soluri de tip:",opts:["Podzolice","Cernoziomuri tipice","Soluri alpine","Turbe"],a:1},
+    {q:"Stațiunile Băile Felix (izvoare termale) se află în:",opts:["Câmpia Someșului","Dealurile Crișene","Câmpia Banatului","Câmpia Crișurilor"],a:1},
+    {q:"Câmpia Crișurilor are cel mai mare oraș:",opts:["Satu Mare","Oradea (~200.000 loc.)","Arad","Carei"],a:1},
+    {q:"Viticultură Miniș-Măderat (vinuri renumite) se află în:",opts:["Dealurile Silvaniei","Câmpia Crișurilor","Dealurile Banato-Crișene","Câmpia Banatului"],a:2},
+    {q:"Câmpia Bărăganului este supranumită:",opts:["Grânarul României","Grădina României","Livada României","Rezervorul României"],a:0},
+  ],
+
+  "Relief Europa – Detalii": [
+    {q:"Mont Blanc (4808 m) se află la granița:",opts:["Elveția–Italia","Franța–Italia","Austria–Germania","Elveția–Austria"],a:1},
+    {q:"Cel mai înalt vârf din Munții Scandinavici este Galdhøpiggen, în:",opts:["Suedia","Danemarca","Norvegia (2469 m)","Finlanda"],a:2},
+    {q:"Cel mai înalt vârf din Pirinei este Aneto, în:",opts:["Franța","Andorra","Spania (3404 m)","Portugalia"],a:2},
+    {q:"Câmpia Europei de Nord este și cea mai mare câmpie din:",opts:["Asia","Africa","Lume","America de Sud"],a:2},
+    {q:"Munții Apenini au altitudinea maximă la Gran Sasso:",opts:["1500 m","2912 m","3200 m","4000 m"],a:1},
+    {q:"Munții Balcani (Stara Planina) au altitudinea maximă la Vf. Botev:",opts:["1895 m","2376 m","2800 m","1500 m"],a:1},
+    {q:"Munții Urali au altitudinea maximă la Narodnaya:",opts:["1200 m","1895 m","2500 m","3000 m"],a:1},
+    {q:"Câmpia Panonică (Puszta) are altitudini de:",opts:["0–80 m","100–200 m","200–400 m","400–600 m"],a:1},
+    {q:"Peninsula Iberică – Meseta are altitudine medie de:",opts:["200 m","~700 m","1200 m","100 m"],a:1},
+    {q:"Alpii se extind pe teritoriul a aproximativ:",opts:["3 țări","5 țări","7–8 țări","12 țări"],a:2},
+  ],
+
+  "Biopedogeografie România": [
+    {q:"Etajul subalpin se caracterizează prin:",opts:["Păduri de molid dens","Jneapăn, ienupăr, afin","Pajiști alpine","Fag și stejar"],a:1},
+    {q:"Etajul montan (800–1800 m) este dominat de:",opts:["Fag și stejar","Molid, brad (conifere)","Jneapăn","Pajiști alpine"],a:1},
+    {q:"Etajul colinar (400–800 m) este dominat de:",opts:["Molid","Jneapăn","Fag și gorun","Pajiști alpine"],a:2},
+    {q:"Zona de silvostepă este tranziția între:",opts:["Pădure și tundră","Stepă și pădure de foioase","Alpin și subalpin","Mediteranean și oceanic"],a:1},
+    {q:"Pădurile de fag sunt caracteristice etajului:",opts:["Subalpin","Montan superior (conifere)","Nemoboreal (700–1400 m)","Câmpie"],a:2},
+    {q:"Maquis-ul și garrigue-ul sunt formațiuni mediteraneene cu:",opts:["Conifere înalte","Arbuști sempervirescenți (măslin, cistus)","Fag și stejar","Molid și brad"],a:1},
+    {q:"Urșii bruni și lupii sunt caracteristici etajului:",opts:["De câmpie","De stepă","Montan și subalpin carpatic","De tundră"],a:2},
+    {q:"Zimbrul (Bison bonasus) există în rezervații în:",opts:["Dobrogea","Câmpia Română","Carpații României","Delta Dunării"],a:2},
+    {q:"Solurile de tip cambisol (brune de pădure) sunt specifice:",opts:["Stepei","Tundrei","Pădurilor temperate de foioase","Mediteranean"],a:2},
+    {q:"Cernoziomurile sunt caracteristice zonei de:",opts:["Pădure montană","Stepă și silvostepă","Alpine","Tundră"],a:1},
+  ],
+
+  "Dunărea – Detalii": [
+    {q:"Dunărea izvorăște din:",opts:["Alpii elvețieni","Munții Pădurea Neagră (Germania)","Pirineii Franței","Munții Bohemiei"],a:1},
+    {q:"Dunărea traversează câte capitale europene?",opts:["1","2","3 (Viena, Bratislava, Budapesta)","4"],a:2},
+    {q:"Hidrocentrala Porțile de Fier I are puterea instalată de:",opts:["500 MW","~2100 MW","3000 MW","1000 MW"],a:1},
+    {q:"Canalul Dunăre–Marea Neagră (1984) scurtează ruta navală cu:",opts:["100 km","200 km","~400 km","600 km"],a:2},
+    {q:"Dunărea face parte din Coridorul Pan-European nr.:",opts:["IV","VI","VII","X"],a:2},
+    {q:"Cel mai important port fluvial al României pe Dunăre este:",opts:["Brăila","Galați","Tulcea","Giurgiu"],a:1},
+    {q:"Marea Neagră comunică cu Mediterana prin:",opts:["Canalul Suez","Bosfor – Marea Marmara – Dardanele","Strâmtoarea Kerci","Gibraltar"],a:1},
+    {q:"Litoralul românesc al Mării Negre are lungimea de:",opts:["100 km","~245 km","400 km","500 km"],a:1},
+    {q:"Dunărea transportă anual:",opts:["~10 mil. tone sedimente","~67 mil. tone sedimente","~200 mil. tone","~500 mil. tone"],a:1},
+    {q:"Portul Constanța este legat de Dunăre prin:",opts:["Brațul Sulina","Canalul Dunăre–Marea Neagră","Brațul Sf. Gheorghe","Canalul Corint"],a:1},
+  ],
+
+  "Geografie Economică România": [
+    {q:"Centrala nucleară de la Cernavodă funcționează cu:",opts:["Cărbune","Gaz natural","Uraniu (reactoare CANDU)","Petrol"],a:2},
+    {q:"Siderurgia la Galați este posibilă datorită:",opts:["Minereului local","Poziției pe Dunăre (transport ieftin de minereu)","Pădurilor din jur","Cărbunelui local"],a:1},
+    {q:"Aurul și argintul se exploatează în Apuseni la:",opts:["Petroșani și Lupeni","Brad, Zlatna, Roșia Montană","Anina și Bocșa","Comarnic"],a:1},
+    {q:"Câmpia Bărăganului este supranumită:",opts:["Grânarul României","Grădina României","Livada României","Rezervorul României"],a:0},
+    {q:"Cel mai mare port maritim al României este:",opts:["Mangalia","Tulcea","Galați","Constanța"],a:3},
+    {q:"Lignitul din Oltenia alimentează termocentralele de la:",opts:["Petroșani","Rovinari, Turceni, Motru","Iași","Brașov"],a:1},
+    {q:"Viticultură Drăgășani se află în:",opts:["Subcarpații de Curbură","Podișul Getic","Câmpia Română","Dobrogea"],a:1},
+    {q:"Viticultură Murfatlar se află în:",opts:["Câmpia Română","Dobrogea de Sud","Delta Dunării","Subcarpați"],a:1},
+    {q:"Lacul de acumulare Vidraru se află pe râul:",opts:["Olt","Jiu","Argeș","Lotru"],a:2},
+    {q:"Bauxita se exploatează în Munții Apuseni la:",opts:["Brad","Dobrești","Roșia Montană","Petroșani"],a:1},
+  ],
+
+  "Vecinii României – Detalii": [
+    {q:"România se învecinează cu câte state?",opts:["4","5","6","7"],a:1},
+    {q:"Granița totală a României are aproximativ:",opts:["1500 km","2200 km","~3149 km","4000 km"],a:2},
+    {q:"Granița România–Bulgaria este formată în principal de:",opts:["Munți","Dunăre","Prut","Siret"],a:1},
+    {q:"Cel mai înalt vârf al Ucrainei este Hoverla, cu:",opts:["1500 m","1800 m","2061 m","2500 m"],a:2},
+    {q:"Moldova are suprafața de:",opts:["13.000 km²","~33.846 km²","50.000 km²","100.000 km²"],a:1},
+    {q:"Câmpia Panonică din Ungaria se numește și:",opts:["Puszta","Tundra","Taiga","Meseta"],a:0},
+    {q:"Cel mai înalt vârf din Ungaria este în Munții Mátra:",opts:["500 m","~1014 m","1500 m","2000 m"],a:1},
+    {q:"Bulgaria iese la:",opts:["Marea Adriatică","Marea Neagră și Marea Egee","Numai Marea Neagră","Marea Mediterană"],a:1},
+    {q:"Capitala Serbiei este:",opts:["Novi Sad","Niș","Subotica","Belgrad"],a:3},
+    {q:"Moldova are spor natural de ~-2‰ și:",opts:["Imigrare masivă","Emigrare masivă (mulți cetățeni cu pașaport român)","Creștere demografică","Natalitate peste 20‰"],a:1},
+  ],
+
+  "Climă Europa – Tipuri": [
+    {q:"Clima oceanică este specifică pentru:",opts:["Spania centrală, Portugalia","Marea Britanie, Irlanda, Franța de vest, Belgia, Olanda","Finlanda, Suedia, Norvegia interior","Islanda, Svalbard"],a:1},
+    {q:"Clima mediteraneană este specifică pentru:",opts:["Marea Britanie și Irlanda","Finlanda și Suedia","Spania, Portugalia, Italia de sud, Grecia, Cipru","Polonia și Cehia"],a:2},
+    {q:"Clima subarctică este specifică pentru:",opts:["Spania și Italia","Marea Britanie","Finlanda, Suedia, Norvegia interior, Rusia de nord","Grecia și Cipru"],a:2},
+    {q:"Clima arctică / de tundră este specifică pentru:",opts:["Spania","Islanda, Svalbard, nordul Norvegiei","Marea Britanie","Germania și Polonia"],a:1},
+    {q:"Clima alpină este specifică pentru:",opts:["Câmpiile nordice","Alpii, Pirineii, Carpații, Munții Scandinavici (înalți)","Coastele mediteraneene","Delta Dunării"],a:1},
+    {q:"Clima oceanică are vânturi caracteristice:",opts:["Crivăț (NE)","Westerlies – din vest, maritime, blânde și umede","Sirocco (N Africa)","Bora (Adriatică)"],a:1},
+    {q:"Clima mediteraneană are vânturi caracteristice:",opts:["Westerlies","Vânturi polare","Mistral (NV Franța), Sirocco (din Africa)","Crivăț (NE)"],a:2},
+    {q:"Clima temperat-continentală din România are vânt:",opts:["Mistral","Sirocco","Crivăț (rece NE) și Austrul (cald SV)","Bora"],a:2},
+    {q:"Foehnul este vântul orografic cald care apare în:",opts:["Câmpiile nordice","Alpii și Carpații (versanți adăpostiți)","Mediterana","Coasta atlantică"],a:1},
+    {q:"Sirocco provine din:",opts:["Atlanticul de Nord","Sahara (Africa de Nord)","Stepa eurasiatică","Arhipelagul scandinav"],a:1},
+  ],
+
+  "Resurse Naturale Europa": [
+    {q:"Cel mai mare producător de energie nucleară din Europa este:",opts:["Germania","Franța (~75% din electricitate)","Rusia","Ucraina"],a:1},
+    {q:"Energia geotermală este exploatată intensiv în:",opts:["Germania","Belgia","Islanda","Polonia"],a:2},
+    {q:"Cărbunele (huilă) se exploatează în zona Ruhr din:",opts:["Franța","Belgia","Germania","Olanda"],a:2},
+    {q:"Cel mai mare zăcământ de bauxită din Europa se află în:",opts:["România","Franța (Provence)","Grecia","Ungaria"],a:1},
+    {q:"Pescuitul este o activitate majoră pentru:",opts:["Germania și Austria","Norvegia și Islanda","Polonia și Cehia","Ungaria și Slovenia"],a:1},
+    {q:"Gazele din Marea Nordului sunt exploatate de:",opts:["Germania și Franța","Norvegia și Marea Britanie","Suedia și Finlanda","Belgia și Olanda"],a:1},
+    {q:"Cel mai mare producător de energie eoliană din Europa este:",opts:["Franța","Germania","Olanda","Belgia"],a:1},
+    {q:"Ferolegerile (fier+nichel) se exploatează în Munții Ural din:",opts:["Ucraina","Belarus","Rusia","Polonia"],a:2},
+    {q:"Pădurile boreale ale Scandinaviei asigură materie primă pentru:",opts:["Turism","Industria de celuloză, hârtie și cherestea","Chimie grea","Metalurgie"],a:1},
+    {q:"Olivele, portocalele și lămâile sunt caracteristice agriculturii din:",opts:["Scandinavia","Zona temperată continentală","Zona mediteraneană","Tundra"],a:2},
+  ],
+
+  /* SET 3 GRILA */
+  "Lacuri România": [
+    {q:"Lacul Sf. Ana este singurul lac vulcanic din România, în Munții:",opts:["Rodnei","Gurghiu","Harghita","Apuseni"],a:2},
+    {q:"Lacul Roșu s-a format prin:",opts:["Eroziune glaciară","Baraj natural (alunecare de teren)","Baraj antropic","Vulcanism"],a:1},
+    {q:"Cel mai mare lac de baraj din România este:",opts:["Vidraru","Porțile de Fier I","Izvorul Muntelui (Bicaz)","Drăgan"],a:2},
+    {q:"Lacul glaciar Bucura (8,8 ha) se află în Munții:",opts:["Făgăraș","Bucegi","Retezat","Parâng"],a:2},
+    {q:"Cel mai adânc lac glaciar din România este Zănoaga (29 m), în Munții:",opts:["Făgăraș","Bucegi","Retezat","Rodnei"],a:2},
+    {q:"Lacul Bâlea se află în Munții:",opts:["Retezat","Bucegi","Parâng","Făgăraș"],a:3},
+    {q:"Lacul Razelm face parte din complexul lagunar:",opts:["Razim-Sinoe","Techirghiol","Delta propriu-zisă","Brăila"],a:0},
+    {q:"Lacul Snagov se află lângă:",opts:["Iași","Cluj-Napoca","București (Ilfov)","Brașov"],a:2},
+    {q:"Lacul Porțile de Fier I este pe râul:",opts:["Olt","Jiu","Dunăre","Timiș"],a:2},
+    {q:"Lacul Techirghiol este cunoscut pentru:",opts:["Pescuit industrial","Nămolul sapropelic și băile terapeutice","Turism montan","Sporturi nautice"],a:1},
+  ],
+
+  "Forme de relief special": [
+    {q:"Cheile Bicazului se află pe râul:",opts:["Bistrița","Trotuș","Bicaz","Moldova"],a:2},
+    {q:"Defileul Oltului (Turnu Roșu) străpunge:",opts:["Carpații Orientali","Carpații Meridionali","Carpații Occidentali","Subcarpații"],a:1},
+    {q:"Sfânxul și Babele sunt formațiuni din Munții:",opts:["Retezat","Bucegi","Apuseni","Rodnei"],a:1},
+    {q:"Transfăgărășanul traversează Munții:",opts:["Bucegi","Parâng","Făgăraș","Retezat"],a:2},
+    {q:"Peștera Urșilor se află în Munții:",opts:["Trascău","Pădurea Craiului","Bihor","Metaliferi"],a:1},
+    {q:"Cheile Nerei-Beușnița sunt în Munții:",opts:["Semenic","Banatului (Aninei)","Retezat","Apuseni"],a:1},
+    {q:"Cetățile Ponorului se află în Munții:",opts:["Trascău","Metaliferi","Bihor – Pădurea Craiului","Codru-Moma"],a:2},
+    {q:"Defileul Cazanele Dunării este la:",opts:["Galați","Drobeta-Turnu Severin – Porțile de Fier","Brăila","Giurgiu"],a:1},
+    {q:"Defileul Jiului (Petroșani–Bumbești) este în:",opts:["Carpații Orientali","Carpații Meridionali","Carpații Occidentali","Subcarpați"],a:1},
+    {q:"Cascada Bigăr se află în:",opts:["Munții Retezat","Munții Banatului (Caraș-Severin)","Apuseni","Bucegi"],a:1},
+  ],
+
+  "Clima în Unitățile de Relief": [
+    {q:"Temperatura medie anuală în Câmpia Bărăganului este de ~:",opts:["4-6°C","8-10°C","10-11°C","14°C"],a:2},
+    {q:"Precipitațiile medii anuale în Munții Banatului sunt de ~:",opts:["300-400 mm","800-1000 mm","1500-2000 mm","400-500 mm"],a:1},
+    {q:"Clima Dobrogei prezintă nuanțe:",opts:["Subpolare","Oceanice","Submediteraneene (mai caldă și mai secetoasă)","Alpine"],a:2},
+    {q:"Temperatura medie a lunii iulie la Iași este de ~:",opts:["15°C","22°C","28°C","35°C"],a:1},
+    {q:"Precipitațiile în Câmpia Română scad de la vest (~700mm) spre est la ~:",opts:["900 mm","400-500 mm","1000 mm","200 mm"],a:1},
+    {q:"Banatul și Oltenia au influențe submediteraneene: ierni:",opts:["Foarte reci și veri secetoase","Blânde, precipitații toamna și primăvara","Secetoase în tot cursul anului","Cu vânturi polare frecvente"],a:1},
+    {q:"Temperatura medie anuală la Constanța (litoral) este de ~:",opts:["7-8°C","9-10°C","11°C","14-15°C"],a:2},
+    {q:"Precipitațiile medii anuale în Podișul Moldovei sunt de ~:",opts:["200-300 mm","500-600 mm","800-900 mm","Peste 1000 mm"],a:1},
+    {q:"Amplitudinea termică anuală crește de la vest spre est datorită:",opts:["Altitudinilor mai mari","Creșterii continentalismului climatic","Influențelor maritime","Defrișărilor"],a:1},
+    {q:"Temperatura medie anuală în Munții Apuseni (altitudini medii) este de ~:",opts:["Sub 0°C","6-8°C","12-14°C","Peste 15°C"],a:1},
+  ],
+
+  "Geomorfologie – Procese": [
+    {q:"Defrișările duc la:",opts:["Îmbunătățirea calității solului","Eroziunea solului, alunecări de teren, inundații mai frecvente","Creșterea biodiversității","Reducerea efectului de seră"],a:1},
+    {q:"Ghețarii se formează acolo unde:",opts:["Precipitațiile solide sunt mai mici decât topirea","Precipitațiile solide depășesc topirea → acumulare → firn → gheață","Precipitațiile sunt egale cu topirea","Precipitațiile lipsesc complet"],a:1},
+    {q:"Fiordurile s-au format prin:",opts:["Eroziune fluviatilă","Activitate vulcanică","Eroziune glaciară urmată de inundare marină","Tectonică de blocare"],a:2},
+    {q:"Câmpiile aluviale se formează prin:",opts:["Eroziune glaciară","Activitate vulcanică","Acumularea aluviunilor fluviatile","Orogeneza alpină"],a:2},
+    {q:"Cernoziomurile se formează sub:",opts:["Păduri de conifere","Tundra arctică","Stepă și silvostepă (ierburi, humus bogat)","Zona alpină"],a:2},
+    {q:"Formele carstice (peșteri, avene) apar în roci de tip:",opts:["Granit","Calcar (dizolvat de apa cu CO₂)","Gnais","Bazalt"],a:1},
+    {q:"Loessul este un depozit format prin:",opts:["Activitate glaciară directă","Depunerea prafului transportat de vânt","Eroziune fluviatilă","Vulcanism"],a:1},
+    {q:"Vulcanii de tip calderic (ex. Santorini) se formează prin:",opts:["Erupție violentă urmată de prăbușirea conului","Erupție lentă bazaltică","Divergența plăcilor","Hotspot oceanic"],a:0},
+    {q:"Dunele de nisip (ex. Dăbuleni) se formează prin:",opts:["Acumulare glaciară","Transport și depunere eoliană (de vânt)","Eroziune fluviatilă","Tectonică"],a:1},
+    {q:"Alunecările de teren sunt frecvente în zone cu:",opts:["Roci cristaline dure","Roci sedimentare argiloase + precipitații + defrișări","Permafrost","Loess nisipos"],a:1},
+  ],
+
+  "UE – Detalii": [
+    {q:"Primul tratat de integrare europeană (CECO) a fost semnat în:",opts:["1945","1951 (Paris)","1957","1963"],a:1},
+    {q:"Tratatul de la Roma (1957) a creat:",opts:["NATO","CECO","CEE și Euratom","ONU"],a:2},
+    {q:"Moneda Euro a fost introdusă ca monedă în numerar în:",opts:["1999","2002","2004","2007"],a:1},
+    {q:"Spațiul Schengen permite:",opts:["Moneda comună","Libera circulație fără controale la frontierele interne","Politică externă comună","Armată comună"],a:1},
+    {q:"Cel mai mare stat din UE ca suprafață este:",opts:["Germania","Spania","Franța","Suedia"],a:2},
+    {q:"Cel mai mic stat din UE ca suprafață este:",opts:["Monaco","Luxemburg","Malta","San Marino"],a:2},
+    {q:"Politica Agricolă Comună (PAC) vizează:",opts:["Transportul internațional","Subvenționarea și reglementarea agriculturii","Politica de mediu","Apărarea"],a:1},
+    {q:"România a adoptat euro?",opts:["Da, din 2007","Da, din 2015","Nu, România nu a adoptat euro","Da, din 2024"],a:2},
+    {q:"Câte state folosesc euro în prezent (zona euro)?",opts:["17","20","27","25"],a:1},
+    {q:"Agenția Europeană pentru Mediu are sediul la:",opts:["Bruxelles","Frankfurt","Copenhaga","Amsterdam"],a:2},
+  ],
+
+  "Transport & Infrastructură Europa": [
+    {q:"Cel mai mare port din Europa este:",opts:["Hamburg","Anvers","Rotterdam (Olanda)","Marsilia"],a:2},
+    {q:"Eurotunelul leagă:",opts:["Franța de Belgia","Franța de Regatul Unit","Belgia de Regatul Unit","Germania de Danemarca"],a:1},
+    {q:"Rețeaua TGV (tren de mare viteză) este specifică:",opts:["Germaniei","Spaniei","Franței","Italiei"],a:2},
+    {q:"Cel mai aglomerat aeroport din Europa este:",opts:["Frankfurt","Amsterdam Schiphol","Paris CDG","Londra Heathrow"],a:3},
+    {q:"Autobahn-ul (fără limită generală de viteză) este în:",opts:["Franța","Olanda","Germania","Austria"],a:2},
+    {q:"Canalul Kiel (Germania) leagă:",opts:["Rinul de Dunăre","Marea Nordului de Marea Baltică","Tamisa de Sena","Elba de Rin"],a:1},
+    {q:"Coridoarele pan-europene de transport sunt în număr de:",opts:["5","7","10","15"],a:2},
+    {q:"Podul Fetești-Cernavodă traversează:",opts:["Olt","Prut","Siret","Dunărea (brațele + Balta Ialomiței)"],a:3},
+    {q:"Portul Constanța este legat de rețeaua fluvială prin:",opts:["Brațul Sulina","Canalul Dunăre–Marea Neagră","Brațul Sf. Gheorghe","Brațul Chilia"],a:1},
+    {q:"Cel mai important nod feroviar din Europa de Est este:",opts:["Varșovia","Budapesta","Viena","București"],a:2},
+  ],
+
+  "Hidrologie Europa": [
+    {q:"Dunărea izvorăște la Donaueschingen, în:",opts:["Austria","Elveția","Germania","Cehia"],a:2},
+    {q:"Volga are lungimea de:",opts:["2287 km","2860 km","3531 km","4000 km"],a:2},
+    {q:"Rinul izvorăște din:",opts:["Pirineii Spaniei","Alpii elvețieni (Lacul Konstanz)","Munții Schwarzwald","Masivul Central Francez"],a:1},
+    {q:"Loara (Loire) are lungimea de:",opts:["775 km","1012 km","1230 km","854 km"],a:1},
+    {q:"Sena (Seine) are lungimea de:",opts:["346 km","682 km","775 km","1012 km"],a:2},
+    {q:"Tamisa (Thames) are lungimea de:",opts:["346 km","682 km","775 km","1012 km"],a:0},
+    {q:"Nistrul (Dniester) se varsă în:",opts:["Dunăre","Marea Azov","Marea Neagră (în Moldova)","Marea Baltică"],a:2},
+    {q:"Prutul izvorăște din:",opts:["Munții Rodnei (România)","Carpații Ucraineni (Ucraina)","Alpii moldoveni","Podișul Podoliei"],a:1},
+    {q:"Tisa izvorăște din:",opts:["Slovacia","Carpații Ucraineni (Ucraina)","România (Maramureș)","Polonia"],a:1},
+    {q:"Niprul (Dnieper) traversează capitala:",opts:["Moscova","Minsk","Kyiv (Kiev)","Harkov"],a:2},
+  ],
+
+  "Populație Europa": [
+    {q:"Cel mai populat stat din UE este:",opts:["Franța","Italia","Spania","Germania (~84 mil.)"],a:3},
+    {q:"Fenomenul brain drain se referă la:",opts:["Migrarea populației rurale spre orașe","Emigrarea persoanelor înalt calificate","Migrarea sezonieră","Repatrierea diasporei"],a:1},
+    {q:"Remitențele sunt:",opts:["Taxe plătite în țara de destinație","Banii trimiși de emigranți familiilor din țara de origine","Ajutoarele sociale europene","Subvențiile UE"],a:1},
+    {q:"Depopularea naturală afectează cel mai mult:",opts:["Europa de Vest","Europa de Nord","Europa de Sud-Est și Est (Bulgaria, România, Serbia)","Irlanda"],a:2},
+    {q:"Urbanizarea se referă la:",opts:["Construirea de drumuri","Creșterea ponderii populației urbane","Industrializarea satelor","Migrarea externă"],a:1},
+    {q:"Navetismul (migrația pendulară) este:",opts:["Migrarea permanentă","Deplasarea zilnică domiciliu-loc de muncă","Emigrarea sezonieră","Migrarea internă definitivă"],a:1},
+    {q:"Rata natalității în România este de ~:",opts:["5‰","~9‰","15‰","20‰"],a:1},
+    {q:"Rata mortalității în România este de ~:",opts:["5‰","8‰","~14‰","20‰"],a:2},
+    {q:"Cel mai populat stat din Europa (total, inclusiv Rusia) este:",opts:["Germania","Franța","Rusia (~144 mil.)","Turcia"],a:2},
+    {q:"Speranța de viață în România este de aproximativ:",opts:["60 ani","~75 ani","80 ani","85 ani"],a:1},
+  ],
+
+  "Recapitulare Generală": [
+    {q:"Care este cel mai lung râu din Europa?",opts:["Dunărea","Rinul","Volga (3531 km)","Niprul"],a:2},
+    {q:"Care este cel mai înalt vârf din România?",opts:["Pietrosu","Moldoveanu (2544 m)","Negoiu","Omu"],a:1},
+    {q:"Care este cel mai mare ghețar din Europa?",opts:["Aletsch (Elveția)","Jostedalsbreen (Norvegia)","Vatnajökull (Islanda, ~8100 km²)","Mer de Glace"],a:2},
+    {q:"Care este cel mai activ vulcan din Europa?",opts:["Hekla","Stromboli","Etna (Sicilia)","Vezuviu"],a:2},
+    {q:"Care este cel mai mare lac natural din România?",opts:["Lacul Roșu","Lacul Razelm","Lacul Snagov","Lacul Sf. Ana"],a:1},
+    {q:"Care este cel mai adânc lac glaciar din România?",opts:["Bucura","Bâlea","Zănoaga (29 m)","Podragu"],a:2},
+    {q:"Care este cel mai mare port din Europa?",opts:["Hamburg","Anvers","Rotterdam","Marsilia"],a:2},
+    {q:"Care este cea mai mare salinã din Europa?",opts:["Slănic-Prahova","Praid (Harghita, România)","Wieliczka (Polonia)","Berchtesgaden (Germania)"],a:1},
+    {q:"Care este cel mai vechi masiv muntos din România?",opts:["Munții Retezat","Munții Rodnei","Munții Măcinului (era hercinică, ~300 mil. ani)","Munții Apuseni"],a:2},
+    {q:"Care este cel mai înalt vulcan din Spania?",opts:["Stromboli","Etna","Teide (3718 m, Tenerife)","Vezuviu"],a:2},
+  ],
+};
+
+/* ══════════════════════════════════════════════════════
+   BAZA DE DATE — ADEVĂRAT/FALS
+══════════════════════════════════════════════════════ */
+const TF_DATA = {
+  "Relief": [
+    {s:"Vârful Moldoveanu (2544 m) este cel mai înalt din România.",a:true},
+    {s:"Carpații Meridionali se mai numesc și Alpii Transilvaniei.",a:true},
+    {s:"Podișul Moldovei se află în vestul României.",a:false,exp:"Podișul Moldovei se află în estul României."},
+    {s:"Munții Apuseni fac parte din Carpații Orientali.",a:false,exp:"Munții Apuseni aparțin Carpaților Occidentali."},
+    {s:"Subcarpații sunt situați la exteriorul arcului carpatic.",a:true},
+    {s:"Podișul Dobrogei este cel mai vechi relief din România.",a:true},
+    {s:"Depresiunea Transilvaniei este înconjurată complet de munți.",a:true},
+    {s:"Câmpia Română este cel mai mare relief de câmpie din România.",a:true},
+    {s:"Mont Blanc (4808 m) este cel mai înalt vârf din Europa.",a:true,exp:"Elbrus (5642 m) este mai înalt, dar dacă considerăm Europa fără Caucaz, atunci da — Mont Blanc este cel mai înalt."},
+    {s:"Munții Pirinei separă Peninsula Iberică de Franța.",a:true},
+    {s:"Carpații Orientali sunt mai înalți decât Carpații Meridionali.",a:false,exp:"Carpații Meridionali sunt mai înalți (Moldoveanu 2544 m vs Pietrosu 2303 m)."},
+    {s:"Câmpia Panonică se întinde exclusiv pe teritoriul Ungariei.",a:false,exp:"Câmpia Panonică se întinde pe teritoriul mai multor state: Ungaria, România, Serbia, Croația, Austria."},
+  ],
+  "Râuri & Lacuri": [
+    {s:"Mureșul este cel mai lung râu din România.",a:true},
+    {s:"Dunărea are o lungime totală de 1860 km.",a:false,exp:"Dunărea are 2860 km lungime totală."},
+    {s:"Lacul Sf. Ana este singurul lac vulcanic din România.",a:true},
+    {s:"Prutul formează granița cu Bulgaria.",a:false,exp:"Prutul formează granița cu Republica Moldova."},
+    {s:"Delta Dunării este Rezervație a Biosferei UNESCO.",a:true},
+    {s:"Siretul este cel mai lung afluent intern al Dunării.",a:true},
+    {s:"Lacul Razelm este cel mai mare lac natural din România.",a:true},
+    {s:"Jiul se varsă direct în Dunăre.",a:true},
+    {s:"Canalul Dunăre-Marea Neagră a fost inaugurat în 1984.",a:true},
+    {s:"Brațul Sulina este cel mai lung braț al Deltei Dunării.",a:false,exp:"Brațul Chilia este cel mai lung. Sulina este cel mai scurt, dar singurul navigabil."},
+    {s:"Dunărea traversează Defileul Porțile de Fier la granița cu Serbia.",a:true},
+    {s:"Volga este cel mai lung fluviu din Europa.",a:true},
+  ],
+  "Climă": [
+    {s:"Clima României este de tip temperat-continental.",a:true},
+    {s:"Crivățul este un vânt cald care bate din vest.",a:false,exp:"Crivățul este un vânt rece care bate din nord-est."},
+    {s:"Dobrogea este cea mai secetoasă regiune din România.",a:true},
+    {s:"Foehnul este un vânt local cald și uscat.",a:true},
+    {s:"Precipitațiile cele mai bogate cad în Câmpia Română.",a:false,exp:"Cele mai multe precipitații cad în Munții Banatului și Apuseni."},
+    {s:"Briza de mare bate ziua dinspre mare spre uscat.",a:true},
+    {s:"Clima mediteraneană se caracterizează prin veri uscate și ierni umede.",a:true},
+    {s:"Curentul Golf Stream face clima Europei de Vest mai blândă.",a:true},
+    {s:"Austrul este un vânt rece care bate din nord-est.",a:false,exp:"Austrul este un vânt cald și uscat care bate din sud-vest sau vest."},
+    {s:"Influențele climatice submediteraneene pătrund în România din vest (Oltenia, Banat).",a:true},
+  ],
+  "Vegetație & Soluri": [
+    {s:"Etajul alpin se află la altitudini de peste 1800 m.",a:true},
+    {s:"Molidul este caracteristic etajului boreal (montan).",a:true},
+    {s:"Solurile cernoziomice sunt cele mai fertile soluri din România.",a:true},
+    {s:"Zimbrul a dispărut complet din fauna României.",a:false,exp:"Zimbrul există în rezervații naturale din Carpați."},
+    {s:"Vegetația de stepă este specifică Dobrogei și Câmpiei Bărăganului.",a:true},
+    {s:"Pădurile de fag sunt caracteristice etajului subalpin.",a:false,exp:"Pădurile de fag sunt caracteristice etajului nemoboreal (700-1400 m). Subalpinul are jnepeni și tufărișuri."},
+    {s:"Silvostepa este zona de tranziție între stepă și pădure.",a:true},
+    {s:"Solurile podzolice sunt mai fertile decât cernoziomurile.",a:false,exp:"Cernoziomurile sunt mult mai fertile. Solurile podzolice sunt acide și mai puțin fertile."},
+  ],
+  "Populație & Economie": [
+    {s:"Sporul natural negativ înseamnă că mortalitatea depășește natalitatea.",a:true},
+    {s:"Centrala nucleară din România se află la Cernavodă.",a:true},
+    {s:"România face parte din spațiul Schengen din 2024.",a:true},
+    {s:"Cel mai mare port maritim al României este Galați.",a:false,exp:"Cel mai important port maritim este Constanța, la Marea Neagră."},
+    {s:"Bazinul carbonifer Petroșani exploatează în principal huilă.",a:true},
+    {s:"Cel mai populat stat din UE este Franța.",a:false,exp:"Cel mai populat stat din UE este Germania."},
+    {s:"România a aderat la Uniunea Europeană în 2007.",a:true},
+    {s:"Dunărea face parte din Coridorul Pan-European VII.",a:true},
+    {s:"Aurul și argintul se extrag în România din zona Munților Apuseni.",a:true},
+    {s:"Portul Rotterdam este cel mai mare port din Europa.",a:true},
+  ],
+  "UE & State Europene": [
+    {s:"Tratatul de la Roma (1957) a pus bazele Comunității Economice Europene.",a:true},
+    {s:"Uniunea Europeană are în prezent 27 de state membre.",a:true},
+    {s:"Sediul principal al instituțiilor UE se află la Paris.",a:false,exp:"Sediul principal este la Bruxelles (Belgia). Parlamentul are sesiuni și la Strasbourg."},
+    {s:"Norvegia este membră a Uniunii Europene.",a:false,exp:"Norvegia nu este membră UE, deși face parte din Spațiul Economic European."},
+    {s:"Capitala Germaniei este Berlin.",a:true},
+    {s:"Capitala Austriei este Viena.",a:true},
+    {s:"Franța este cel mai mare stat ca suprafață din UE.",a:true},
+    {s:"Tratatul de la Maastricht (1992) a creat oficial Uniunea Europeană.",a:true},
+    {s:"Curtea de Justiție a UE are sediul la Bruxelles.",a:false,exp:"Curtea de Justiție a UE are sediul la Luxemburg."},
+    {s:"Capitala Bulgariei este Sofia.",a:true},
+    {s:"Serbia este membră a Uniunii Europene.",a:false,exp:"Serbia este candidată la UE, dar nu este membră."},
+    {s:"Republica Moldova are ca limbă oficială româna.",a:true},
+  ],
+
+  /* ── NOU: Râuri România – Orașe ── */
+  "Râuri România – Orașe": [
+    {s:"Oltul trece prin Miercurea Ciuc, Sfântu Gheorghe, Râmnicu Vâlcea și Slatina.",a:true},
+    {s:"Jiul trece prin Târgu Jiu și Craiova.",a:true},
+    {s:"Bistrița trece prin Piatra Neamț.",a:true},
+    {s:"Prin Cluj-Napoca curge Someșul Mic.",a:true},
+    {s:"Mureșul este cel mai lung râu interior al României (~761 km).",a:true},
+    {s:"Prutul formează granița cu Bulgaria.",a:false,exp:"Prutul formează granița cu Republica Moldova (și parțial Ucraina)."},
+    {s:"Dâmbovița traversează Bucureștiul.",a:true},
+    {s:"Prin Timișoara curge râul Bega.",a:true},
+    {s:"Crișul Repede trece prin Oradea.",a:true},
+    {s:"Argeșul trece prin Pitești.",a:true},
+    {s:"Someșul Mic se formează la Cluj-Napoca.",a:false,exp:"Someșul Mic trece PRIN Cluj-Napoca; se formează din mai mulți afluenți în zona Munților Apuseni."},
+    {s:"Bistrița se varsă în Siret.",a:true},
+    {s:"Jijia este afluent al Prutului.",a:true},
+    {s:"Siretul trece adiacent orașului Bacău.",a:true},
+    {s:"Mureșul se varsă în Dunăre direct.",a:false,exp:"Mureșul se varsă în Tisa, nu direct în Dunăre."},
+    {s:"Miercurea Ciuc este situată pe Olt.",a:true},
+    {s:"Sfântu Gheorghe (jud. Covasna) este pe Olt.",a:true},
+    {s:"Prin Sibiu trece râul Cibin.",a:true},
+    {s:"Crisul Repede se varsă în Tisa (prin Criș).",a:true},
+    {s:"Drobeta-Turnu Severin este situată pe Dunăre.",a:true},
+  ],
+
+  /* ── NOU: Județe & Reședințe ── */
+  "Județe & Reședințe": [
+    {s:"Reședința jud. Harghita este Miercurea Ciuc.",a:true},
+    {s:"Reședința jud. Covasna este Sfântu Gheorghe.",a:true},
+    {s:"Reședința jud. Ilfov este Buftea.",a:true},
+    {s:"Reședința jud. Caraș-Severin este Caransebeș.",a:false,exp:"Reședința jud. Caraș-Severin este Reșița."},
+    {s:"Reședința jud. Gorj este Târgu Jiu.",a:true},
+    {s:"Reședința jud. Hunedoara este Deva.",a:true},
+    {s:"Reședința jud. Mehedinți este Drobeta-Turnu Severin.",a:true},
+    {s:"Reședința jud. Sălaj este Zalău.",a:true},
+    {s:"Reședința jud. Vrancea este Focșani.",a:true},
+    {s:"Reședința jud. Teleorman este Alexandria.",a:true},
+    {s:"Reședința jud. Maramureș este Sighetu Marmației.",a:false,exp:"Reședința jud. Maramureș este Baia Mare."},
+    {s:"Reședința jud. Mureș este Târgu Mureș.",a:true},
+    {s:"Reședința jud. Bihor este Oradea.",a:true},
+    {s:"Reședința jud. Timiș este Timișoara.",a:true},
+    {s:"Reședința jud. Suceava este Suceava.",a:true},
+    {s:"Reședința jud. Ialomița este Slobozia.",a:true},
+    {s:"Reședința jud. Giurgiu este Giurgiu.",a:true},
+    {s:"Reședința jud. Olt este Slatina.",a:true},
+    {s:"Reședința jud. Dolj este Craiova.",a:true},
+    {s:"Reședința jud. Prahova este Ploiești.",a:true},
+  ],
+
+  /* ── NOU: Vânturi Europene ── */
+  "Vânturi Europene": [
+    {s:"Crivățul bate din nord-est și este rece și uscat.",a:true},
+    {s:"Foehnul este un vânt cald și uscat care coboară de pe versanții montani.",a:true},
+    {s:"Sirocco aduce aer cald și prafos din Africa de Nord.",a:true},
+    {s:"Bora este un vânt cald și umed specific coastei Adriatice.",a:false,exp:"Bora este un vânt RECE și violent specific coastei Adriatice."},
+    {s:"Briza marină bate ziua dinspre mare spre uscat.",a:true},
+    {s:"Briza de munte bate noaptea dinspre vârf spre vale.",a:true},
+    {s:"Mistralul bate în sudul Franței prin văile Ronului.",a:true},
+    {s:"Austrul în România este un vânt cald și uscat din vest/sud-vest.",a:true},
+    {s:"Tramontana este un vânt rece din nord specific NE Spaniei și Italiei.",a:true},
+    {s:"Meltemi este un vânt estival în Marea Egee.",a:true},
+    {s:"Vânturile de Vest aduc precipitații bogate pe coastele vestice ale Europei.",a:true},
+    {s:"Sirocco este un vânt rece care vine din nord-est.",a:false,exp:"Sirocco este un vânt CALD și prafos care vine din Africa de Nord."},
+    {s:"Foehnul produce topiri rapide ale zăpezii pe versanții adăpostiți ai Alpilor.",a:true},
+    {s:"Curentul Golf Stream face clima Europei de Vest mai blândă.",a:true},
+    {s:"Crivățul este responsabil pentru viscolele din Câmpia Bărăganului.",a:true},
+  ],
+
+  /* ── NOU: Capitale Europene ── */
+  "Capitale Europene": [
+    {s:"Capitala Elveției este Zürich.",a:false,exp:"Capitala Elveției este Berna. Zürich este cel mai mare oraș, dar nu capitala."},
+    {s:"Capitala Belarusului este Minsk.",a:true},
+    {s:"Capitala Albaniei este Tirana.",a:true},
+    {s:"Capitala Kosovo este Pristina.",a:true},
+    {s:"Capitala Muntenegrului este Podgorica.",a:true},
+    {s:"Capitala Sloveniei este Ljubljana.",a:true},
+    {s:"Capitala Slovaciei este Bratislava.",a:true},
+    {s:"Capitala Croației este Zagreb.",a:true},
+    {s:"Capitala Macedoniei de Nord este Skopje.",a:true},
+    {s:"Capitala Islandei este Reykjavik.",a:true},
+    {s:"Capitala Letoniei este Tallinn.",a:false,exp:"Capitala Letoniei este Riga. Tallinn este capitala Estoniei."},
+    {s:"Capitala Lituaniei este Vilnius.",a:true},
+    {s:"Capitala Maltei este Valletta.",a:true},
+    {s:"Capitala Liechtensteinului este Vaduz.",a:true},
+    {s:"Capitala Andorrei este Andorra la Vella.",a:true},
+    {s:"Capitala Moldovei este Chișinău.",a:true},
+    {s:"Capitala Norvegiei este Oslo.",a:true},
+    {s:"Capitala Finlandei este Helsinki.",a:true},
+    {s:"Capitala Danemarcei este Copenhaga.",a:true},
+    {s:"Capitala Estoniei este Tallinn.",a:true},
+  ],
+
+  /* ── NOU: Climă Valori ── */
+  "Climă – Valori": [
+    {s:"Clima oceanică are precipitații de 700–1200 mm/an, uniform repartizate.",a:true},
+    {s:"Clima mediteraneană are precipitații de 400–700 mm, concentrate iarna.",a:true},
+    {s:"Clima temperat-continentală are temperatura medie anuală de 8–10°C.",a:true},
+    {s:"Clima subarctică (boreală) are temperaturi de 0–4°C.",a:true},
+    {s:"Clima arctică are temperatura medie anuală sub 0°C.",a:true},
+    {s:"Clima alpină are precipitații de 800–2000 mm/an.",a:true},
+    {s:"Temperatura medie anuală în clima mediteraneană este de 15–18°C.",a:true},
+    {s:"Precipitațiile medii anuale în Câmpia Bărăganului sunt de 400–500 mm.",a:true},
+    {s:"Dobrogea are precipitații medii anuale de 350–450 mm.",a:true},
+    {s:"Precipitații medii anuale pe toată România sunt de ~637 mm.",a:true},
+    {s:"Temperatura medie iulie în Câmpia Română este de 22–24°C.",a:true},
+    {s:"Influențele submediteraneene în România se manifestă în Oltenia și Banat.",a:true},
+    {s:"Delta Dunării are precipitații medii anuale de ~400–450 mm.",a:true},
+    {s:"Zona montană înaltă din România are precipitații de peste 1000 mm/an.",a:true},
+    {s:"Temperatura medie anuală în Câmpia Română este de ~10–11°C.",a:true},
+  ],
+
+  /* ── NOU: Geografie Umană ── */
+  "Geografie Umană": [
+    {s:"Romania are 41 de județe plus Municipiul București.",a:true},
+    {s:"Sporul natural al României este de ~-5‰.",a:true},
+    {s:"Cel mai populat stat din UE este Germania.",a:true},
+    {s:"Cea mai slab populată țară din Europa ca densitate este Islanda.",a:true},
+    {s:"Olanda are cea mai mare densitate din Europa de Vest (~431 loc/km²).",a:true},
+    {s:"Bulgaria are cel mai mare spor natural negativ din UE (~-7‰).",a:true},
+    {s:"Albania are cel mai mare spor natural pozitiv din Europa (~+6‰).",a:true},
+    {s:"Remitențele românilor din diaspora se ridică la ~14 miliarde EUR/an.",a:true},
+    {s:"Circa 3–4 milioane de români lucrează în afara țării.",a:true},
+    {s:"Norvegia nu este membră UE.",a:true},
+    {s:"România a aderat la UE în 2007.",a:true},
+    {s:"Curtea de Justiție a UE are sediul la Luxemburg.",a:true},
+    {s:"Parlamentul European are sesiuni la Strasbourg și Bruxelles.",a:true},
+    {s:"Franța este cel mai mare stat ca suprafață din UE.",a:true},
+    {s:"România face parte din spațiul Schengen din 2024.",a:true},
+  ],
+
+  /* ══ SET 2 — TF noi ══ */
+
+  "Subcarpați & Podișuri": [
+    {s:"Subcarpații de Curbură sunt legați de focarul seismic Vrancea.",a:true},
+    {s:"Subcarpații Getici sunt cei mai extinși subcarpați din România.",a:true},
+    {s:"Petroșani (huilă) se află în Subcarpații de Curbură.",a:false,exp:"Bazinul carbonifer Petroșani se află în Valea Jiului, în Carpații Meridionali, nu în Subcarpați."},
+    {s:"Slănic-Prahova (sare) se află în Subcarpații de Curbură.",a:true},
+    {s:"Câmpina (petrol) este în Subcarpații de Curbură (jud. Prahova).",a:true},
+    {s:"Podișul Dobrogei este delimitat la est de Marea Neagră.",a:true},
+    {s:"Munții Măcinului sunt cel mai vechi masiv muntos din România, format în era hercinică.",a:true},
+    {s:"Canalul Dunăre–Marea Neagră traversează Dobrogea de Sud.",a:true},
+    {s:"Vf. Țuțuiatu (467 m) este cel mai înalt din Dobrogea.",a:true},
+    {s:"Podișul Târnavelor are cea mai mare salinã din Europa — la Praid.",a:true},
+    {s:"Bucovina de Sus cu mănăstirile UNESCO face parte din Podișul Sucevei.",a:true},
+    {s:"Podișul Moldovei are altitudini maxime de ~688 m.",a:true},
+    {s:"Câmpia Transilvaniei este cel mai bogat zăcământ de gaz metan din România.",a:true},
+    {s:"Podișul Someșan include Cluj-Napoca, cel mai mare oraș din Transilvania.",a:true},
+    {s:"Podișul Getic se întinde la sud de Subcarpații Getici.",a:true},
+  ],
+
+  "Câmpii & Dealuri de Vest": [
+    {s:"Câmpia Română este cea mai mare câmpie din România (~52.000 km²).",a:true},
+    {s:"Câmpia Bărăganului are loess gros de 3–10 m și cernoziomuri tipice.",a:true},
+    {s:"Câmpia Olteniei are risc de deșertificare (nisipuri mobile la Dăbuleni).",a:true},
+    {s:"Câmpia Vlăsiei cuprinde capitala București și lacurile Snagov, Căldărușani.",a:true},
+    {s:"Câmpia Siretului Inferior prezintă risc de inundații frecvente pe Siret.",a:true},
+    {s:"Câmpia de Vest (Banato-Crișeană) este prelungirea Câmpiei Panonice.",a:true},
+    {s:"Câmpia Banatului are cernoziomuri tipice — cea mai fertilă parte a Câmpiei de Vest.",a:true},
+    {s:"Băile Felix (izvoare termale unice în Europa) sunt în Dealurile Crișene.",a:true},
+    {s:"Viticultură Miniș-Măderat (vinuri renumite) se află în Dealurile Banato-Crișene.",a:true},
+    {s:"Câmpia Bărăganului este supranumită grânarul României.",a:true},
+    {s:"Câmpia Olteniei este cea mai fertilă parte a Câmpiei Române.",a:false,exp:"Câmpia Banatului / Câmpia Bărăganului sunt considerate cele mai fertile zone. Câmpia Olteniei are risc de deșertificare."},
+    {s:"Galați (siderurgie ArcelorMittal) este în Câmpia Siretului Inferior.",a:true},
+    {s:"Oradea (~200.000 loc.) este cel mai mare oraș din Câmpia de Vest.",a:true},
+    {s:"Câmpia Someșului (Satu Mare, Bihor nord) prezintă risc de inundații.",a:true},
+    {s:"Câmpia Vlăsiei este zona cea mai dens populată din România.",a:true},
+  ],
+
+  "Relief Europa – Detalii": [
+    {s:"Mont Blanc (4808 m) este cel mai înalt vârf din Europa de Vest (fără Caucaz).",a:true},
+    {s:"Mont Blanc se află la granița Franța–Italia.",a:true},
+    {s:"Galdhøpiggen (2469 m) este cel mai înalt vârf din Munții Scandinavici.",a:true},
+    {s:"Aneto (3404 m) este cel mai înalt vârf din Pirineii Spaniei.",a:true},
+    {s:"Câmpia Europei de Nord–Est este cea mai mare câmpie din lume.",a:true},
+    {s:"Munții Apenini au altitudinea maximă la Gran Sasso (2912 m).",a:true},
+    {s:"Munții Balcani (Stara Planina) au altitudinea maximă la Vf. Botev (2376 m).",a:true},
+    {s:"Munții Urali au altitudinea maximă la Narodnaya (1895 m).",a:true},
+    {s:"Câmpia Panonică are altitudini de 100–200 m.",a:true},
+    {s:"Alpii s-au format prin orogeneza alpino-carpatică în Mezozoic–Neogen.",a:true},
+    {s:"Munții Scandinavici s-au format în era alpină.",a:false,exp:"Munții Scandinavici s-au format în era caledoniana (~400 mil. ani), nu în era alpină."},
+    {s:"Podișul Meseta din Spania are altitudine medie de ~700 m.",a:true},
+    {s:"Câmpia Panonică se întinde pe mai multe state: Ungaria, România, Serbia, Croația.",a:true},
+    {s:"Munții Pirinei constituie granița naturală dintre Peninsula Iberică și Franța.",a:true},
+    {s:"Vulcanul Vezuviu a îngropat Pompeii în erupția din 79 d.Hr.",a:true},
+  ],
+
+  "Biopedogeografie": [
+    {s:"Etajul subalpin se caracterizează prin jneapăn și ienupăr.",a:true},
+    {s:"Etajul montan (800–1800 m) din România este dominat de molid și brad.",a:true},
+    {s:"Pădurile de fag sunt caracteristice etajului nemoboreal (700–1400 m).",a:true},
+    {s:"Cernoziomurile sunt cele mai fertile soluri, specifice stepei și silvostepei.",a:true},
+    {s:"Zimbrul există în rezervații naturale din Carpații României.",a:true},
+    {s:"Maquis-ul este o formațiune cu arbuști sempervirescenți specifică Mediteranei.",a:true},
+    {s:"Urșii bruni și lupii sunt caracteristici etajului montan și subalpin carpatic.",a:true},
+    {s:"Solurile podzolice sunt mai fertile decât cernoziomurile.",a:false,exp:"Cernoziomurile sunt mult mai fertile. Podzolurile sunt acide și sărace în humus."},
+    {s:"Silvostepa este zona de tranziție între stepă și pădure de foioase.",a:true},
+    {s:"Câmpia Bărăganului și Dobrogea au vegetație de stepă.",a:true},
+    {s:"Capra neagră trăiește în zona alpină a Carpaților.",a:true},
+    {s:"Zona arctică/de tundră are soluri de tip criosol.",a:true},
+    {s:"Pădurile boreale (taiga) au soluri podzolice.",a:true},
+    {s:"Etajul colinar (400–800 m) din România este dominat de fag și gorun.",a:true},
+    {s:"Delta Dunării are cel mai mare masiv de stuf din lume (~1700 km²).",a:true},
+  ],
+
+  "Dunărea & Marea Neagră": [
+    {s:"Dunărea traversează capitalele Viena, Bratislava și Budapesta.",a:true},
+    {s:"Hidrocentrala Porțile de Fier I are puterea instalată de ~2100 MW.",a:true},
+    {s:"Canalul Dunăre–Marea Neagră scurtează ruta navală cu ~400 km.",a:true},
+    {s:"Dunărea face parte din Coridorul Pan-European VII.",a:true},
+    {s:"Cel mai important port fluvial al României pe Dunăre este Galați.",a:true},
+    {s:"Marea Neagră comunică cu Mediterana prin Bosfor–Marea Marmara–Dardanele.",a:true},
+    {s:"Litoralul românesc al Mării Negre are ~245 km lungime.",a:true},
+    {s:"Dunărea transportă ~67 milioane tone de sedimente pe an.",a:true},
+    {s:"Portul Constanța este legat de Dunăre prin Canalul Dunăre–Marea Neagră.",a:true},
+    {s:"Dunărea izvorăște din Munții Alpii Elvețieni.",a:false,exp:"Dunărea izvorăște din Munții Pădurea Neagră (Schwarzwald), Germania."},
+    {s:"Barajul Porțile de Fier I este la granița România–Serbia.",a:true},
+    {s:"Bratul Chilia are cel mai mare debit din Delta Dunării (~58%).",a:true},
+    {s:"Bratul Sulina este singurul navigabil pentru nave maritime.",a:true},
+    {s:"Delta Dunării avansează în mare cu ~30–40 m/an.",a:true},
+    {s:"Canal Dunăre–Marea Neagră are 64 km lungime.",a:true},
+  ],
+
+  "Geografie Economică & UE": [
+    {s:"Centrala nucleară de la Cernavodă funcționează cu reactoare CANDU (uraniu).",a:true},
+    {s:"Siderurgia la Galați este favorizată de poziția pe Dunăre.",a:true},
+    {s:"Aurul și argintul se exploatează în Munții Apuseni (Brad, Roșia Montană).",a:true},
+    {s:"Câmpia Bărăganului este grânarul României.",a:true},
+    {s:"Cel mai mare port maritim al României este Constanța.",a:true},
+    {s:"Termocentralele Rovinari, Turceni și Motru funcționează pe lignit din Oltenia.",a:true},
+    {s:"Viticultură Drăgășani se află în Podișul Getic.",a:true},
+    {s:"Viticultură Murfatlar se află în Dobrogea de Sud.",a:true},
+    {s:"Lacul de acumulare Vidraru se află pe Argeș.",a:true},
+    {s:"Cel mai mare producător de energie nucleară din Europa este Franța.",a:true},
+    {s:"Energia geotermală este exploatată intensiv în Islanda.",a:true},
+    {s:"Gazele naturale din Marea Nordului sunt exploatate de Norvegia și Marea Britanie.",a:true},
+    {s:"Pescuitul este o activitate majoră pentru Norvegia și Islanda.",a:true},
+    {s:"Zona mediteraneană produce olive, portocale și lămâi.",a:true},
+    {s:"Franța produce ~75% din electricitate din surse nucleare.",a:true},
+  ],
+
+  /* SET 3 TF */
+  "Lacuri & Forme de Relief": [
+    {s:"Lacul Sf. Ana este singurul lac vulcanic din România, aflat în Munții Harghita.",a:true},
+    {s:"Lacul Roșu s-a format printr-un baraj natural (alunecare de teren).",a:true},
+    {s:"Lacul Izvorul Muntelui (Bicaz) este cel mai mare lac de baraj din România.",a:true},
+    {s:"Lacul Bucura (8,8 ha) este cel mai mare lac glaciar din România.",a:true},
+    {s:"Lacul Zănoaga (29 m adâncime) este cel mai adânc lac glaciar din România.",a:true},
+    {s:"Lacul Bâlea se află în Munții Făgăraș.",a:true},
+    {s:"Lacul Techirghiol este cunoscut pentru nămolul sapropelic și băile terapeutice.",a:true},
+    {s:"Sfânxul și Babele sunt formațiuni din Munții Bucegi.",a:true},
+    {s:"Transfăgărășanul traversează Munții Retezat.",a:false,exp:"Transfăgărășanul traversează Munții Făgăraș."},
+    {s:"Cheile Nerei-Beușnița se află în Munții Banatului (Caraș-Severin).",a:true},
+    {s:"Defileul Jiului este în Carpații Meridionali.",a:true},
+    {s:"Peștera Urșilor se află în Munții Pădurea Craiului (Apuseni).",a:true},
+    {s:"Defileul Cazanele Dunării este la Porțile de Fier.",a:true},
+    {s:"Lacul Razelm face parte din complexul lagunar Razim-Sinoe.",a:true},
+    {s:"Lacul Bâlea se află în Munții Retezat.",a:false,exp:"Lacul Bâlea se află în Munții Făgăraș."},
+  ],
+
+  "Geomorfologie & Procese": [
+    {s:"Defrișările duc la eroziunea solului, alunecări de teren și inundații mai frecvente.",a:true},
+    {s:"Ghețarii se formează acolo unde precipitațiile solide depășesc topirea.",a:true},
+    {s:"Fiordurile s-au format prin eroziune glaciară urmată de inundare marină.",a:true},
+    {s:"Câmpiile aluviale se formează prin acumularea aluviunilor fluviatile.",a:true},
+    {s:"Cernoziomurile se formează sub stepa și silvostepa cu ierburi bogate.",a:true},
+    {s:"Formele carstice (peșteri, doline) apar în roci de calcar.",a:true},
+    {s:"Loessul este un depozit format prin depunerea prafului transportat de vânt.",a:true},
+    {s:"Dunele de nisip se formează prin transport și depunere eoliană.",a:true},
+    {s:"Vulcanii de tip calderic se formează prin erupție violentă urmată de prăbușirea conului.",a:true},
+    {s:"Alunecările de teren sunt frecvente pe roci sedimentare argiloase cu precipitații abundente.",a:true},
+    {s:"Pădurile de conifere (taiga) formează soluri podzolice, acide.",a:true},
+    {s:"Loessul favorizează formarea cernoziomurilor fertile.",a:true},
+    {s:"Dunele de nisip de la Dăbuleni (Câmpia Olteniei) prezintă risc de deșertificare.",a:true},
+    {s:"Solurile alpine sunt bine dezvoltate și fertile.",a:false,exp:"Solurile alpine sunt slab dezvoltate, subțiri și puțin fertile."},
+    {s:"Eroziunea solului este accelerată de defrișări.",a:true},
+  ],
+
+  "UE & Transport": [
+    {s:"Primul tratat de integrare europeană (CECO) a fost semnat în 1951 la Paris.",a:true},
+    {s:"Tratatul de la Roma (1957) a creat CEE și Euratom.",a:true},
+    {s:"Moneda Euro a fost introdusă ca monedă în numerar în 2002.",a:true},
+    {s:"Spațiul Schengen permite libera circulație fără controale la frontierele interne.",a:true},
+    {s:"Franța este cel mai mare stat ca suprafață din UE.",a:true},
+    {s:"Malta este cel mai mic stat din UE ca suprafață.",a:true},
+    {s:"România a adoptat euro.",a:false,exp:"România nu a adoptat euro. Este membră UE dar nu face parte din zona euro."},
+    {s:"Zona euro numără în prezent 20 de state membre.",a:true},
+    {s:"Cel mai mare port din Europa este Rotterdam (Olanda).",a:true},
+    {s:"Eurotunelul leagă Franța de Regatul Unit.",a:true},
+    {s:"Rețeaua TGV de trenuri de mare viteză este specifică Franței.",a:true},
+    {s:"Cel mai aglomerat aeroport din Europa este Londra Heathrow.",a:true},
+    {s:"Canalul Kiel leagă Marea Nordului de Marea Baltică.",a:true},
+    {s:"Dunărea face parte din Coridorul Pan-European VII.",a:true},
+    {s:"Podul Fetești-Cernavodă traversează Dunărea.",a:true},
+  ],
+
+  "Hidrologie Europa": [
+    {s:"Volga (3531 km) este cel mai lung fluviu din Europa.",a:true},
+    {s:"Dunărea (2860 km) este al doilea fluviu din Europa ca lungime.",a:true},
+    {s:"Rinul izvorăște din Alpii elvețieni.",a:true},
+    {s:"Sena traversează Parisul.",a:true},
+    {s:"Tamisa traversează Londra.",a:true},
+    {s:"Vistula este cel mai lung fluviu din Polonia.",a:true},
+    {s:"Oder formează granița naturală germano-poloneză.",a:true},
+    {s:"Nistrul se varsă în Marea Neagră.",a:true},
+    {s:"Prutul izvorăște din Carpații Ucraineni.",a:true},
+    {s:"Tisa izvorăște din Carpații Ucraineni.",a:true},
+    {s:"Niprul traversează capitala Ucrainei, Kyiv.",a:true},
+    {s:"Dunărea izvorăște din Munții Pădurea Neagră (Germania).",a:true},
+    {s:"Ebro este cel mai mare fluviu spaniol ca debit.",a:true},
+    {s:"Loara (1012 km) este cel mai lung fluviu din Franța.",a:true},
+    {s:"Fluviul Po este cel mai important fluviu din Italia.",a:true},
+  ],
+
+  "Populație & Economie Europa": [
+    {s:"Cel mai populat stat din UE este Germania (~84 milioane loc.).",a:true},
+    {s:"Brain drain-ul se referă la emigrarea persoanelor înalt calificate.",a:true},
+    {s:"Remitențele sunt banii trimiși de emigranți familiilor din țara de origine.",a:true},
+    {s:"Depopularea naturală afectează cel mai mult Europa de Sud-Est și Est.",a:true},
+    {s:"Navetismul (migrația pendulară) este deplasarea zilnică domiciliu–loc de muncă.",a:true},
+    {s:"Cel mai mare producător de energie nucleară din Europa este Franța.",a:true},
+    {s:"Energia geotermală este exploatată intensiv în Islanda.",a:true},
+    {s:"Norvegia și Marea Britanie exploatează gaze naturale din Marea Nordului.",a:true},
+    {s:"Pescuitul este o activitate majoră pentru Norvegia și Islanda.",a:true},
+    {s:"Pădurile boreale ale Scandinaviei asigură materie primă pentru industria de celuloză și hârtie.",a:true},
+    {s:"Rata natalității în România este de ~9‰.",a:true},
+    {s:"Rata mortalității în România este de ~14‰.",a:true},
+    {s:"Speranța de viață în România este de aproximativ 75 de ani.",a:true},
+    {s:"Bulgaria are cel mai mare spor natural negativ din UE (~-7‰).",a:true},
+    {s:"Irlanda are unul dintre cele mai ridicate sporuri naturale din Europa (~+5‰).",a:true},
+  ],
+
+  "Recapitulare Generală": [
+    {s:"Lacul Razelm-Sinoe (~1000 km²) este cel mai mare complex lacustru din România.",a:true},
+    {s:"Delta Dunării este Rezervație a Biosferei UNESCO din 1991.",a:true},
+    {s:"Cel mai lung braț al Deltei Dunării este Chilia (120 km).",a:true},
+    {s:"Cel mai estic punct al României este orașul Sulina.",a:true},
+    {s:"Canalul Dunăre–Marea Neagră are 64 km lungime.",a:true},
+    {s:"Dunărea traversează 3 capitale europene: Viena, Bratislava, Budapesta.",a:true},
+    {s:"Vatnajökull (~8100 km²) din Islanda este cel mai mare ghețar din Europa.",a:true},
+    {s:"Etna (Sicilia) este cel mai activ vulcan din Europa.",a:true},
+    {s:"Praid (Harghita) are cea mai mare salinã din Europa.",a:true},
+    {s:"Mont Blanc (4808 m) este cel mai înalt vârf din Europa de Vest.",a:true},
+    {s:"Moldoveanu (2544 m) este cel mai înalt vârf din România.",a:true},
+    {s:"Volga este cel mai lung fluviu din Europa.",a:true},
+    {s:"Rotterdam (Olanda) este cel mai mare port din Europa.",a:true},
+    {s:"Franța este cel mai mare stat ca suprafață din UE.",a:true},
+    {s:"Munții Măcinului sunt cel mai vechi masiv muntos din România.",a:true},
+  ],
+};
+
+/* ══════════════════════════════════════════════════════
+   BAZA DE DATE — POTRIVIRE
+══════════════════════════════════════════════════════ */
+const MATCH_SETS = [
+  {title:"Râuri → Afluent al / Se varsă în",items:[
+    {drag:"Siret",ico:"🌊",drop:"Dunărea"},
+    {drag:"Mureș",ico:"🌊",drop:"Tisa"},
+    {drag:"Olt",ico:"🌊",drop:"Dunărea (direct)"},
+    {drag:"Jijia",ico:"🌊",drop:"Prut"},
+    {drag:"Buzău",ico:"🌊",drop:"Siret"},
+    {drag:"Bistrița",ico:"🌊",drop:"Siret"},
+  ]},
+  {title:"Munți → Grup carpatic",items:[
+    {drag:"Retezat",ico:"⛰️",drop:"Carpații Meridionali"},
+    {drag:"Ceahlău",ico:"⛰️",drop:"Carpații Orientali"},
+    {drag:"Bihor",ico:"⛰️",drop:"Carpații Occidentali"},
+    {drag:"Bucegi",ico:"⛰️",drop:"Carpații Meridionali"},
+    {drag:"Rodnei",ico:"⛰️",drop:"Carpații Orientali"},
+  ]},
+  {title:"Lacuri → Tip de formare",items:[
+    {drag:"Sf. Ana",ico:"💧",drop:"Vulcanic"},
+    {drag:"Bâlea",ico:"💧",drop:"Glaciar"},
+    {drag:"Razelm",ico:"💧",drop:"Liman marin"},
+    {drag:"Bicaz",ico:"💧",drop:"Antropic (baraj)"},
+    {drag:"Roșu",ico:"💧",drop:"Baraj natural (alunecare)"},
+  ]},
+  {title:"State → Capitale europene",items:[
+    {drag:"Austria",ico:"🏙️",drop:"Viena"},
+    {drag:"Grecia",ico:"🏙️",drop:"Atena"},
+    {drag:"Portugalia",ico:"🏙️",drop:"Lisabona"},
+    {drag:"Polonia",ico:"🏙️",drop:"Varșovia"},
+    {drag:"Ungaria",ico:"🏙️",drop:"Budapesta"},
+    {drag:"Bulgaria",ico:"🏙️",drop:"Sofia"},
+  ]},
+  {title:"Vânturi → Caracteristici principale",items:[
+    {drag:"Crivăț",ico:"💨",drop:"Rece, uscat, Nord-Est"},
+    {drag:"Austrul",ico:"💨",drop:"Cald, uscat, Sud-Vest"},
+    {drag:"Foehn",ico:"💨",drop:"Cald-uscat, coborând munți"},
+    {drag:"Mistral",ico:"💨",drop:"Rece, puternic, S-E Franța"},
+  ]},
+  {title:"Instituții UE → Sediu",items:[
+    {drag:"Parlamentul European",ico:"🏛️",drop:"Strasbourg / Bruxelles"},
+    {drag:"Curtea de Justiție",ico:"🏛️",drop:"Luxemburg"},
+    {drag:"Banca Centrală Europeană",ico:"🏛️",drop:"Frankfurt"},
+    {drag:"Comisia Europeană",ico:"🏛️",drop:"Bruxelles"},
+  ]},
+  {title:"Resurse → Zonă de exploatare în România",items:[
+    {drag:"Huilă",ico:"⛏️",drop:"Petroșani (Valea Jiului)"},
+    {drag:"Lignit",ico:"⛏️",drop:"Oltenia (Rovinari, Turceni)"},
+    {drag:"Aur & Argint",ico:"⛏️",drop:"Munții Apuseni"},
+    {drag:"Petrol",ico:"⛏️",drop:"Muntenia și Oltenia"},
+    {drag:"Gaze naturale",ico:"⛏️",drop:"Transilvania și Câmpia Română"},
+  ]},
+  {title:"Țări vecine → Capitale",items:[
+    {drag:"Ucraina",ico:"🌍",drop:"Kyiv (Kiev)"},
+    {drag:"Republica Moldova",ico:"🌍",drop:"Chișinău"},
+    {drag:"Bulgaria",ico:"🌍",drop:"Sofia"},
+    {drag:"Ungaria",ico:"🌍",drop:"Budapesta"},
+    {drag:"Serbia",ico:"🌍",drop:"Belgrad"},
+  ]},
+
+  /* ── NOU: Vânturi → Caracteristici ── */
+  {title:"Vânturi → Caracteristici principale",items:[
+    {drag:"Crivăț",ico:"💨",drop:"Rece, uscat, Nord-Est"},
+    {drag:"Sirocco",ico:"💨",drop:"Cald, prafos, din Sahara"},
+    {drag:"Foehn",ico:"💨",drop:"Cald-uscat, coboară munții"},
+    {drag:"Bora",ico:"💨",drop:"Rece, violent, coasta Adriatică"},
+    {drag:"Mistral",ico:"💨",drop:"Rece, puternic, S Franța"},
+  ]},
+  {title:"Vânturi → Direcție / Regiune",items:[
+    {drag:"Austrul",ico:"💨",drop:"Cald, uscat, din Vest/SV (România)"},
+    {drag:"Tramontana",ico:"💨",drop:"Rece din Nord (NE Spania, Italia)"},
+    {drag:"Meltemi",ico:"💨",drop:"Estival, Marea Egee (Grecia)"},
+    {drag:"Briza marină (zi)",ico:"💨",drop:"De pe mare spre uscat"},
+    {drag:"Briza de munte (noapte)",ico:"💨",drop:"De pe vârf spre vale"},
+  ]},
+
+  /* ── NOU: Râuri → Trec prin reședințe ── */
+  {title:"Râuri → Trec prin aceste reședințe de județ",items:[
+    {drag:"Olt",ico:"🌊",drop:"Miercurea Ciuc → Sfântu Gh. → Rm. Vâlcea → Slatina"},
+    {drag:"Jiu",ico:"🌊",drop:"Târgu Jiu → Craiova"},
+    {drag:"Mureș",ico:"🌊",drop:"Târgu Mureș → Deva → Arad"},
+    {drag:"Dâmbovița",ico:"🌊",drop:"Târgoviște → București"},
+    {drag:"Bistrița",ico:"🌊",drop:"Piatra Neamț"},
+  ]},
+
+  /* ── NOU: Capitale → State ── */
+  {title:"Capitale → State europene (Balcani/Est)",items:[
+    {drag:"Tirana",ico:"🏙️",drop:"Albania"},
+    {drag:"Podgorica",ico:"🏙️",drop:"Muntenegru"},
+    {drag:"Pristina",ico:"🏙️",drop:"Kosovo"},
+    {drag:"Skopje",ico:"🏙️",drop:"Macedonia de Nord"},
+    {drag:"Ljubljana",ico:"🏙️",drop:"Slovenia"},
+    {drag:"Sarajevo",ico:"🏙️",drop:"Bosnia și Herțegovina"},
+  ]},
+  {title:"Capitale → State europene (Nord și Mici)",items:[
+    {drag:"Reykjavik",ico:"🏙️",drop:"Islanda"},
+    {drag:"Valletta",ico:"🏙️",drop:"Malta"},
+    {drag:"Vaduz",ico:"🏙️",drop:"Liechtenstein"},
+    {drag:"Andorra la Vella",ico:"🏙️",drop:"Andorra"},
+    {drag:"Berna",ico:"🏙️",drop:"Elveția"},
+    {drag:"San Marino",ico:"🏙️",drop:"San Marino (stat)"},
+  ]},
+  {title:"Capitale → State europene (Baltic + Est)",items:[
+    {drag:"Tallinn",ico:"🏙️",drop:"Estonia"},
+    {drag:"Riga",ico:"🏙️",drop:"Letonia"},
+    {drag:"Vilnius",ico:"🏙️",drop:"Lituania"},
+    {drag:"Minsk",ico:"🏙️",drop:"Belarus"},
+    {drag:"Kyiv (Kiev)",ico:"🏙️",drop:"Ucraina"},
+    {drag:"Chișinău",ico:"🏙️",drop:"Republica Moldova"},
+  ]},
+
+  /* ── NOU: Tipuri de Climă → Temp & Precipitații ── */
+  {title:"Tipuri de Climă → Temperatura medie anuală",items:[
+    {drag:"Oceanică (atlantică)",ico:"🌡️",drop:"8–12°C"},
+    {drag:"Mediteraneană",ico:"🌡️",drop:"15–18°C"},
+    {drag:"Temperat-continentală",ico:"🌡️",drop:"8–10°C"},
+    {drag:"Subarctică (boreală)",ico:"🌡️",drop:"0–4°C"},
+    {drag:"Arctică / Tundră",ico:"🌡️",drop:"Sub 0°C"},
+  ]},
+  {title:"Tipuri de Climă → Precipitații medii anuale",items:[
+    {drag:"Oceanică (atlantică)",ico:"🌧️",drop:"700–1200 mm"},
+    {drag:"Mediteraneană",ico:"🌧️",drop:"400–700 mm (iarna)"},
+    {drag:"Temperat-continentală",ico:"🌧️",drop:"600–700 mm"},
+    {drag:"Alpină (montană)",ico:"🌧️",drop:"800–2000 mm"},
+    {drag:"Arctică / Tundră",ico:"🌧️",drop:"200–400 mm (zăpadă)"},
+  ]},
+
+  /* ── NOU: Vulcani → Localizare ── */
+  {title:"Vulcani → Localizare în Europa",items:[
+    {drag:"Etna",ico:"🌋",drop:"Sicilia, Italia"},
+    {drag:"Vezuviu",ico:"🌋",drop:"Campania (Napoli), Italia"},
+    {drag:"Eyjafjallajökull",ico:"🌋",drop:"Islanda"},
+    {drag:"Santorini",ico:"🌋",drop:"Grecia (Marea Egee)"},
+    {drag:"Teide",ico:"🌋",drop:"Tenerife, Insulele Canare"},
+  ]},
+
+  /* ── NOU: Ghețari → Localizare ── */
+  {title:"Ghețari → Localizare",items:[
+    {drag:"Vatnajökull (~8100 km²)",ico:"🧊",drop:"Islanda"},
+    {drag:"Aletsch (~82 km lungime)",ico:"🧊",drop:"Elveția (Alpi)"},
+    {drag:"Mer de Glace",ico:"🧊",drop:"Franța (Alpi)"},
+    {drag:"Jostedalsbreen",ico:"🧊",drop:"Norvegia"},
+    {drag:"Bucura / Zănoaga",ico:"🧊",drop:"Munții Retezat, România"},
+  ]},
+
+  /* ── NOU: Fluvii → Se varsă în ── */
+  {title:"Fluvii Europene → Se varsă în",items:[
+    {drag:"Volga",ico:"🌊",drop:"Marea Caspică"},
+    {drag:"Dunărea",ico:"🌊",drop:"Marea Neagră"},
+    {drag:"Rinul",ico:"🌊",drop:"Marea Nordului"},
+    {drag:"Sena",ico:"🌊",drop:"Canalul Mânecii"},
+    {drag:"Rona (Rhône)",ico:"🌊",drop:"Marea Mediterană"},
+    {drag:"Loara (Loire)",ico:"🌊",drop:"Oceanul Atlantic"},
+  ]},
+
+  /* ── NOU: Județe → Resedinte ── */
+  {title:"Județe → Reședințe (selecție)",items:[
+    {drag:"Harghita",ico:"🏛️",drop:"Miercurea Ciuc"},
+    {drag:"Covasna",ico:"🏛️",drop:"Sfântu Gheorghe"},
+    {drag:"Gorj",ico:"🏛️",drop:"Târgu Jiu"},
+    {drag:"Hunedoara",ico:"🏛️",drop:"Deva"},
+    {drag:"Mehedinți",ico:"🏛️",drop:"Drobeta-Turnu Severin"},
+    {drag:"Ilfov",ico:"🏛️",drop:"Buftea"},
+  ]},
+  {title:"Județe → Reședințe (selecție 2)",items:[
+    {drag:"Bihor",ico:"🏛️",drop:"Oradea"},
+    {drag:"Maramureș",ico:"🏛️",drop:"Baia Mare"},
+    {drag:"Mureș",ico:"🏛️",drop:"Târgu Mureș"},
+    {drag:"Timiș",ico:"🏛️",drop:"Timișoara"},
+    {drag:"Constanța",ico:"🏛️",drop:"Constanța"},
+    {drag:"Brăila",ico:"🏛️",drop:"Brăila"},
+  ]},
+
+  /* ══ SET 2 — MATCH noi ══ */
+
+  {title:"Subcarpați → Subdiviziuni principale",items:[
+    {drag:"Subcarpații Moldovei",ico:"🏔️",drop:"Neamț, Bacău, Suceava"},
+    {drag:"Subcarpații de Curbură",ico:"🏔️",drop:"Vrancea, Buzău, Prahova"},
+    {drag:"Subcarpații Getici",ico:"🏔️",drop:"Argeș, Dâmbovița, Gorj, Vâlcea"},
+  ]},
+
+  {title:"Câmpii → Județe principale",items:[
+    {drag:"Câmpia Olteniei",ico:"🌾",drop:"Dolj, Olt, Mehedinți"},
+    {drag:"Câmpia Bărăganului",ico:"🌾",drop:"Ialomița, Călărași, Brăila"},
+    {drag:"Câmpia Vlăsiei",ico:"🌾",drop:"Ilfov, Giurgiu, Dâmbovița (E)"},
+    {drag:"Câmpia Someșului",ico:"🌾",drop:"Satu Mare, Bihor (N)"},
+    {drag:"Câmpia Banatului",ico:"🌾",drop:"Timiș, Arad (S)"},
+  ]},
+
+  {title:"Podișuri → Subdiviziuni principale",items:[
+    {drag:"Podișul Someșan",ico:"🗺️",drop:"Cluj, Sălaj, Bistrița-Năsăud"},
+    {drag:"Podișul Târnavelor",ico:"🗺️",drop:"Mureș, Sibiu, Brașov"},
+    {drag:"Câmpia Transilvaniei",ico:"🗺️",drop:"Cluj, Mureș, Bistrița-Năsăud"},
+    {drag:"Podișul Bârladului",ico:"🗺️",drop:"Iași, Vaslui, Galați"},
+    {drag:"Podișul Sucevei",ico:"🗺️",drop:"Suceava, Botoșani, Iași"},
+  ]},
+
+  {title:"Vârfuri → Altitudini (România)",items:[
+    {drag:"Moldoveanu",ico:"🏔️",drop:"2544 m"},
+    {drag:"Negoiu",ico:"🏔️",drop:"2535 m"},
+    {drag:"Pietrosu Rodnei",ico:"🏔️",drop:"2303 m"},
+    {drag:"Pietrosu Călimanilor",ico:"🏔️",drop:"2101 m"},
+    {drag:"Cucurbăta Mare",ico:"🏔️",drop:"1849 m"},
+  ]},
+
+  {title:"Unități de relief → Altitudine maximă",items:[
+    {drag:"Carpații Meridionali",ico:"⛰️",drop:"2544 m (Moldoveanu)"},
+    {drag:"Carpații Orientali",ico:"⛰️",drop:"2303 m (Pietrosu Rodnei)"},
+    {drag:"Carpații Occidentali",ico:"⛰️",drop:"1849 m (Cucurbăta Mare)"},
+    {drag:"Alpii (Europa)",ico:"⛰️",drop:"4808 m (Mont Blanc)"},
+    {drag:"Dobrogea",ico:"⛰️",drop:"467 m (Vf. Țuțuiatu)"},
+  ]},
+
+  {title:"Fluvii → Lungime",items:[
+    {drag:"Volga",ico:"🌊",drop:"3531 km"},
+    {drag:"Dunărea",ico:"🌊",drop:"2860 km"},
+    {drag:"Niprul",ico:"🌊",drop:"2287 km"},
+    {drag:"Rinul",ico:"🌊",drop:"1230 km"},
+    {drag:"Mureșul",ico:"🌊",drop:"~761 km"},
+  ]},
+
+  {title:"Resurse → Zone de exploatare România",items:[
+    {drag:"Huilă",ico:"⛏️",drop:"Petroșani (Valea Jiului)"},
+    {drag:"Lignit",ico:"⛏️",drop:"Oltenia (Rovinari, Turceni, Motru)"},
+    {drag:"Aur & Argint",ico:"⛏️",drop:"Munții Apuseni (Brad, Roșia Montană)"},
+    {drag:"Gaz metan",ico:"⛏️",drop:"Câmpia Transilvaniei (Sarmaș, Bazna)"},
+    {drag:"Sare",ico:"⛏️",drop:"Praid, Slănic, Ocna Mureș"},
+  ]},
+
+  {title:"Tipuri de climă → Precipitații anuale",items:[
+    {drag:"Oceanică (atlantică)",ico:"🌧️",drop:"700–1200 mm"},
+    {drag:"Mediteraneană",ico:"🌧️",drop:"400–700 mm (concentrate iarna)"},
+    {drag:"Temperat-continentală",ico:"🌧️",drop:"600–700 mm"},
+    {drag:"Alpină (montană)",ico:"🌧️",drop:"800–2000 mm"},
+    {drag:"Arctică / Tundră",ico:"🌧️",drop:"200–400 mm (zăpadă)"},
+  ]},
+
+  {title:"Tipuri de climă → Temp. medie anuală",items:[
+    {drag:"Oceanică (atlantică)",ico:"🌡️",drop:"8–12°C"},
+    {drag:"Mediteraneană",ico:"🌡️",drop:"15–18°C"},
+    {drag:"Temperat-continentală",ico:"🌡️",drop:"8–10°C"},
+    {drag:"Subarctică (boreală)",ico:"🌡️",drop:"0–4°C"},
+    {drag:"Arctică / Tundră",ico:"🌡️",drop:"Sub 0°C (medie anuală)"},
+  ]},
+
+  {title:"Județe → Reședințe (set 3)",items:[
+    {drag:"Suceava",ico:"🏛️",drop:"Suceava"},
+    {drag:"Neamț",ico:"🏛️",drop:"Piatra Neamț"},
+    {drag:"Bacău",ico:"🏛️",drop:"Bacău"},
+    {drag:"Iași",ico:"🏛️",drop:"Iași"},
+    {drag:"Vaslui",ico:"🏛️",drop:"Vaslui"},
+    {drag:"Galați",ico:"🏛️",drop:"Galați"},
+  ]},
+
+  {title:"Județe → Reședințe (set 4)",items:[
+    {drag:"Vrancea",ico:"🏛️",drop:"Focșani"},
+    {drag:"Buzău",ico:"🏛️",drop:"Buzău"},
+    {drag:"Prahova",ico:"🏛️",drop:"Ploiești"},
+    {drag:"Dâmbovița",ico:"🏛️",drop:"Târgoviște"},
+    {drag:"Argeș",ico:"🏛️",drop:"Pitești"},
+    {drag:"Vâlcea",ico:"🏛️",drop:"Râmnicu Vâlcea"},
+  ]},
+
+  {title:"Județe → Reședințe (set 5)",items:[
+    {drag:"Dolj",ico:"🏛️",drop:"Craiova"},
+    {drag:"Olt",ico:"🏛️",drop:"Slatina"},
+    {drag:"Gorj",ico:"🏛️",drop:"Târgu Jiu"},
+    {drag:"Mehedinți",ico:"🏛️",drop:"Drobeta-Turnu Severin"},
+    {drag:"Caraș-Severin",ico:"🏛️",drop:"Reșița"},
+    {drag:"Hunedoara",ico:"🏛️",drop:"Deva"},
+  ]},
+
+  /* SET 3 MATCH */
+  {title:"Lacuri → Tip de formare",items:[
+    {drag:"Sf. Ana",ico:"💧",drop:"Vulcanic"},
+    {drag:"Bâlea",ico:"💧",drop:"Glaciar"},
+    {drag:"Razelm",ico:"💧",drop:"Liman marin"},
+    {drag:"Bicaz (Izvorul Muntelui)",ico:"💧",drop:"Antropic (baraj)"},
+    {drag:"Lacul Roșu",ico:"💧",drop:"Baraj natural (alunecare)"},
+  ]},
+
+  {title:"Lacuri glaciare → Masiv montan",items:[
+    {drag:"Bucura",ico:"💧",drop:"Munții Retezat"},
+    {drag:"Zănoaga",ico:"💧",drop:"Munții Retezat"},
+    {drag:"Bâlea",ico:"💧",drop:"Munții Făgăraș"},
+    {drag:"Podragu",ico:"💧",drop:"Munții Făgăraș"},
+    {drag:"Lacul Vulturilor",ico:"💧",drop:"Munții Siriu"},
+  ]},
+
+  {title:"Fluvii Europene → Lungime",items:[
+    {drag:"Volga",ico:"🌊",drop:"3531 km"},
+    {drag:"Dunărea",ico:"🌊",drop:"2860 km"},
+    {drag:"Niprul",ico:"🌊",drop:"2287 km"},
+    {drag:"Rinul",ico:"🌊",drop:"1230 km"},
+    {drag:"Mureșul",ico:"🌊",drop:"~761 km"},
+  ]},
+
+  {title:"Fluvii → Se varsă în",items:[
+    {drag:"Volga",ico:"🌊",drop:"Marea Caspică"},
+    {drag:"Dunărea",ico:"🌊",drop:"Marea Neagră"},
+    {drag:"Rinul",ico:"🌊",drop:"Marea Nordului"},
+    {drag:"Sena",ico:"🌊",drop:"Canalul Mânecii"},
+    {drag:"Rona (Rhône)",ico:"🌊",drop:"Marea Mediterană"},
+    {drag:"Loara (Loire)",ico:"🌊",drop:"Oceanul Atlantic"},
+  ]},
+
+  {title:"Vulcani → Cauza geologică",items:[
+    {drag:"Islanda (rift)",ico:"🌋",drop:"Divergența plăcilor (Rift Atlantic)"},
+    {drag:"Etna / Stromboli",ico:"🌋",drop:"Subducția plăcii africane"},
+    {drag:"Insulele Canare",ico:"🌋",drop:"Hotspot oceanic"},
+    {drag:"Santorini",ico:"🌋",drop:"Arcul vulcanic egeean (subducție)"},
+    {drag:"Vezuviu",ico:"🌋",drop:"Zona de subducție mediteraneană"},
+  ]},
+
+  {title:"Ghețari → Localizare",items:[
+    {drag:"Vatnajökull (~8100 km²)",ico:"🧊",drop:"Islanda"},
+    {drag:"Aletsch (~82 km lungime)",ico:"🧊",drop:"Elveția (Alpi)"},
+    {drag:"Mer de Glace",ico:"🧊",drop:"Franța (Alpi)"},
+    {drag:"Jostedalsbreen",ico:"🧊",drop:"Norvegia"},
+    {drag:"Bucura / Zănoaga",ico:"🧊",drop:"Munții Retezat, România"},
+  ]},
+
+  {title:"Instituții UE → Sediu",items:[
+    {drag:"Parlamentul European",ico:"🏛️",drop:"Strasbourg / Bruxelles"},
+    {drag:"Curtea de Justiție",ico:"🏛️",drop:"Luxemburg"},
+    {drag:"Banca Centrală Europeană",ico:"🏛️",drop:"Frankfurt"},
+    {drag:"Comisia Europeană",ico:"🏛️",drop:"Bruxelles"},
+    {drag:"Consiliul UE",ico:"🏛️",drop:"Bruxelles"},
+  ]},
+
+  {title:"Resurse → Zone de exploatare România",items:[
+    {drag:"Huilă",ico:"⛏️",drop:"Petroșani (Valea Jiului)"},
+    {drag:"Lignit",ico:"⛏️",drop:"Oltenia (Rovinari, Turceni, Motru)"},
+    {drag:"Aur & Argint",ico:"⛏️",drop:"Munții Apuseni (Brad, Roșia Montană)"},
+    {drag:"Gaz metan",ico:"⛏️",drop:"Câmpia Transilvaniei (Sarmaș, Bazna)"},
+    {drag:"Sare",ico:"⛏️",drop:"Praid, Slănic, Ocna Mureș"},
+  ]},
+
+  {title:"Dealuri de Vest → Specificități",items:[
+    {drag:"Dealurile Silvaniei",ico:"🏔️",drop:"Pomicultură, Sălaj (Zalău)"},
+    {drag:"Dealurile Crișene",ico:"🏔️",drop:"Băile Felix (izvoare termale)"},
+    {drag:"Dealurile Banato-Crișene",ico:"🏔️",drop:"Viticultură Miniș-Măderat"},
+  ]},
+
+  {title:"Câmpii → Specificități",items:[
+    {drag:"Câmpia Olteniei",ico:"🌾",drop:"Risc deșertificare (Dăbuleni)"},
+    {drag:"Câmpia Bărăganului",ico:"🌾",drop:"Grânarul României, loess, cernoziomuri"},
+    {drag:"Câmpia Vlăsiei",ico:"🌾",drop:"București, Snagov, Căldărușani"},
+    {drag:"Câmpia Banatului",ico:"🌾",drop:"Cea mai fertilă din Câmpia de Vest"},
+    {drag:"Câmpia Siretului Inferior",ico:"🌾",drop:"Galați, risc inundații, viticultură"},
+  ]},
+
+  {title:"Judete → Resedinte (set 6)",items:[
+    {drag:"Alba",ico:"🏛️",drop:"Alba Iulia"},
+    {drag:"Cluj",ico:"🏛️",drop:"Cluj-Napoca"},
+    {drag:"Sibiu",ico:"🏛️",drop:"Sibiu"},
+    {drag:"Brașov",ico:"🏛️",drop:"Brașov"},
+    {drag:"Harghita",ico:"🏛️",drop:"Miercurea Ciuc"},
+    {drag:"Covasna",ico:"🏛️",drop:"Sfântu Gheorghe"},
+  ]},
+
+  {title:"Vânturi → Caracteristici (complet)",items:[
+    {drag:"Crivăț",ico:"💨",drop:"Rece, uscat, Nord-Est (România)"},
+    {drag:"Foehn",ico:"💨",drop:"Cald-uscat, coboară munții (Alpi)"},
+    {drag:"Bora",ico:"💨",drop:"Rece, violent, coasta Adriatică"},
+    {drag:"Mistral",ico:"💨",drop:"Rece, puternic, S Franța – valea Ronului"},
+    {drag:"Sirocco",ico:"💨",drop:"Cald, prafos, din Sahara"},
+  ]},
+
+  {title:"Clima → Vânturi caracteristice",items:[
+    {drag:"Clima oceanică",ico:"🌬️",drop:"Westerlies (vânturi de Vest)"},
+    {drag:"Clima mediteraneană",ico:"🌬️",drop:"Mistral, Sirocco, Bora"},
+    {drag:"Clima continentală (România)",ico:"🌬️",drop:"Crivăț (NE), Austrul (SV)"},
+    {drag:"Clima alpină",ico:"🌬️",drop:"Foehn (versanți adăpostiți)"},
+    {drag:"Clima subarctică",ico:"🌬️",drop:"Vânturi polare"},
+  ]},
+];
+
+/* ══ GRILĂ ENGINE ══ */
+const gChaps = Object.keys(GRILA_DATA);
+let gActive = 'Toate', gAnswered = {}, gCurrent = [];
+
+function buildGrilaChaps(){
+  const el = document.getElementById('grila-chaps');
+  el.innerHTML = '';
+  ['Toate', ...gChaps].forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'chap-btn' + (c==='Toate'?' active':'');
+    b.textContent = c;
+    b.onclick = () => {
+      document.querySelectorAll('#grila-chaps .chap-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      gActive = c;
+      renderGrila();
+    };
+    el.appendChild(b);
+  });
+}
+
+function renderGrila(){
+  let pool = gActive==='Toate'
+    ? Object.values(GRILA_DATA).flat()
+    : [...(GRILA_DATA[gActive]||[])];
+  gCurrent = pool.sort(()=>Math.random()-.5).slice(0,10);
+  gAnswered = {};
+  const c = document.getElementById('grila-container');
+  c.innerHTML = '';
+  document.getElementById('grila-result').classList.remove('show');
+  gCurrent.forEach((q,i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card'; card.id = 'gc-'+i;
+    const opts = q.opts.map((o,j) => `
+      <div class="opt" onclick="answerGrila(${i},${j})" id="go-${i}-${j}">
+        <span class="opt-lbl">${['A','B','C','D'][j]}</span>${o}
+      </div>`).join('');
+    card.innerHTML = `
+      <div class="q-num">ÎNTREBAREA ${i+1} / ${gCurrent.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="opts">${opts}</div>
+      <div class="q-feedback" id="gf-${i}"></div>`;
+    c.appendChild(card);
+  });
+}
+
+function answerGrila(qi, oi){
+  if(gAnswered[qi] !== undefined) return;
+  gAnswered[qi] = oi;
+  const q = gCurrent[qi];
+  const correct = oi === q.a;
+  addScore(correct);
+  document.getElementById(`go-${qi}-${q.a}`).classList.add('correct-ans');
+  if(!correct) document.getElementById(`go-${qi}-${oi}`).classList.add('wrong-ans');
+  document.getElementById('gc-'+qi).classList.add(correct?'correct':'wrong');
+  const fb = document.getElementById('gf-'+qi);
+  fb.className = 'q-feedback show ' + (correct?'ok':'err');
+  fb.textContent = correct ? '✓ Corect!' : '✗ Greșit. Răspuns corect: '+['A','B','C','D'][q.a]+') '+q.opts[q.a];
+  document.querySelectorAll(`[id^="go-${qi}-"]`).forEach(o=>o.style.pointerEvents='none');
+  if(Object.keys(gAnswered).length === gCurrent.length) showResult('grila');
+}
+
+/* ══ TF ENGINE ══ */
+const tfChaps = Object.keys(TF_DATA);
+let tfActive = 'Toate', tfAnswered = {}, tfCurrent = [];
+
+function buildTFChaps(){
+  const el = document.getElementById('tf-chaps');
+  el.innerHTML = '';
+  ['Toate', ...tfChaps].forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'chap-btn' + (c==='Toate'?' active':'');
+    b.textContent = c;
+    b.onclick = () => {
+      document.querySelectorAll('#tf-chaps .chap-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      tfActive = c;
+      renderTF();
+    };
+    el.appendChild(b);
+  });
+}
+
+function renderTF(){
+  let pool = tfActive==='Toate'
+    ? Object.values(TF_DATA).flat()
+    : [...(TF_DATA[tfActive]||[])];
+  tfCurrent = pool.sort(()=>Math.random()-.5).slice(0,12);
+  tfAnswered = {};
+  const c = document.getElementById('tf-container');
+  c.innerHTML = '';
+  document.getElementById('tf-result').classList.remove('show');
+  tfCurrent.forEach((q,i) => {
+    const card = document.createElement('div');
+    card.className = 'tf-card'; card.id = 'tfc-'+i;
+    card.innerHTML = `
+      <div class="q-num">ENUNȚUL ${i+1}</div>
+      <div class="tf-text">${q.s}</div>
+      <div class="tf-btns">
+        <button class="tf-btn t" onclick="answerTF(${i},true)">✓ Adevărat</button>
+        <button class="tf-btn f" onclick="answerTF(${i},false)">✗ Fals</button>
+      </div>
+      <div class="q-feedback" id="tff-${i}"></div>`;
+    c.appendChild(card);
+  });
+}
+
+function answerTF(i, ans){
+  if(tfAnswered[i] !== undefined) return;
+  tfAnswered[i] = ans;
+  const q = tfCurrent[i];
+  const correct = ans === q.a;
+  addScore(correct);
+  const card = document.getElementById('tfc-'+i);
+  card.classList.add(correct?'correct':'wrong');
+  const btns = card.querySelectorAll('.tf-btn');
+  btns.forEach(b => { b.style.pointerEvents='none'; b.style.opacity='.5'; });
+  const picked = ans ? btns[0] : btns[1];
+  picked.style.opacity = '1';
+  picked.classList.add(correct?'correct':'wrong');
+  if(!correct){
+    const correctBtn = q.a ? btns[0] : btns[1];
+    correctBtn.style.opacity='1';
+    correctBtn.classList.add('correct');
+  }
+  const fb = document.getElementById('tff-'+i);
+  fb.className = 'q-feedback show ' + (correct?'ok':'err');
+  fb.textContent = correct ? '✓ Corect!' : `✗ Fals! ${q.exp||'Răspuns corect: '+(q.a?'Adevărat':'Fals')}`;
+  if(Object.keys(tfAnswered).length === tfCurrent.length) showResult('tf');
+}
+
+/* ══ RESULT ══ */
+function showResult(type){
+  const answered = type==='grila' ? gAnswered : tfAnswered;
+  const current = type==='grila' ? gCurrent : tfCurrent;
+  const ok = Object.entries(answered).filter(([i,o]) =>
+    type==='grila' ? current[i].a===o : current[i].a===o
+  ).length;
+  const tot = current.length;
+  const pct = Math.round(ok/tot*100);
+  const r = document.getElementById(type+'-result');
+  r.innerHTML = `<div class="result-emoji">${pct>=80?'🏆':pct>=60?'👍':'📚'}</div>
+    <h3>${pct>=80?'Excelent!':pct>=60?'Bun progres!':'Continuă să exersezi!'}</h3>
+    <div class="result-pct">${ok}/${tot}</div>
+    <p>${pct}% răspunsuri corecte</p>`;
+  r.classList.add('show');
+}
+
+/* ══ MATCH ENGINE ══ */
+let matchDragSrc = null;
+
+function buildMatch(){
+  matchDragSrc = null;
+  const c = document.getElementById('match-container');
+  c.innerHTML = '';
+  document.getElementById('match-result').classList.remove('show');
+
+  // Pick 4 random sets
+  const chosen = [...MATCH_SETS].sort(()=>Math.random()-.5).slice(0,4);
+
+  chosen.forEach((set, si) => {
+    const div = document.createElement('div');
+    div.className = 'match-set';
+    const shuffled = [...set.items].sort(()=>Math.random()-.5);
+    const leftHTML = shuffled.map((it,j) => `
+      <div class="drag-item" draggable="true" id="drag-${si}-${j}"
+        data-val="${it.drag}" data-set="${si}"
+        ondragstart="dragStart(event,this)" ondragend="dragEnd(event,this)">
+        <span class="drag-ico">${it.ico}</span>${it.drag}
+      </div>`).join('');
+    const rightHTML = set.items.map((it,j) => `
+      <div>
+        <div class="drop-label">${it.drop}</div>
+        <div class="drop-zone" id="drop-${si}-${j}"
+          data-set="${si}" data-target="${it.drag}"
+          ondragover="dragOver(event,this)"
+          ondragleave="dragLeave(event,this)"
+          ondrop="doDrop(event,this)">Trage aici →</div>
+      </div>`).join('');
+    div.innerHTML = `
+      <div class="match-set-title">📌 ${set.title}</div>
+      <div class="match-wrap">
+        <div><h4>Elemente</h4>${leftHTML}</div>
+        <div><h4>Categorii</h4>${rightHTML}</div>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+
+function dragStart(e,el){ matchDragSrc=el; el.classList.add('dragging'); e.dataTransfer.setData('text',el.dataset.val+':'+el.dataset.set); }
+function dragEnd(e,el){ el.classList.remove('dragging'); }
+function dragOver(e,el){ e.preventDefault(); el.classList.add('drag-over'); }
+function dragLeave(e,el){ el.classList.remove('drag-over'); }
+
+function doDrop(e, dropEl){
+  e.preventDefault();
+  dropEl.classList.remove('drag-over');
+  const [val, si] = e.dataTransfer.getData('text').split(':');
+  if(dropEl.dataset.set !== si) return;
+  // Clear previous placement of this drag item
+  document.querySelectorAll('.drop-zone').forEach(dz => {
+    if(dz.dataset.currentDrag === val && dz !== dropEl){
+      dz.innerHTML = 'Trage aici →';
+      dz.classList.remove('filled');
+      dz.dataset.currentDrag = '';
+    }
+  });
+  dropEl.innerHTML = `<span style="margin-right:6px">${matchDragSrc.querySelector('.drag-ico').textContent}</span>${val}`;
+  dropEl.classList.add('filled');
+  dropEl.dataset.currentDrag = val;
+  matchDragSrc.classList.add('matched');
+  matchDragSrc.setAttribute('draggable','false');
+}
+
+function checkMatch(){
+  let ok=0, tot=0;
+  document.querySelectorAll('.drop-zone').forEach(dz => {
+    if(!dz.dataset.currentDrag) return;
+    tot++;
+    const correct = dz.dataset.currentDrag === dz.dataset.target;
+    dz.classList.remove('filled');
+    dz.classList.add(correct ? 'correct-drop' : 'wrong-drop');
+    if(correct){ok++; addScore(true);} else {addScore(false);}
+  });
+  const pct = tot>0 ? Math.round(ok/tot*100) : 0;
+  const r = document.getElementById('match-result');
+  r.innerHTML = `<div class="result-emoji">${pct>=80?'🎯':pct>=60?'👍':'🔄'}</div>
+    <h3>${pct>=80?'Potriviri perfecte!':pct>=60?'Aproape acolo!':'Mai încearcă!'}</h3>
+    <div class="result-pct">${ok}/${tot}</div>
+    <p>${pct}% potriviri corecte</p>`;
+  r.classList.add('show');
+}
+
+/* ══ INIT ══ */
+buildGrilaChaps();
+renderGrila();
+buildTFChaps();
+renderTF();
+buildMatch();
+</script>
+</body>
+</html>
