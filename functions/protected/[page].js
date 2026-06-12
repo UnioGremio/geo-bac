@@ -83,8 +83,10 @@ const fileRes = await fetch(fullURL);
    return new Response('Eroare la încărcarea conținutului.', { status: 503 });
   }
 
- const html = (await fileRes.text())
-   .replace('<head>', '<head><base href="/">');
+  const buffer = await fileRes.arrayBuffer();
+ const html = new TextDecoder('utf-8').decode(buffer)
+   .replace('<head>', '<head><meta charset="utf-8"><base href="/">');
+
 
  return new Response(html, {
    status: 200,
