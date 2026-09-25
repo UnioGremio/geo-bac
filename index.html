@@ -212,6 +212,27 @@ footer a{color:var(--text2);text-decoration:none;}
 .reveal{opacity:0;transform:translateY(30px);transition:all 0.7s cubic-bezier(0.16,1,0.3,1);}
 .reveal.visible{opacity:1;transform:translateY(0);}
 
+/* ── Recenzii ── */
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-bottom:40px;}
+.review-card{border:1px solid var(--border);border-radius:16px;padding:24px;background:var(--surface);}
+.review-card .rc-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;}
+.review-card .rc-name{font-family:var(--font);font-weight:700;font-size:14px;}
+.review-card .rc-stars{color:var(--amber);font-size:14px;letter-spacing:1px;flex-shrink:0;}
+.review-card .rc-text{color:var(--text2);font-size:14px;line-height:1.6;}
+.review-card .rc-date{color:var(--text3);font-size:11px;margin-top:12px;}
+.reviews-empty{color:var(--text3);text-align:center;padding:20px 0;grid-column:1/-1;font-size:14px;}
+.review-form-wrap{max-width:480px;margin:0 auto;border:1px solid var(--border2);border-radius:20px;padding:28px;background:var(--surface2);}
+.review-form-wrap h4{font-family:var(--font);font-weight:700;font-size:16px;margin-bottom:16px;}
+#recenzii-form input,#recenzii-form textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-family:var(--body);font-size:14px;margin-bottom:12px;}
+#recenzii-form input:focus,#recenzii-form textarea:focus{outline:none;border-color:var(--teal);}
+#recenzii-form textarea{resize:vertical;}
+.rec-stars{font-size:28px;color:var(--border2);letter-spacing:6px;margin-bottom:14px;cursor:pointer;user-select:none;}
+.rec-stars span.active{color:var(--amber);}
+.rec-msg{font-size:13px;margin-top:10px;color:var(--teal);min-height:1.2em;}
+.rec-msg.err{color:var(--coral);}
+.recenzii-hint{text-align:center;color:var(--text3);font-size:14px;max-width:480px;margin:0 auto;}
+.recenzii-hint a{color:var(--teal);font-weight:600;text-decoration:none;}
+
 /* ── Mobile ── */
 @media(max-width:900px){
   .nav-pills{display:none;}
@@ -535,6 +556,36 @@ footer a{color:var(--text2);text-decoration:none;}
   </div>
 </section>
 
+<!-- Recenzii -->
+<section class="section" id="recenzii">
+  <div class="reveal">
+    <div class="section-label">⭐ Păreri reale</div>
+    <h2 class="section-title">Ce spun cei care au încercat</h2>
+    <p class="section-desc">Recenzii de la utilizatori cu abonament activ — verificate manual, nu postate de oricine.</p>
+  </div>
+
+  <div id="recenzii-lista" class="reviews-grid">
+    <p class="reviews-empty">Se încarcă recenziile…</p>
+  </div>
+
+  <div id="recenzii-form-wrap" class="review-form-wrap" style="display:none">
+    <h4>Lasă o recenzie</h4>
+    <form id="recenzii-form">
+      <input type="text" id="rec-nume" placeholder="Numele tău (cum vrei să apară)" maxlength="60" required>
+      <div id="rec-stars" class="rec-stars" data-val="0">
+        <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+      </div>
+      <textarea id="rec-text" placeholder="Ce părere ai despre GeoBac?" rows="3" maxlength="1000" required></textarea>
+      <button type="submit" class="btn-primary">Trimite recenzia</button>
+      <p id="rec-msg" class="rec-msg"></p>
+    </form>
+  </div>
+
+  <p id="recenzii-login-hint" class="recenzii-hint" style="display:none">
+    <a href="login.html">Autentifică-te</a> cu un cont cu abonament activ ca să lași o recenzie.
+  </p>
+</section>
+
 <!-- Pricing -->
 <section class="price-section" id="cumpara">
   <div class="price-card reveal">
@@ -602,6 +653,187 @@ const obs=new IntersectionObserver((entries)=>{
   entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
 },{threshold:0.15,rootMargin:'0px 0px -40px 0px'});
 reveals.forEach(r=>obs.observe(r));
+
+// ─── Recenzii ───
+// Folosește exact aceleași constante și metodă (localStorage + XHR) ca auth.js,
+// ca sesiunea userului logat să fie recunoscută identic pe toate paginile.
+(function(){
+  var SUPABASE_URL = 'https://bxbefvelonocuheavsri.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4YmVmdmVsb25vY3VoZWF2c3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMTk5MzAsImV4cCI6MjA5Mjc5NTkzMH0.lRJX8JITWrBl1Mb6IeETtwBddTEOw7FI5isa9oGsGDA';
+
+  function getSession(){
+    try{
+      var raw = localStorage.getItem('sb-bxbefvelonocuheavsri-auth-token');
+      if(!raw) return null;
+      var data = JSON.parse(raw);
+      return (data && data.access_token) ? data : null;
+    }catch(e){ return null; }
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function incarcaRecenzii(){
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', SUPABASE_URL + '/rest/v1/recenzii?select=nume_afisat,nota,text,creat_la&status=eq.aprobata&order=creat_la.desc&limit=20', true);
+    xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+    xhr.onload = function(){
+      var cont = document.getElementById('recenzii-lista');
+      try{
+        var data = JSON.parse(xhr.responseText);
+        if(!Array.isArray(data) || !data.length){
+          cont.innerHTML = '<p class="reviews-empty">Fii primul care lasă o recenzie 👋</p>';
+          return;
+        }
+        cont.innerHTML = data.map(function(r){
+          return '<div class="review-card">'
+            + '<div class="rc-head"><span class="rc-name">'+escapeHtml(r.nume_afisat)+'</span>'
+            + '<span class="rc-stars">'+'★'.repeat(r.nota)+'☆'.repeat(5-r.nota)+'</span></div>'
+            + '<p class="rc-text">'+escapeHtml(r.text)+'</p>'
+            + '<div class="rc-date">'+new Date(r.creat_la).toLocaleDateString('ro-RO')+'</div>'
+            + '</div>';
+        }).join('');
+      }catch(e){
+        cont.innerHTML = '<p class="reviews-empty">Recenziile nu s-au putut încărca.</p>';
+      }
+    };
+    xhr.onerror = function(){
+      document.getElementById('recenzii-lista').innerHTML = '<p class="reviews-empty">Recenziile nu s-au putut încărca.</p>';
+    };
+    xhr.send();
+  }
+
+  function verificaAcces(){
+    var session = getSession();
+    if(!session){
+      document.getElementById('recenzii-login-hint').style.display = 'block';
+      return;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', SUPABASE_URL + '/rest/v1/profiles?select=is_premium&limit=1', true);
+    xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + session.access_token);
+    xhr.onload = function(){
+      try{
+        var d = JSON.parse(xhr.responseText);
+        if(Array.isArray(d) && d.length && d[0].is_premium === true){
+          document.getElementById('recenzii-form-wrap').style.display = 'block';
+        } else {
+          document.getElementById('recenzii-login-hint').style.display = 'block';
+        }
+      }catch(e){
+        document.getElementById('recenzii-login-hint').style.display = 'block';
+      }
+    };
+    xhr.onerror = function(){
+      document.getElementById('recenzii-login-hint').style.display = 'block';
+    };
+    xhr.send();
+  }
+
+  function trimiteRecenzie(userId, nume, nota, text, token, msg, btn, form){
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', SUPABASE_URL + '/rest/v1/recenzii', true);
+    xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('Prefer', 'return=minimal');
+    xhr.onload = function(){
+      btn.disabled = false;
+      if(xhr.status >= 200 && xhr.status < 300){
+        msg.className = 'rec-msg';
+        msg.textContent = 'Mulțumim! Recenzia ta a fost trimisă și va apărea aici după verificare.';
+        form.reset();
+        document.querySelectorAll('#rec-stars span').forEach(function(st){ st.classList.remove('active'); });
+        notaSelectata = 0;
+      } else if(xhr.status === 409){
+        msg.className = 'rec-msg err';
+        msg.textContent = 'Ai lăsat deja o recenzie cu acest cont.';
+      } else {
+        msg.className = 'rec-msg err';
+        msg.textContent = 'Ceva nu a mers. Încearcă din nou.';
+      }
+    };
+    xhr.onerror = function(){
+      btn.disabled = false;
+      msg.className = 'rec-msg err';
+      msg.textContent = 'Eroare de rețea.';
+    };
+    xhr.send(JSON.stringify({ user_id: userId, nume_afisat: nume, nota: nota, text: text }));
+  }
+
+  var notaSelectata = 0;
+
+  incarcaRecenzii();
+  verificaAcces();
+
+  var stele = document.querySelectorAll('#rec-stars span');
+  stele.forEach(function(s){
+    s.addEventListener('click', function(){
+      notaSelectata = parseInt(s.getAttribute('data-v'), 10);
+      stele.forEach(function(st){
+        st.classList.toggle('active', parseInt(st.getAttribute('data-v'),10) <= notaSelectata);
+      });
+    });
+  });
+
+  var form = document.getElementById('recenzii-form');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var msg = document.getElementById('rec-msg');
+    msg.className = 'rec-msg';
+    msg.textContent = '';
+
+    if(notaSelectata < 1){
+      msg.className = 'rec-msg err';
+      msg.textContent = 'Alege o notă (dă click pe stele).';
+      return;
+    }
+
+    var nume = document.getElementById('rec-nume').value.trim();
+    var text = document.getElementById('rec-text').value.trim();
+    if(!nume || text.length < 10){
+      msg.className = 'rec-msg err';
+      msg.textContent = 'Completează numele și un text de minim 10 caractere.';
+      return;
+    }
+
+    var session = getSession();
+    if(!session){
+      msg.className = 'rec-msg err';
+      msg.textContent = 'Sesiunea a expirat, reautentifică-te.';
+      return;
+    }
+
+    var btn = form.querySelector('button');
+    btn.disabled = true;
+
+    var xhrUser = new XMLHttpRequest();
+    xhrUser.open('GET', SUPABASE_URL + '/auth/v1/user', true);
+    xhrUser.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+    xhrUser.setRequestHeader('Authorization', 'Bearer ' + session.access_token);
+    xhrUser.onload = function(){
+      try{
+        var user = JSON.parse(xhrUser.responseText);
+        if(!user || !user.id) throw new Error('no user');
+        trimiteRecenzie(user.id, nume, notaSelectata, text, session.access_token, msg, btn, form);
+      }catch(e){
+        msg.className = 'rec-msg err';
+        msg.textContent = 'Nu am putut confirma contul. Reîncarcă pagina.';
+        btn.disabled = false;
+      }
+    };
+    xhrUser.onerror = function(){
+      msg.className = 'rec-msg err';
+      msg.textContent = 'Eroare de rețea.';
+      btn.disabled = false;
+    };
+    xhrUser.send();
+  });
+})();
 </script>
 </body>
 </html>

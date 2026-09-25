@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Moderare recenzii — geo-bac</title>
+<style>
+  :root{
+    --bg:#0c1117; --panel:#161c26; --text:#e8ecf1; --muted:#8b96a5;
+    --accent:#14b8a6; --danger:#e5484d; --border:#242c38;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:Outfit,system-ui,-apple-system,sans-serif;padding:1.2rem;}
+  h1{font-size:1.25rem;margin:0 0 1rem;}
+  #login{max-width:320px;margin:3rem auto;display:flex;flex-direction:column;gap:.7rem;}
+  input,button{font-family:inherit;font-size:1rem;padding:.65rem .8rem;
+    border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text);}
+  button{background:var(--accent);border:none;color:#04211d;font-weight:600;cursor:pointer;}
+  button.danger{background:var(--danger);color:#fff;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:1rem;margin-bottom:.8rem;}
+  .meta{font-size:.75rem;color:var(--muted);margin-bottom:.4rem;}
+  .stars{color:#f5b942;letter-spacing:2px;}
+  .txt{margin:.5rem 0 .8rem;line-height:1.4;white-space:pre-wrap;}
+  .row{display:flex;gap:.6rem;}
+  .row button{flex:1;}
+  #list{display:none;max-width:640px;margin:0 auto;}
+  #empty{color:var(--muted);text-align:center;padding:2rem 0;}
+  #err{color:var(--danger);font-size:.85rem;min-height:1.2em;}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <h1>Moderare recenzii</h1>
+  <input id="token" type="password" placeholder="Parola de admin" autocomplete="off">
+  <button onclick="autentifica()">Intră</button>
+  <div id="err"></div>
+</div>
+
+<div id="list">
+  <h1>Recenzii în așteptare</h1>
+  <div id="continut"><div id="empty">Se încarcă…</div></div>
+</div>
+
+<script>
+let TOKEN = '';
+
+document.getElementById('token').addEventListener('keydown', e => {
+  if (e.key === 'Enter') autentifica();
+});
+
+function autentifica(){
+  TOKEN = document.getElementById('token').value.trim();
+  if(!TOKEN) return;
+  incarca();
+}
+
+async function incarca(){
+  document.getElementById('err').textContent = '';
+  try{
+    const res = await fetch('/api/recenzii-admin', {
+      headers: { 'x-admin-token': TOKEN }
+    });
+    if(res.status === 401){
+      document.getElementById('err').textContent = 'Parolă greșită.';
+      return;
+    }
+    if(!res.ok){
+      document.getElementById('err').textContent = 'Eroare server.';
+      return;
+    }
+    const data = await res.json();
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('list').style.display = 'block';
+    randeaza(data);
+  }catch(e){
+    document.getElementById('err').textContent = 'Eroare de rețea.';
+  }
+}
+
+function randeaza(recenzii){
+  const cont = document.getElementById('continut');
+  if(!recenzii.length){
+    cont.innerHTML = '<div id="empty">Nicio recenzie în așteptare 🎉</div>';
+    return;
+  }
+  cont.innerHTML = recenzii.map(r => `
+    <div class="card" data-id="${r.id}">
+      <div class="meta">${escapeHtml(r.nume_afisat)} ·
+        <span class="stars">${'★'.repeat(r.nota)}${'☆'.repeat(5 - r.nota)}</span> ·
+        ${new Date(r.creat_la).toLocaleDateString('ro-RO')}</div>
+      <div class="txt">${escapeHtml(r.text)}</div>
+      <div class="row">
+        <button onclick="modereaza('${r.id}','aprobata',this)">Aprobă</button>
+        <button class="danger" onclick="modereaza('${r.id}','respinsa',this)">Respinge</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function modereaza(id, actiune, btn){
+  const card = btn.closest('.card');
+  card.style.opacity = '.5';
+  btn.closest('.row').querySelectorAll('button').forEach(b => b.disabled = true);
+  try{
+    const res = await fetch('/api/recenzii-admin', {
+      method: 'POST',
+      headers: { 'x-admin-token': TOKEN, 'content-type': 'application/json' },
+      body: JSON.stringify({ id, actiune })
+    });
+    if(res.ok){
+      card.remove();
+      if(!document.querySelectorAll('.card').length){
+        document.getElementById('continut').innerHTML = '<div id="empty">Nicio recenzie în așteptare 🎉</div>';
+      }
+    }else{
+      card.style.opacity = '1';
+      btn.closest('.row').querySelectorAll('button').forEach(b => b.disabled = false);
+    }
+  }catch(e){
+    card.style.opacity = '1';
+    btn.closest('.row').querySelectorAll('button').forEach(b => b.disabled = false);
+  }
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
