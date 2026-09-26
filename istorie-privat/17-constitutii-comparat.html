@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Constituțiile României — o radiografie prin lege (test)</title>
+<style>
+  :root{
+    --bg:#0c1117;
+    --bg-panel:#131a23;
+    --bg-page:#17202b;
+    --line:#2a3542;
+    --ink:#e9e6dd;
+    --ink-dim:#9aa4b0;
+    --gold:#c9a227;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:760px; margin:0 auto; padding:0 16px 50px; }
+
+  header{ padding:26px 0 14px; }
+  .eyebrow{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin:0 0 8px;
+  }
+  h1{
+    font-family:'Spectral',Georgia,'Times New Roman',serif;
+    font-weight:600;
+    font-size:clamp(22px,5.5vw,30px);
+    margin:0 0 8px;
+  }
+  .sub{
+    color:var(--ink-dim);
+    font-size:13.5px;
+    line-height:1.55;
+    max-width:60ch;
+    margin:0;
+  }
+
+  /* ---- table of contents ---- */
+  .toc{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding:16px 0;
+    -webkit-overflow-scrolling:touch;
+  }
+  .toc-item{
+    flex:none;
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:11px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    padding:7px 11px;
+    border-radius:4px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .toc-item.active{ color:var(--bg); background:var(--gold); border-color:var(--gold); font-weight:600; }
+
+  /* ---- the book ---- */
+  .book-frame{
+    position:relative;
+    perspective:1800px;
+    margin-top:8px;
+  }
+  .book-page{
+    background:var(--bg-page);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:0;
+    min-height:520px;
+    box-shadow:0 20px 50px rgba(0,0,0,.4);
+    position:relative;
+    overflow:hidden;
+    transform-origin:left center;
+    transition:transform .38s cubic-bezier(.4,0,.2,1), opacity .38s;
+  }
+  .book-page.turning-next{ transform:rotateY(-14deg) translateX(-10px); opacity:.4; }
+  .book-page.turning-prev{ transform:rotateY(14deg) translateX(10px); opacity:.4; }
+
+  .page-spine{
+    position:absolute; left:0; top:0; bottom:0;
+    width:6px;
+    background:linear-gradient(to right, rgba(0,0,0,.35), transparent);
+  }
+
+  .page-header{
+    padding:26px 30px 18px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(201,162,39,.06), transparent);
+  }
+  .page-num{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0 0 8px;
+  }
+  .page-header h2{
+    font-family:'Spectral',Georgia,'Times New Roman',serif;
+    font-size:24px;
+    font-weight:600;
+    margin:0 0 4px;
+    line-height:1.25;
+  }
+  .page-header .years{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:12px;
+    color:var(--ink-dim);
+  }
+
+  .page-body{ padding:20px 30px 30px; }
+  .field{
+    margin-bottom:18px;
+    padding-bottom:16px;
+    border-bottom:1px solid rgba(255,255,255,.04);
+  }
+  .field:last-child{ border-bottom:none; margin-bottom:0; padding-bottom:0; }
+  .field-label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:10.5px;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin:0 0 6px;
+  }
+  .field-label .ico{ font-size:13px; }
+  .field p{
+    font-size:13.5px;
+    line-height:1.62;
+    color:var(--ink);
+    margin:0;
+  }
+  .field.restrangeri .field-label{ color:#c77a5f; }
+  .field.restrangeri{
+    background:rgba(199,122,95,.06);
+    margin:0 -30px -30px;
+    padding:16px 30px 24px;
+    border-bottom:none;
+    border-top:1px solid rgba(199,122,95,.2);
+  }
+
+  /* ---- nav ---- */
+  .book-nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:14px;
+  }
+  .nav-btn{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:13px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    color:var(--ink);
+    padding:11px 18px;
+    border-radius:5px;
+    cursor:pointer;
+  }
+  .nav-btn:disabled{ opacity:.3; cursor:default; }
+  .nav-btn:not(:disabled):hover{ border-color:var(--gold); color:var(--gold); }
+  .page-counter{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:12px;
+    color:var(--ink-dim);
+  }
+
+  footer{
+    padding:22px 0 10px;
+    color:var(--ink-dim);
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:10.5px;
+    text-align:center;
+  }
+
+  @media (max-width:480px){
+    .page-header{ padding:20px 18px 14px; }
+    .page-body{ padding:16px 18px 22px; }
+    .field.restrangeri{ margin:0 -18px -22px; padding:14px 18px 20px; }
+  }
+</style>
+
+<script>
+// shared visit-tracking for the unified progress page — writes only, never reads elsewhere in this tool
+try {
+  const gbVisited = JSON.parse(localStorage.getItem('gb_progress_visited') || '{}');
+  gbVisited['constitutii'] = new Date().toISOString();
+  localStorage.setItem('gb_progress_visited', JSON.stringify(gbVisited));
+} catch(e) {}
+</script>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Materie · Constituțiile României</p>
+    <h1>O radiografie a societății prin lege</h1>
+    <p class="sub">11 legi fundamentale, de la Regulamentele Organice la revizuirea din 2003 — fiecare analizată prin aceleași cinci întrebări: cine guvernează, cum sunt separate puterile, dacă există pluripartidism, ce drepturi sunt garantate, și ce se restrânge sau se încalcă.</p>
+  </header>
+
+  <div class="toc" id="toc"></div>
+
+  <div class="book-frame">
+    <div class="book-page" id="bookPage">
+      <div class="page-spine"></div>
+      <div class="page-header">
+        <p class="page-num" id="pageNum"></p>
+        <h2 id="pageTitle"></h2>
+        <p class="years" id="pageYears"></p>
+      </div>
+      <div class="page-body" id="pageBody"></div>
+    </div>
+  </div>
+
+  <div class="book-nav">
+    <button class="nav-btn" id="prevBtn">← Pagina anterioară</button>
+    <span class="page-counter" id="pageCounter"></span>
+    <button class="nav-btn" id="nextBtn">Pagina următoare →</button>
+  </div>
+
+  <footer>geo-bac · test intern — nu e integrat în site</footer>
+</div>
+
+<script>
+const PAGES = [{"title": "Regulamentele Organice", "years": "1831–1858", "guvernamant": "Principate autonome (Țara Românească, Moldova), sub suzeranitate otomană și protectorat rusesc. Domn ales pe viață — nu încă monarhie constituțională în sens modern.", "separareaPuterilor": "Prima separare modernă a puterilor în stat: executiv (domnul + Sfatul Domnesc), legislativ (Adunarea Obștească — boieri, mandat 5 ani), judecătoresc (Înaltul Divan și tribunalele).", "pluripartidism": "Nu exista — regim de stări, dominat de boierime. Nu existau partide politice moderne.", "drepturi": "Libertatea comerțului, reformă fiscală, învățământ reglementat de stat. Instituții noi: Miliția pământeană, Arhivele Statului, Serviciul sanitar.", "restrangeri": "Rusia a impus un articol care interzicea orice modificare a Regulamentelor fără acordul ei și al Porții — suveranitate limitată din exterior. Drepturile politice rămân apanajul exclusiv al boierimii; țărănimea nu are reprezentare."}, {"title": "Convenția de la Paris", "years": "1858", "guvernamant": "Principatele Unite ale Moldovei și Valahiei — fiecare principat cu domn ales pe viață, dar cu instituții comune noi.", "separareaPuterilor": "Domn + adunare electivă în fiecare principat. Instituții comune: Comisia Centrală (Focșani) și Înalta Curte de Casație și Justiție.", "pluripartidism": "Nu este documentat explicit ca sistem multipartid, dar se lărgește baza politică odată cu abolirea privilegiilor boierești.", "drepturi": "Abolirea privilegiilor boierimii — pas spre egalitatea în fața legii.", "restrangeri": "Rămâne un cadru de tranziție (valabil doar până în 1864); autonomia deplină e încă limitată de garanția colectivă a celor 7 puteri."}, {"title": "Statutul Dezvoltător al Convenției de la Paris", "years": "1864", "guvernamant": "Domnie (Alexandru Ioan Cuza) cu puteri legislative sporite, aprobat prin plebiscit.", "separareaPuterilor": "Primul Parlament bicameral din istoria românească: Adunarea Electivă + Corpul Ponderator (Senatul, ¼ din membri numiți de domn). Consiliul de Stat — specialiști pe domenii, elaborează legile.", "pluripartidism": "Nu este documentat ca sistem multipartid consolidat la acest moment.", "drepturi": "Adoptat în același context cu marile reforme ale lui Cuza (secularizare, reformă agrară), deși acestea nu fac parte din textul Statutului propriu-zis.", "restrangeri": "Chiar actul de naștere al Statutului e un exemplu de restrângere: lovitura de stat din 2 mai 1864, prin care Cuza dizolvă Adunarea aleasă și guvernează cu puteri legislative sporite unilateral."}, {"title": "Constituția din 1866", "years": "1866–1923 (57 de ani — cea mai longevivă)", "guvernamant": "România — monarhie constituțională ereditară (familia Hohenzollern-Sigmaringen). Prima constituție propriu-zisă a României, inspirată din Constituția belgiană din 1831 (8 titluri, 133 de articole).", "separareaPuterilor": "Separare clară: executiv (domnitorul/regele), legislativ (Adunarea Deputaților + Senatul), judecătoresc — independent.", "pluripartidism": "Da, implicit prin sistemul parlamentar — cadrul în care se formează marile partide (PNL – 1875, Partidul Conservator – 1880).", "drepturi": "Garantate constituțional: libertatea individuală, libertatea conștiinței, libertatea presei, dreptul de proprietate privată.", "restrangeri": "Vot cenzitar — dreptul de vot era condiționat de avere și educație, exercitat de sub 5% din populație. Marea majoritate a cetățenilor (țărănimea) rămâne fără reprezentare politică reală."}, {"title": "Constituția din 1923", "years": "1923–1938", "guvernamant": "Monarhie constituțională, adoptată în contextul Marii Uniri — regele Ferdinand convoacă Adunarea Constituantă. România Mare recunoscută ca stat național, unitar și indivizibil.", "separareaPuterilor": "Parlament bicameral (Adunarea Deputaților + Senat); suveranitatea națională e afirmată explicit ca principiu constituțional.", "pluripartidism": "Da — sistem multipartid activ (PNL, PNȚ și alte formațiuni), una dintre cele mai democratice constituții europene ale vremii.", "drepturi": "Vot universal masculin (21+) — extindere majoră față de votul cenzitar din 1866.", "restrangeri": "Femeile nu au drept de vot. Puterile regelui rămân suficient de largi încât să poată influența decisiv politica (numirea guvernelor, dizolvarea Parlamentului) — o democrație reală, dar incompletă."}, {"title": "Constituția din 1938", "years": "1938–1940", "guvernamant": "Impusă prin plebiscit (martie 1938) de regele Carol II, în contextul instabilității politice interbelice — dictatură regală.", "separareaPuterilor": "Practic desființată: regele devine autoritate supremă — numește guvernul, dizolvă Parlamentul, conduce armata. Puterile nu mai sunt separate, ci concentrate.", "pluripartidism": "Interzis — toate partidele politice sunt scoase în afara legii.", "drepturi": "Regimul democratic e suspendat în întregime.", "restrangeri": "Întreaga constituție este, în esență, actul de instituire a unei restrângeri masive a drepturilor și libertăților — rămâne în vigoare până la abdicarea forțată a lui Carol II, în 1940."}, {"title": "Constituția din 1948", "years": "1948–1952", "guvernamant": "Republică Populară Română — prima constituție comunistă, adoptată la un an după abdicarea forțată a regelui Mihai I.", "separareaPuterilor": "Formal există organe ale statului, dar rolul conducător al PMR/PCR e deja implicit — puterea reală se concentrează în partid, nu în instituțiile separate.", "pluripartidism": "De facto inexistent — celelalte partide (PNL, PNȚ) fuseseră deja interzise/eliminate până în 1947.", "drepturi": "Declarative — drepturi cetățenești formale, dar subordonate „intereselor proletariatului”, fără garanții reale de exercitare.", "restrangeri": "Libertatea religioasă e doar formală — propaganda religioasă e interzisă. Drepturile scrise în constituție nu corespund practicii reale a regimului (cenzură, represiune)."}, {"title": "Constituția din 1952", "years": "1952–1965", "guvernamant": "Republică Populară Română (continuitate de regim, constituție nouă, mai explicit stalinistă).", "separareaPuterilor": "PMR — rol conducător consacrat explicit constituțional, nu doar implicit ca în 1948.", "pluripartidism": "Inexistent — partid unic, consacrat constituțional.", "drepturi": "Declarative, subordonate „interesului general” — o formulă vagă, folosită pentru a justifica orice restrângere a drepturilor individuale.", "restrangeri": "Ateismul e promovat activ de stat — restrângere explicită și asumată constituțional a libertății religioase, mai severă decât în 1948."}, {"title": "Constituția din 1965", "years": "1965–1989 (cea mai longevivă constituție comunistă)", "guvernamant": "Republica Socialistă România — adoptată la preluarea puterii de către Nicolae Ceaușescu.", "separareaPuterilor": "PCR consacrat constituțional ca „forța politică conducătoare a întregii societăți” — formularea cea mai explicită dintre cele trei constituții comuniste.", "pluripartidism": "Inexistent — partid unic.", "drepturi": "Drepturile cetățenești rămân subordonate socialismului ca scop suprem al statului.", "restrangeri": "Ateismul rămâne oficial, dar religia practicată privat e tolerată (relaxare formală față de 1952). În practică, regimul devine tot mai represiv spre final, sub cultul personalității Ceaușescu — decalaj tot mai mare între litera constituției și realitate."}, {"title": "Constituția din 1991", "years": "1991–2003 (revizuită, rămâne în vigoare)", "guvernamant": "Republică semiprezidențială, stat democratic de drept — adoptată după Revoluția din decembrie 1989.", "separareaPuterilor": "Puterea executivă împărțită între președinte și guvern; Parlament bicameral (Camera Deputaților + Senatul); justiție independentă — Curtea Constituțională și Consiliul Superior al Magistraturii.", "pluripartidism": "Da — restaurat integral, sistem multipartid democratic.", "drepturi": "Drepturi și libertăți fundamentale garantate constituțional; vot universal, egal, direct și secret.", "restrangeri": "Materialul nu semnalează restrângeri semnificative — constituția marchează revenirea la democrația constituțională deplină, după 42 de ani de regim comunist."}, {"title": "Revizuirea Constituției din 2003", "years": "2003 — în vigoare astăzi", "guvernamant": "Rămâne republică semiprezidențială — revizuire, nu schimbare de regim constituțional.", "separareaPuterilor": "Structura rămâne neschimbată; mandatul președintelui se extinde de la 4 la 5 ani.", "pluripartidism": "Neschimbat, rămâne activ.", "drepturi": "Protecție sporită a drepturilor fundamentale, aliniată standardelor europene; nou — dreptul de acces la informații publice; proprietatea privată — garantată și declarată inviolabilă.", "restrangeri": "Nu sunt semnalate — revizuirea extinde și consolidează drepturile, motivată de necesitatea armonizării cu legislația europeană, în perspectiva aderării la UE din 2007."}];
+
+let currentPage = 0;
+
+const bookPageEl = document.getElementById('bookPage');
+const pageNumEl = document.getElementById('pageNum');
+const pageTitleEl = document.getElementById('pageTitle');
+const pageYearsEl = document.getElementById('pageYears');
+const pageBodyEl = document.getElementById('pageBody');
+const pageCounterEl = document.getElementById('pageCounter');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const tocEl = document.getElementById('toc');
+
+const FIELDS = [
+  { key:'guvernamant', label:'Formă de guvernământ', icon:'👑' },
+  { key:'separareaPuterilor', label:'Separarea puterilor în stat', icon:'⚖️' },
+  { key:'pluripartidism', label:'Pluripartidism', icon:'🗳️' },
+  { key:'drepturi', label:'Drepturi și libertăți cetățenești', icon:'📜' },
+  { key:'restrangeri', label:'Restrângeri / încălcări', icon:'⚠️', cls:'restrangeri' }
+];
+
+function renderPage(idx, direction){
+  const p = PAGES[idx];
+
+  function fill(){
+    pageNumEl.textContent = 'Pagina ' + (idx+1) + ' din ' + PAGES.length;
+    pageTitleEl.textContent = p.title;
+    pageYearsEl.textContent = p.years;
+    pageBodyEl.innerHTML = FIELDS.map(f => `
+      <div class="field ${f.cls || ''}">
+        <p class="field-label"><span class="ico">${f.icon}</span>${f.label}</p>
+        <p>${p[f.key]}</p>
+      </div>
+    `).join('') + `
+      <a href="istorie-timeline-test.html?search=${encodeURIComponent(p.title)}&chapter=8" target="_blank" rel="noopener"
+         style="display:block;margin-top:18px;padding:11px 14px;background:var(--bg-panel);border:1px solid var(--gold);border-radius:5px;color:var(--gold);font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:11.5px;text-align:center;text-decoration:none;">
+        🕐 Vezi „${p.title}” pe cronologie →
+      </a>`;
+    pageCounterEl.textContent = (idx+1) + ' / ' + PAGES.length;
+    prevBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === PAGES.length - 1;
+    [...tocEl.children].forEach((c,i)=>c.classList.toggle('active', i===idx));
+  }
+
+  if(direction){
+    bookPageEl.classList.add(direction === 'next' ? 'turning-next' : 'turning-prev');
+    setTimeout(()=>{
+      fill();
+      bookPageEl.classList.remove('turning-next','turning-prev');
+    }, 180);
+  } else {
+    fill();
+  }
+}
+
+function goTo(idx){
+  if(idx < 0 || idx >= PAGES.length || idx === currentPage) return;
+  const direction = idx > currentPage ? 'next' : 'prev';
+  currentPage = idx;
+  renderPage(currentPage, direction);
+}
+
+prevBtn.addEventListener('click', ()=> goTo(currentPage - 1));
+nextBtn.addEventListener('click', ()=> goTo(currentPage + 1));
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'ArrowRight') goTo(currentPage + 1);
+  if(e.key === 'ArrowLeft') goTo(currentPage - 1);
+});
+
+// swipe support (mobile)
+let touchStartX = null;
+bookPageEl.addEventListener('touchstart', (e)=>{ touchStartX = e.touches[0].clientX; });
+bookPageEl.addEventListener('touchend', (e)=>{
+  if(touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if(Math.abs(dx) > 50){
+    if(dx < 0) goTo(currentPage + 1); else goTo(currentPage - 1);
+  }
+  touchStartX = null;
+});
+
+PAGES.forEach((p, i)=>{
+  const b = document.createElement('button');
+  b.className = 'toc-item' + (i===0 ? ' active' : '');
+  b.textContent = (i+1) + '. ' + p.title;
+  b.addEventListener('click', ()=> goTo(i));
+  tocEl.appendChild(b);
+});
+
+renderPage(0);
+</script>
+</body>
+</html>

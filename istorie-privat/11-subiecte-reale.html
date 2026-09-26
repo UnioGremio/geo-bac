@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BAC Istorie 2026 — Varianta 3 (test)</title>
+<style>
+  :root{
+    --bg:#0c1117; --bg-panel:#131a23; --bg-card:#161e29; --line:#26303c;
+    --ink:#e9e6dd; --ink-dim:#9aa4b0; --gold:#c9a227; --red:#b6402e; --green:#2e8f86;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; padding-bottom:60px; }
+  .wrap{ max-width:720px; margin:0 auto; padding:0 18px; }
+
+  .timerbar{ position:sticky; top:0; z-index:40; background:var(--bg-panel); border-bottom:1px solid var(--line); padding:12px 18px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .timerbar.hidden{ display:none; }
+  .timer-clock{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:20px; font-weight:600; }
+  .timer-clock.low{ color:var(--red); }
+  .timer-label{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--ink-dim); letter-spacing:.08em; text-transform:uppercase; }
+  .submit-btn{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; background:var(--red); border:none; color:#fff; padding:9px 14px; border-radius:3px; cursor:pointer; font-weight:600; }
+
+  header{ padding:28px 0 16px; }
+  .eyebrow{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 8px; }
+  h1{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-weight:600; font-size:clamp(20px,5vw,28px); margin:0 0 10px; }
+  .sub{ color:var(--ink-dim); font-size:13.5px; line-height:1.55; margin:0 0 8px; }
+  .source-note{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--gold); background:rgba(201,162,39,.08); border:1px solid var(--gold); border-radius:4px; padding:8px 12px; margin:10px 0; line-height:1.5; }
+
+  .rules{ background:var(--bg-panel); border:1px solid var(--line); border-left:3px solid var(--gold); border-radius:4px; padding:18px 20px; margin:20px 0; }
+  .rules p{ margin:0 0 8px; font-size:13.5px; line-height:1.6; }
+  .rules .k{ color:var(--gold); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; }
+  .start-btn{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:14px; font-weight:600; background:var(--gold); color:var(--bg); border:none; padding:14px 22px; border-radius:4px; cursor:pointer; margin-top:8px; }
+
+  .tabs{ display:flex; gap:6px; margin:20px 0 4px; flex-wrap:wrap; }
+  .tab{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; background:transparent; border:1px solid var(--line); color:var(--ink-dim); padding:8px 13px; border-radius:3px; cursor:pointer; }
+  .tab.active{ color:var(--bg); background:var(--gold); border-color:var(--gold); font-weight:600; }
+
+  .subject{ display:none; padding:18px 0 30px; }
+  .subject.active{ display:block; }
+  .subject-title{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:18px; font-weight:600; margin:0 0 4px; }
+  .subject-points{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--gold); margin:0 0 16px; }
+
+  .source-box{ background:var(--bg-card); border:1px solid var(--line); border-left:3px solid var(--gold); border-radius:4px; padding:16px 18px; margin-bottom:10px; }
+  .source-box .src-label{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--gold); margin:0 0 8px; letter-spacing:.05em; }
+  .source-box p{ font-size:13.5px; line-height:1.65; margin:0 0 8px; font-style:italic; }
+  .source-box .src-credit{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--ink-dim); font-style:normal; text-align:right; margin:0; }
+  .read-instr{ font-size:13px; color:var(--ink-dim); margin:14px 0 16px; }
+
+  .part-title{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:15px; font-weight:600; margin:22px 0 8px; color:var(--gold); }
+  .item{ margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--line); }
+  .item:last-child{ border-bottom:none; }
+  .item-q{ font-size:13.5px; line-height:1.55; margin:0 0 8px; }
+  .item-q .pts-tag{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--gold); }
+  .item textarea, .item input[type=text]{ width:100%; background:var(--bg-panel); border:1px solid var(--line); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; font-size:13px; padding:9px 11px; border-radius:3px; resize:vertical; outline:none; }
+  .item textarea:focus, .item input[type=text]:focus{ border-color:var(--gold); }
+  .item input[type=text]{ margin-bottom:6px; }
+
+  .mc-options label{ display:block; margin:6px 0; font-size:13px; cursor:pointer; }
+  .mc-options input{ margin-right:8px; }
+
+  .reveal-btn{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; background:transparent; border:1px solid var(--line); color:var(--ink-dim); padding:6px 10px; border-radius:3px; cursor:pointer; margin-top:6px; }
+  .answer-key{ display:none; margin-top:8px; padding:9px 11px; background:rgba(201,162,39,.08); border-left:2px solid var(--gold); font-size:12.5px; line-height:1.55; }
+  .answer-key.shown{ display:block; }
+  .self-score{ display:flex; align-items:center; gap:8px; margin-top:8px; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11.5px; color:var(--ink-dim); flex-wrap:wrap; }
+  .self-score input{ width:48px; background:var(--bg-panel); border:1px solid var(--line); color:var(--ink); padding:5px 6px; border-radius:3px; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; text-align:center; }
+
+  .essay-reper{ font-size:13.5px; line-height:1.7; margin:0 0 16px; }
+  .essay-reper ul{ margin:6px 0 0; padding-left:20px; }
+  .word-count{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--ink-dim); margin-top:6px; }
+
+  footer{ padding:14px 0 30px; color:var(--ink-dim); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; text-align:center; line-height:1.6; }
+
+  .score-hero{ text-align:center; padding:30px 0 10px; }
+  .score-num{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:52px; font-weight:700; color:var(--gold); line-height:1; }
+  .score-label{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; color:var(--ink-dim); margin-top:6px; }
+  .breakdown{ display:flex; justify-content:space-between; background:var(--bg-panel); border:1px solid var(--line); border-radius:4px; padding:14px 18px; margin:20px 0; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; }
+  .breakdown .bd-val{ font-size:17px; color:var(--gold); font-weight:600; }
+  .restart-btn{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:13px; background:transparent; border:1px solid var(--gold); color:var(--gold); padding:11px 18px; border-radius:4px; cursor:pointer; margin-top:10px; }
+</style>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+
+<div class="timerbar hidden" id="timerbar">
+  <div><div class="timer-label">Timp rămas</div><div class="timer-clock" id="timerClock">3:00:00</div></div>
+  <button class="submit-btn" id="submitBtn">Predă lucrarea</button>
+</div>
+
+<div class="wrap">
+  <div id="screenIntro">
+    <header>
+      <p class="eyebrow">Bacalaureat 2026 · Proba E.c) · Istorie</p>
+      <h1>Subiecte reale — alege o variantă</h1>
+      <p class="sub">Subiecte oficiale de la Ministerul Educației, cu barem oficial — nu generate. Subiectele I și II sunt construite pe surse istorice, exact ca la examenul real.</p>
+      <p class="source-note">Sursă: Ministerul Educației și Cercetării / Centrul Național pentru Curriculum și Evaluare — Examenul național de bacalaureat 2026, Proba E.c) Istorie, subiect + barem oficial.</p>
+    </header>
+    <div class="tabs" id="variantTabs" style="margin-top:18px;"></div>
+    <div class="rules">
+      <p><span class="k">DURATĂ</span> — 3 ore (180 de minute), cronometrate</p>
+      <p><span class="k">STRUCTURĂ</span> — Subiectul I (30p, pe 2 surse) · Subiectul II (30p, pe 1 sursă) · Subiectul III — eseu (30p) · 10p din oficiu</p>
+      <p><span class="k">CORECTARE</span> — câțiva itemi obiectivi (literă, an, nume) se corectează automat; restul, fiind bazați pe interpretarea surselor, se autoevaluează după predare, cu textul exact al baremului oficial afișat</p>
+    </div>
+    <button class="start-btn" id="startBtn">Începe simularea</button>
+  </div>
+
+  <div id="screenExam" style="display:none;">
+    <div class="tabs" id="tabs"></div>
+    <div class="subject" id="subjectI"><p class="subject-title">Subiectul I</p><p class="subject-points">30 de puncte</p><div id="itemsI"></div></div>
+    <div class="subject" id="subjectII"><p class="subject-title">Subiectul al II-lea</p><p class="subject-points">30 de puncte</p><div id="itemsII"></div></div>
+    <div class="subject" id="subjectIII"><p class="subject-title">Subiectul al III-lea</p><p class="subject-points">30 de puncte</p><div id="itemsIII"></div></div>
+  </div>
+
+  <div id="screenResults" style="display:none;">
+    <div class="score-hero"><div class="score-num" id="finalScore">—</div><div class="score-label">din 100 de puncte</div></div>
+    <div class="breakdown">
+      <div class="bd"><div class="bd-val" id="bdI">0</div>Subiect I</div>
+      <div class="bd"><div class="bd-val" id="bdII">0</div>Subiect II</div>
+      <div class="bd"><div class="bd-val" id="bdIII">0</div>Subiect III</div>
+      <div class="bd"><div class="bd-val">10</div>Oficiu</div>
+    </div>
+    <div id="resultsDetail"></div>
+    <button class="restart-btn" id="restartBtn">Începe din nou</button>
+  </div>
+
+  <footer>geo-bac · test intern — subiect oficial reprodus pentru studiu, nu e integrat în site</footer>
+</div>
+
+<script>
+
+function stripDiacritics(s){ return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
+function answerMatches(userText, accepted){
+  const norm = stripDiacritics(userText);
+  if(!norm) return false;
+  const list = Array.isArray(accepted) ? accepted : [accepted];
+  return list.some(acc => norm.includes(stripDiacritics(String(acc))));
+}
+
+const EXAM_SECONDS = 3*60*60;
+let timeLeft = EXAM_SECONDS, timerHandle = null, submitted = false;
+let ANSWERS = {};
+
+// ---------- SOURCES (exact text, official) ----------
+const SOURCE_A_var3 = {
+  label: 'Sursa A',
+  text: `În 1858, cele șapte puteri au semnat Convenția de la Paris. [...] Era un document cu unele dispoziții foarte înaintate și altele retrograde. În problema unirii Moldovei cu Țara Românească - fundamentală pentru români - se alesese o cale de compromis. [...] Menținute sub suzeranitatea Porții [Imperiul Otoman] și sub „garanția colectivă" a puterilor, cele două țări urmau „să se administreze liber și în afara oricărei ingerințe a Înaltei Porți", purtând denumirea de „Principatele Unite ale Moldovei și Țării Românești", separația administrativ-politică fiind însă menținută mai departe. Fiecare Principat urma să fie condus de câte un domn și miniștrii săi, ultimii supuși responsabilității ministeriale. Puterea legislativă trebuia să fie exercitată colectiv de domn, Adunarea din țara respectivă și Comisia centrală nou instituită, comună Principatelor. Puterii judecătorești trebuia să i se asigure independența [...]. Domnul urma să fie ales în fiecare țară pe viață de către Adunarea electivă. Domn putea fi fiecare muntean sau moldovean, cu un venit de 3 000 de galbeni și având îndeplinite funcții publice timp de zece ani. [...] În ansamblu, Convenția de la Paris, deși nu acorda Unirea, apropia pe români de momentul realizării unificării celor două Principate.`,
+  credit: '(D. Berindei, Istoria românilor)'
+};
+const SOURCE_B_var3 = {
+  label: 'Sursa B',
+  text: `Începuturile domniei lui Al. I. Cuza au fost anevoioase fiindcă domnul era obligat să colaboreze cu două guverne, unul la Iaşi şi celălalt la Bucureşti. Abia la sfârșitul anului 1861, Imperiul Otoman a recunoscut unirea politico-administrativă a Moldovei cu Țara Românească pe timpul domniei lui Cuza [...]. Unirea, odată realizată, neînțelegerile politice au reapărut cu puteri sporite de însemnătatea problemelor de rezolvat, între care cea mai dificilă era, desigur, elaborarea Legii rurale [...]. O altă problemă a estompat temporar confruntarea în jurul Legii rurale: secularizarea averilor mănăstirești [...]. Prin legea din [...] 1863 au fost trecute în proprietatea statului „toate averile mănăstirești". Ca urmare, aproximativ un sfert din teritoriul țării a devenit patrimoniu al statului, ceea ce a mărit suprafața de care dispuneau autoritățile pentru viitoarea împroprietărire. Cu scopul de a elimina obstacolele din calea împroprietăririi, ca şi a altor reforme, Cuza [...] a promulgat o nouă constituție (Statutul Dezvoltător), care întărea puterea domnului în detrimentul legislativului.`,
+  credit: '(F. Constantiniu, O istorie sinceră a poporului român)'
+};
+const SOURCE_C_var3 = {
+  label: 'Sursa',
+  text: `Pentru a nu permite pătrunderea tătarilor în Transilvania, regele Ungariei, Ludovic de Anjou a hotărât să înființeze pe versantul estic al Carpaților o marcă, adică o formațiune politico-militară de apărare. În fruntea acestei formațiuni l-a numit pe Dragoș. [...] Fondarea statului independent Moldova este legată de numele voievodului Bogdan. [...] Acesta [...] îşi arătase nesupunerea față de regele Ungariei, fapt pentru care fusese îndepărtat din demnitatea de voievod al Țării Maramureșului. Era vorba de fapt de o răscoală a unor români în frunte cu Bogdan care se răzvrătiseră împotriva dominației maghiare. [...] Răzvrătiții au fost nevoiți să treacă peste munți, la est de Carpați. [...] Bogdan, probabil cu susținerea românilor din Estul Carpaților, l-a îndepărtat pe Balc, urmașul lui Dragoș, de la putere, forțându-l să plece din Moldova. Ludovic I nu putea accepta ca Moldova să iasă de sub stăpânirea sa. În anul 1364 el a trimis o oaste împotriva lui Bogdan, care a fost înfrântă de acesta, astfel că Moldova ieșea de sub dominație ungară [...]. Moldova începe să participe activ în politica internațională în timpul lui Lațcu (1369-1375) [...] când a apărut pericolul reluării expansiunii maghiare în spațiul est-carpatic sub motivul „readucerii" populației de aici la [...] catolicism. Pentru a preîntâmpina acest pericol, Lațcu [...] a adresat papei Urban al V-lea rugămintea de a înființa o episcopie catolică în Moldova [...]. Astfel, Siretul, devenit de curând capitală a Moldovei, obținea şi statutul de reședință episcopală. [...] Moldova continuă să se afirme în relațiile internaționale din Europa de Est şi Sud-Est în timpul lui Petru I Mușat (1375-1391). [...] Evenimentul cel mai important în politica externă a lui Petru I Mușat a fost semnarea [...] Tratatului moldo-polon de la Lemberg (Liov). [...] Pentru Moldova, importanța politică a acestui tratat consta în faptul că Petru I Mușat își asigura astfel protecția Poloniei împotriva vechilor pretenții maghiare la pământurile est-carpatice. [...] Pentru consolidarea țării şi recunoașterea ei internațională [...], Petru I Mușat a hotărât să înființeze o mitropolie ortodoxă.`,
+  credit: '(I. Țurcanu, Istoria românilor)'
+};
+
+// ---------- Subiectul I items (real, exact text) ----------
+
+// ---------- Varianta 2 (Sesiune Specială, 19 mai 2026) ----------
+const SOURCE_A_var2 = {
+  label: 'Sursa A',
+  text: `La două săptămâni după instalarea în funcție a guvernului condus de P. Groza, la 23 martie 1945, acesta a emis un decret-lege cu privire la reforma agrară. Decretul-lege prevedea exproprierea tuturor domeniilor de peste 50 de hectare aflate în proprietatea particulară și [...] nu oferea niciun fel de compensații. [...] Confiscarea tuturor utilajelor de pe moșiile expropriate a constituit un aspect semnificativ al reformei, întrucât acestea au fost folosite pentru dotarea noilor centre de închiriere a mașinilor agricole pentru țărani [...]. Aceste centre au reprezentat un pas important spre colectivizarea forțată de mai târziu [...]. Ca să convingă țăranii [...] de seriozitatea angajamentului său de a menține proprietatea particulară, guvernul a cerut efectuarea unei plăți către stat pentru pământul primit. Suma era mică, nu constituia o povară financiară [...], însă era importantă, întrucât Partidul Comunist [...] s-a folosit de aceasta pentru a dovedi țăranilor că proprietatea lor asupra pământului este definitivă. [...] Guvernul Groza [...] a dat o atenție primordială industriei. El a urmat îndeaproape principiile și strategia schițate la Conferința Națională a Partidului Comunist din octombrie 1945.`,
+  credit: '(K. Hitchins, România 1866-1947)'
+};
+const SOURCE_B_var2 = {
+  label: 'Sursa B',
+  text: `În prima etapă, între 1948-1950, s-au „naționalizat", adică s-au confiscat întreprinderile industriale, bancare, spitale și farmacii, teatre, cinematografe, magazine, locuințe etc. [...] Practic, proprietatea privată a fost desființată. [...] În 1949 a început colectivizarea forțată, adică o confiscare mascată a pământului individual, terminată în 1962, după multe intimidări, abuzuri, arestări și crime. Țăranii se opuneau răpirii pământurilor lor și treceau la rezistențe de diferite tipuri aproape peste tot. [...] Până la urmă, 96% din pământul arabil făcea parte din „gospodării agricole colective" – G.A.C. (numite ulterior „cooperative agricole de producție" – C.A.P.). Se spunea că pământul și uneltele nu mai aparțineau țăranilor ca persoane ci comunităților de țărani când de fapt totul era confiscat și controlat de stat. În economie, [...] totul era trecut în planuri cincinale (de cinci ani) și decenale (de 10 ani) care trebuiau să conducă la „succese istorice" și la „realizări epocale". Partidul Comunist, numit între anii 1948 și 1965 Partidul Muncitoresc Român, controla și dirija totul. [...] În fruntea partidului s-a aflat până în 1965 Gheorghe Gheorghiu-Dej.`,
+  credit: '(I. A. Pop, Scurtă istorie a românilor)'
+};
+const SOURCE_C_var2 = {
+  label: 'Sursa',
+  text: `Revoluționarii moldoveni, [...] ajunși dincolo de Carpați, au rămas profund impresionați de Adunarea de la Blaj. La 12 mai 1848, la Brașov, ei au redactat programul cunoscut sub denumirea de Prințipiile noastre pentru reformarea patriei, care prevedea: [...] împroprietărirea țăranilor fără despăgubire [...], „unirea Moldovei și a Valahiei într-un singur stat neatârnat românesc". [...] Comitetul revoluționar și comitetul executiv au pregătit [...] declanșarea revoluției în Țara Românească [...]. Au decis trecerea la acțiune, hotărându-se ca procesul revoluționar să înceapă la 9 iunie 1848, la București, dar și în alte locuri: Islaz, Telega, Ocnele Mari etc. [...] Aflând de proiectele de acțiune ale Comitetului revoluționar și de apropiata izbucnire a revoluției, autoritățile [...] au trecut la măsuri represive, efectuând arestări în rândul fruntașilor revoluționari. Din această cauză, în mai multe puncte din țară, [...] revoluția n-a putut izbucni. Declanșarea revoluției la Islaz s-a putut realiza în condiții optime [...]. Au fost de față Ion Heliade Rădulescu, Ștefan Golescu și preotul Radu Șapcă, cel dintâi citind Proclamația [...]. La primul punct s-a definit „poziția internațională" a Țării Românești, care rămânea „în aceleași legături [...] cu Înalta Poartă [Imperiul Otoman]" [...]. Totodată, Țara Românească își proclama deplina „neatârnare administrativă și legislativă", deci autonomia, respingându-se orice amestec al vreunei puteri din afară [...]. Prin Proclamație, egalitatea politică a cetățenilor, libertatea „absolută" a tiparului și desființarea rangurilor boierești ofereau temeiul social noii construcții a societății. [...] În fruntea statului rămânea, potrivit Proclamației, un domn, dar „responsabil" și ales pe cinci ani din toate categoriile sociale [...]. Adunarea Legislativă [...] trebuia alcătuită din „reprezentanți ai tuturor stărilor societății". [...] Era instituită garda națională. O atenție deosebită era dată învățământului, instrucțiunea publică urmând a fi „egală și întreagă pentru tot românul".`,
+  credit: '(Istoria românilor)'
+};
+
+function buildSubiectI_var2(){
+  return [
+    { key:'I-1', type:'text', points:2, q:'1. Numiți instituția care a emis decretul-lege din 1945, precizată în sursa A.', accept:['guvern'] },
+    { key:'I-2', type:'open', points:2, q:'2. Precizați, din sursa B, o informație referitoare la colectivizare.',
+      barem:'2 puncte pentru oricare dintre răspunsurile: În 1949 a început colectivizarea forțată; țăranii se opun colectivizării etc. Se punctează orice mod de redactare a răspunsului corect (prin citat din sursă/menționare sau în enunț).' },
+    { key:'I-3', type:'open', points:6, q:'3. Menționați câte un lider politic precizat în sursa A, respectiv în sursa B.',
+      barem:'Câte 3 puncte pentru fiecare răspuns: P. Groza/Groza, Gheorghe Gheorghiu-Dej. Se punctează orice mod de redactare a răspunsului corect (prin precizare/menționare sau în enunț). (3px2=6p)' },
+    { key:'I-4', type:'mc', points:3, q:'4. Scrieți litera corespunzătoare sursei care susține că planurile cincinale sunt aplicate în domeniul economic.', options:['Sursa A','Sursa B'], correctIdx:1 },
+    { key:'I-5', type:'open', points:7, q:'5. Scrieți o relație cauză-efect stabilită între două informații selectate din sursa A, precizând rolul fiecăreia dintre aceste informații (cauză, respectiv efect).',
+      barem:'7 puncte pentru scrierea oricărei relații cauză-efect stabilite între două informații selectate din sursa A. Exemple: cauză: întrucât acestea au fost folosite pentru dotarea noilor centre de închiriere a mașinilor agricole pentru țărani și efect: Confiscarea tuturor utilajelor de pe moșiile expropriate a constituit un aspect semnificativ al reformei SAU cauză: întrucât Partidul Comunist [...] s-a folosit de aceasta pentru a dovedi țăranilor că proprietatea lor asupra pământului este definitivă și efect: Suma era mică, nu constituia o povară financiară [...], însă era importantă etc.' },
+    { key:'I-6', type:'open', points:6, q:'6. Prezentați două acțiuni desfășurate de România în relațiile internaționale din perioada 1949-1980.',
+      barem:'Câte 1 punct pentru menționarea oricăror două acțiuni (1px2=2p). Exemple: participă la constituirea CAER, participă la constituirea Organizației Tratatului de la Varșovia, stabilește relații diplomatice cu R.F. Germania etc. Câte 2 puncte pentru prezentarea fiecărei acțiuni menționate — o scurtă expunere cu două informații (2px2=4p).' },
+    { key:'I-7', type:'open', points:4, q:'7. Menționați o asemănare între două practici politice utilizate în România, în perioada 1991-1999.',
+      barem:'4 puncte pentru menționarea oricărei asemănări. Exemple: caracter democratic, respectă drepturile și libertățile cetățenești etc. Se punctează exclusiv menționarea asemănării.' }
+  ];
+}
+function buildSubiectII_var2(){
+  return [
+    { key:'II-1', type:'text', points:2, q:'1. Numiți un revoluționar din Țara Românească, precizat în sursa dată.', accept:['ion heliade radulescu','stefan golescu','radu sapca','heliade'] },
+    { key:'II-2', type:'text', points:2, q:'2. Precizați secolul la care se referă sursa dată.', accept:['xix','19'] },
+    { key:'II-3', type:'open', points:6, q:'3. Menționați programul elaborat de revoluționarii moldoveni și o prevedere a acestuia, la care se referă sursa dată.',
+      barem:'3 puncte pentru răspunsul: Prințipiile noastre pentru reformarea patriei. 3 puncte pentru menționarea oricărei prevederi a acestuia. Exemple: împroprietărirea țăranilor fără despăgubire; unirea Moldovei cu Valahia etc.' },
+    { key:'II-4', type:'open', points:6, q:'4. Menționați, din sursa dată, două informații referitoare la Comitetul revoluționar.',
+      barem:'Câte 3 puncte pentru menționarea, din sursa dată, a oricăror două informații referitoare la Comitetul revoluționar (3px2=6p). Exemple: a pregătit declanșarea revoluției în Țara Românească; autoritățile au trecut la măsuri represive aflând de proiectele Comitetului; a hotărât ca procesul revoluționar să înceapă la 9 iunie 1848 în mai multe localități etc.' },
+    { key:'II-5', type:'open', points:10, q:'5. Formulați, pe baza sursei date, un punct de vedere referitor la Proclamația de la Islaz, susținându-l cu două informații selectate din sursă.',
+      barem:'4 puncte pentru formularea oricărui punct de vedere referitor la Proclamația de la Islaz. Câte 3 puncte pentru selectarea din sursă a oricăror două informații care susțin punctul de vedere (3px2=6p). Punctajul total (10p) sau parțial (7p) se acordă răspunsului format din punctul de vedere ȘI din cele două informații. Nu se punctează doar punctul de vedere sau doar informațiile.' },
+    { key:'II-6', type:'open', points:4, q:'6. Argumentați, printr-un fapt istoric relevant, afirmația conform căreia o acțiune din politica internă a statului român din perioada 1863-1883 a contribuit la modernizarea acestuia.',
+      barem:'4 puncte pentru argumentarea afirmației date — prezentarea oricărui fapt istoric relevant (de exemplu: Legea instrucțiunii publice, Constituția din 1866 etc.) prin precizarea a două informații și utilizarea conectorilor care exprimă cauzalitatea și concluzia.' }
+  ];
+}
+function buildSubiectIII_var2(){
+  return [
+    { key:'III-a', type:'open', points:6, q:'Prezentarea unui fapt istoric prin care românii se implică în relațiile internaționale din perioada 1380-1400.',
+      barem:'2 puncte pentru menționarea oricărui fapt istoric (de exemplu: acceptarea suzeranității regelui Poloniei de către Petru I Mușat, cruciada de la Nicopole etc.). 3 puncte pentru prezentarea faptului istoric — o scurtă expunere cu două informații și relație cauză-efect. 1 punct pentru precizarea doar a unei informații.' },
+    { key:'III-b', type:'open', points:6, q:'Menționarea a două acțiuni militare la care participă românii în perioada 1401-1456.',
+      barem:'Câte 3 puncte pentru menționarea oricăror două acțiuni militare (3px2=6p). Exemple: lupta de la Marienburg, cruciada de la Varna, lupta de la Belgrad etc.' },
+    { key:'III-c', type:'open', points:8, q:'Precizarea unei acțiuni diplomatice desfășurate de români în perioada 1457-1500 și menționarea a două aspecte cu privire la aceasta.',
+      barem:'2 puncte pentru precizarea oricărei acțiuni diplomatice (de exemplu: Tratatul de la Overchelăuți, Tratatul de la Hârlău etc.). Câte 3 puncte pentru menționarea oricăror două aspecte cu privire la aceasta (3px2=6p). Exemple: Ștefan cel Mare recunoaște suzeranitatea regelui Poloniei, Cetatea Hotin este cedată regelui Poloniei, contribuie la consolidarea domniei lui Ștefan cel Mare etc.' },
+    { key:'III-d', type:'open', points:5, q:'Formularea unui punct de vedere referitor la participarea românilor la relațiile internaționale din secolul al XVI-lea și susținerea acestuia printr-un argument istoric.',
+      barem:'1 punct pentru formularea oricărui punct de vedere (de exemplu: Românii participă la relațiile internaționale din secolul al XVI-lea prin acțiuni cu caracter antiotoman. etc.). 4 puncte pentru susținerea punctului de vedere printr-un argument istoric — prezentarea unui fapt istoric relevant, cu două informații și conectori de cauzalitate/concluzie.' },
+    { key:'III-forma', type:'open', points:6, q:'Ordonarea și exprimarea ideilor (limbaj istoric adecvat, structurare, succesiune cronologică/logică, încadrare în limita de spațiu).',
+      barem:'2p limbaj istoric adecvat (1p parțial). 1p structurarea eseului (introducere-cuprins-concluzie). 2p respectarea succesiunii cronologice/logice (1p parțial). 1p respectarea limitei de spațiu.' }
+  ];
+}
+
+function buildSubiectI_var3(){
+  return [
+    { key:'I-1', type:'text', points:2, q:'1. Numiți noua constituție precizată în sursa B.', accept:['statutul dezvoltator'] },
+    { key:'I-2', type:'open', points:2, q:'2. Precizați, din sursa A, o informație referitoare la domn.',
+      barem:'2 puncte pentru oricare dintre răspunsurile: Fiecare Principat urma să fie condus de câte un domn și miniștrii săi; era ales pe viață etc. Se punctează orice mod de redactare a răspunsului corect (prin citat din sursă/menționare sau în enunț).' },
+    { key:'I-3', type:'open', points:6, q:'3. Menționați două spații istorice, precizate atât în sursa A, cât și în sursa B.',
+      barem:'Câte 3 puncte pentru oricare două dintre răspunsurile: Moldova, Țara Românească, Imperiul Otoman. Se punctează orice mod de redactare a răspunsului corect (prin precizare/menționare sau în enunț). (3px2=6p)' },
+    { key:'I-4', type:'mc', points:3, q:'4. Scrieți litera corespunzătoare sursei care susține că puterile ajung la un compromis în problema unirii românilor.', options:['Sursa A','Sursa B'], correctIdx:0 },
+    { key:'I-5', type:'open', points:7, q:'5. Scrieți o relație cauză-efect stabilită între două informații selectate din sursa B, precizând rolul fiecăreia dintre aceste informații (cauză, respectiv efect).',
+      barem:'7 puncte pentru scrierea oricărei relații cauză-efect stabilite între două informații selectate din sursa B, precizând rolul fiecăreia dintre aceste informații (cauză, respectiv efect). Exemple: cauză: fiindcă domnul era obligat să colaboreze cu două guverne și efect: Începuturile domniei lui Al. I. Cuza au fost anevoioase SAU cauză: Prin legea din [...] 1863 au fost trecute în proprietatea statului „toate averile mănăstirești". și efect: Ca urmare, aproximativ un sfert din teritoriul țării a devenit patrimoniu al statului etc.' },
+    { key:'I-6', type:'open', points:6, q:'6. Prezentați două fapte istorice din perioada 1866-1886 referitoare la România.',
+      barem:'Câte 1 punct pentru menționarea oricăror două fapte istorice din perioada 1866-1886 referitoare la România (1px2=2p). Exemple: Constituția din 1866, obținerea independenței de stat, aderarea la Tripla Alianță etc. Câte 2 puncte pentru prezentarea fiecărui fapt istoric menționat — o scurtă expunere în care sunt precizate două informații referitoare la faptul istoric (2px2=4p).' },
+    { key:'I-7', type:'open', points:4, q:'7. Menționați o asemănare între două acțiuni desfășurate de România în relațiile internaționale din perioada 1917-1920.',
+      barem:'4 puncte pentru menționarea oricărei asemănări între două acțiuni desfășurate de România în relațiile internaționale din perioada 1917-1920. Exemple: caracter militar, colaborare cu Antanta etc. Se punctează exclusiv menționarea asemănării (nu se iau în considerare alte informații).' }
+  ];
+}
+function buildSubiectII_var3(){
+  return [
+    { key:'II-1', type:'text', points:2, q:'1. Numiți capitala Moldovei, precizată în sursa dată.', accept:['siret'] },
+    { key:'II-2', type:'text', points:2, q:'2. Precizați secolul la care se referă sursa dată.', accept:['xiv', '14'] },
+    { key:'II-3a', type:'text', points:3, q:'3a. Menționați conducătorul răscoalei din Țara Maramureșului, la care se referă sursa dată.', accept:['bogdan'] },
+    { key:'II-3b', type:'open', points:3, q:'3b. Menționați o acțiune desfășurată de acesta în Moldova, la care se referă sursa dată.',
+      barem:'3 puncte pentru menționarea oricărei acțiuni desfășurate de Bogdan în Moldova, la care se referă sursa dată. Exemple: În anul 1364 el a trimis o oaste împotriva lui Bogdan, care a fost înfrântă de acesta, astfel că Moldova ieșea de sub dominație ungară; l-a înlăturat pe Balc din Moldova etc.' },
+    { key:'II-4', type:'open', points:6, q:'4. Menționați, din sursa dată, două informații referitoare la marcă.',
+      barem:'Câte 3 puncte pentru menționarea, din sursa dată, a oricăror două informații referitoare la marcă (3px2=6p). Exemple: formațiune politico-militară de apărare; în fruntea acestei formațiuni l-a numit pe Dragoș; situată în Estul Carpaților etc.' },
+    { key:'II-5', type:'open', points:10, q:'5. Formulați, pe baza sursei date, un punct de vedere referitor la acțiunile conducătorilor Moldovei, în perioada 1369-1391, susținându-l cu două informații selectate din sursă.',
+      barem:'4 puncte pentru formularea, pe baza sursei date, a oricărui punct de vedere referitor la acțiunile conducătorilor Moldovei, în perioada 1369-1391. Câte 3 puncte pentru selectarea, din sursa dată, a oricăror două informații care susțin punctul de vedere formulat (3px2=6p). Punctajul total (10p) sau cel parțial (7p) se acordă răspunsului format din punctul de vedere ȘI din cele două informații/o informație selectate din sursă. Nu se punctează doar punctul de vedere sau doar informațiile.' },
+    { key:'II-6', type:'open', points:4, q:'6. Argumentați, printr-un fapt istoric relevant, afirmația conform căreia în secolul al XV-lea românii participă la acțiuni militare cu caracter antiotoman. (Se punctează prezentarea unui fapt istoric relevant și utilizarea conectorilor care exprimă cauzalitatea și concluzia.)',
+      barem:'4 puncte pentru argumentarea afirmației date — prezentarea oricărui fapt istoric relevant (de exemplu: cruciada de la Varna, lupta de la Vaslui etc.) prin precizarea a două informații referitoare la acest fapt și prin utilizarea conectorilor care exprimă cauzalitatea (deoarece, pentru că etc.) și concluzia (așadar, astfel etc.)' }
+  ];
+}
+function buildSubiectIII_var3(){
+  return [
+    { key:'III-a', type:'open', points:6, q:'Prezentarea constituției României adoptate în etapa stalinismului, în a doua jumătate a secolului al XX-lea.',
+      barem:'2 puncte pentru menționarea constituției (Constituția din 1952). 3 puncte pentru prezentarea constituției menționate — o scurtă expunere în care sunt precizate două informații referitoare la constituție și se utilizează relația cauză-efect. 1 punct pentru precizarea doar a unei informații referitoare la constituție.' },
+    { key:'III-b', type:'open', points:6, q:'Menționarea a două acțiuni politice desfășurate de România în relațiile internaționale din perioada 1955-1969.',
+      barem:'Câte 3 puncte pentru menționarea oricăror două acțiuni politice desfășurate de România în relațiile internaționale din perioada 1955-1969 (3px2=6p). Exemple: devine stat membru al Organizației Tratatului de la Varșovia, legături diplomatice cu RFG, participarea la Conferința de la Moscova desfășurată în contextul Războiului de 6 zile etc.' },
+    { key:'III-c', type:'open', points:8, q:'Precizarea unei practici politice utilizate în România, în perioada 1970-1988 și menționarea a două aspecte referitoare la aceasta.',
+      barem:'2 puncte pentru precizarea oricărei practici politice utilizate în România, în perioada 1970-1988 (de exemplu: cultul personalității, represiunea politică etc.). Câte 3 puncte pentru menționarea oricăror două aspecte referitoare la aceasta (3px2=6p). Exemple: se accentuează în etapa național-comunismului, preia modelul asiatic, se manifestă în domeniul cultural etc.; se exercită prin intermediul Securității, se intensifică supravegherea populației, încalcă drepturile și libertățile cetățenești etc.' },
+    { key:'III-d', type:'open', points:5, q:'Formularea unui punct de vedere referitor la democrația din România în perioada 1990-1997 și susținerea acestuia printr-un argument istoric.',
+      barem:'1 punct pentru formularea oricărui punct de vedere referitor la democrația din România în perioada 1990-1997 (de exemplu: Democrația din România în perioada 1990-1997 a fost consolidată prin măsuri legislative.; Pluralismul politic este o caracteristică a democrației din România în perioada 1990-1997. etc.). 4 puncte pentru susținerea punctului de vedere formulat printr-un argument istoric — prezentarea oricărui fapt istoric relevant, prin precizarea a două informații referitoare la acest fapt și utilizarea conectorilor care exprimă cauzalitatea și concluzia.' },
+    { key:'III-forma', type:'open', points:6, q:'Ordonarea și exprimarea ideilor (limbaj istoric adecvat, structurare, succesiune cronologică/logică, încadrare în limita de spațiu).',
+      barem:'2p limbaj istoric adecvat (1p parțial). 1p structurarea eseului (introducere-cuprins-concluzie). 2p respectarea succesiunii cronologice/logice (1p parțial). 1p respectarea limitei de spațiu.' }
+  ];
+}
+
+// ---------- rendering ----------
+function scoreInputRow(key, max){
+  return `<div class="self-score">Punctaj: <input type="number" min="0" max="${max}" value="0" id="score-${key}" data-max="${max}"> / ${max}p</div>`;
+}
+function sourceBoxHTML(src){
+  return `<div class="source-box"><p class="src-label">${src.label}</p><p>„${src.text}"</p><p class="src-credit">${src.credit}</p></div>`;
+}
+function renderItem(item){
+  const saved = ANSWERS[item.key] || {};
+  if(item.type === 'text'){
+    return `<div class="item"><p class="item-q"><span class="pts-tag">${item.points}p</span> ${item.q}</p>
+      <input type="text" class="ans-input" data-item="${item.key}" placeholder="Răspunsul tău…" value="${(saved.text||'').replace(/"/g,'&quot;')}">
+      <button class="reveal-btn" data-target="key-${item.key}">Arată răspunsul corect</button>
+      <div class="answer-key" id="key-${item.key}">Răspuns corect: ${item.accept[0]}</div></div>`;
+  }
+  if(item.type === 'mc'){
+    const opts = item.options.map((o,i)=>`<label><input type="radio" name="mc-${item.key}" value="${i}" ${saved.choice==i?'checked':''}> ${o}</label>`).join('');
+    return `<div class="item"><p class="item-q"><span class="pts-tag">${item.points}p</span> ${item.q}</p><div class="mc-options">${opts}</div></div>`;
+  }
+  // open
+  return `<div class="item"><p class="item-q"><span class="pts-tag">${item.points}p</span> ${item.q}</p>
+    <textarea class="ans-input" data-item="${item.key}" rows="3" placeholder="Răspunsul tău…">${saved.text||''}</textarea>
+    <button class="reveal-btn" data-target="key-${item.key}">Arată baremul</button>
+    <div class="answer-key" id="key-${item.key}">${item.barem}</div>
+    ${scoreInputRow(item.key, item.points)}</div>`;
+}
+function collectAnswers(){
+  document.querySelectorAll('.ans-input').forEach(el=>{
+    const k = el.dataset.item;
+    if(!ANSWERS[k]) ANSWERS[k] = {};
+    ANSWERS[k].text = el.value;
+  });
+  document.querySelectorAll('input[type=radio]:checked').forEach(r=>{
+    const k = r.name.replace('mc-','');
+    if(!ANSWERS[k]) ANSWERS[k] = {};
+    ANSWERS[k].choice = parseInt(r.value,10);
+  });
+}
+function wireAll(el){
+  [...el.querySelectorAll('.reveal-btn')].forEach(btn=>{ if(!btn.dataset.target) return; btn.addEventListener('click', ()=> document.getElementById(btn.dataset.target).classList.add('shown')); });
+  el.querySelectorAll('.ans-input').forEach(inp=> inp.addEventListener('input', ()=>{ collectAnswers(); saveState(); }));
+  el.querySelectorAll('input[type=radio]').forEach(r=> r.addEventListener('change', ()=>{ collectAnswers(); saveState(); }));
+}
+
+const EXAM_ITEMS = { I:[], II:[], III:[] };
+
+let currentVariant = 'var3';
+const VARIANT_CONFIG = {
+  var3: {
+    label: '2026 · Varianta 3 (sesiunea iulie)',
+    buildI: buildSubiectI_var3, buildII: buildSubiectII_var3, buildIII: buildSubiectIII_var3,
+    sourcesI: [SOURCE_A_var3, SOURCE_B_var3], sourcesII: [SOURCE_C_var3],
+    essayTheme: 'evoluția politică a României în a doua jumătate a secolului al XX-lea'
+  },
+  var2: {
+    label: '2026 · Varianta 2 (sesiune specială)',
+    buildI: buildSubiectI_var2, buildII: buildSubiectII_var2, buildIII: buildSubiectIII_var2,
+    sourcesI: [SOURCE_A_var2, SOURCE_B_var2], sourcesII: [SOURCE_C_var2],
+    essayTheme: 'acțiunile românilor în relațiile internaționale din a doua jumătate a secolului al XIV-lea – secolul al XVI-lea'
+  }
+};
+
+function renderSubjectI(){
+  const cfg = VARIANT_CONFIG[currentVariant];
+  const el = document.getElementById('itemsI');
+  const items = cfg.buildI();
+  el.innerHTML = cfg.sourcesI.map(sourceBoxHTML).join('') +
+    '<p class="read-instr">Pornind de la aceste surse, răspundeți la următoarele cerințe:</p>' +
+    items.map(renderItem).join('');
+  wireAll(el);
+  EXAM_ITEMS.I = items;
+}
+function renderSubjectII(){
+  const cfg = VARIANT_CONFIG[currentVariant];
+  const el = document.getElementById('itemsII');
+  const items = cfg.buildII();
+  el.innerHTML = cfg.sourcesII.map(sourceBoxHTML).join('') +
+    '<p class="read-instr">Pornind de la această sursă, răspundeți la următoarele cerințe:</p>' +
+    items.map(renderItem).join('');
+  wireAll(el);
+  EXAM_ITEMS.II = items;
+}
+function renderSubjectIII(){
+  const cfg = VARIANT_CONFIG[currentVariant];
+  const el = document.getElementById('itemsIII');
+  const items = cfg.buildIII();
+  el.innerHTML = `<p class="essay-reper">Elaborați, în aproximativ două pagini, un eseu despre <b>${cfg.essayTheme}</b>, având în vedere:</p>` +
+    items.map(renderItem).join('') +
+    `<div class="item"><p class="item-q">Eseul complet</p><textarea id="essayText" rows="12" placeholder="Scrie eseul aici…"></textarea><p class="word-count" id="wordCount">0 cuvinte</p></div>`;
+  wireAll(el);
+  document.getElementById('essayText').addEventListener('input', updateWordCount);
+  EXAM_ITEMS.III = items;
+}
+function updateWordCount(){
+  const ta = document.getElementById('essayText');
+  const words = ta.value.trim().length ? ta.value.trim().split(/\s+/).length : 0;
+  document.getElementById('wordCount').textContent = words + ' cuvinte (recomandat: ~350-400 pentru două pagini)';
+}
+
+const TAB_DEFS = [{id:'subjectI',label:'Subiectul I'},{id:'subjectII',label:'Subiectul II'},{id:'subjectIII',label:'Subiectul III'}];
+function renderTabs(){
+  const el = document.getElementById('tabs'); el.innerHTML='';
+  TAB_DEFS.forEach((t,i)=>{
+    const b=document.createElement('button');
+    b.className='tab'+(i===0?' active':'');
+    b.textContent=t.label+' (30p)';
+    b.addEventListener('click', ()=>selectTab(t.id));
+    el.appendChild(b);
+  });
+}
+function selectTab(id){
+  [...document.querySelectorAll('.subject')].forEach(s=>s.classList.toggle('active', s.id===id));
+  const idx = TAB_DEFS.findIndex(t=>t.id===id);
+  [...document.querySelectorAll('.tab')].forEach((b,i)=>b.classList.toggle('active', i===idx));
+}
+
+function formatTime(s){ const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60; return [h,m,sec].map(v=>String(v).padStart(2,'0')).join(':'); }
+function tick(){
+  if(submitted) return;
+  timeLeft--;
+  const el = document.getElementById('timerClock');
+  el.textContent = formatTime(Math.max(0,timeLeft));
+  el.classList.toggle('low', timeLeft<=600);
+  if(timeLeft%10===0) saveState();
+  if(timeLeft<=0){ clearInterval(timerHandle); doSubmit(); }
+}
+
+function saveState(){ try{ localStorage.setItem('istorie_examen_'+currentVariant, JSON.stringify({timeLeft,submitted,ANSWERS})); }catch(e){} }
+function loadState(){
+  let raw; try{ raw=JSON.parse(localStorage.getItem('istorie_examen_'+currentVariant)||'null'); }catch(e){ raw=null; }
+  if(!raw) return false;
+  timeLeft=raw.timeLeft; submitted=raw.submitted; ANSWERS=raw.ANSWERS||{};
+  return true;
+}
+function startExam(){
+  localStorage.removeItem('istorie_examen_'+currentVariant);
+  ANSWERS = {}; timeLeft = EXAM_SECONDS; submitted = false;
+  beginUI();
+}
+function beginUI(){
+  document.getElementById('screenIntro').style.display='none';
+  document.getElementById('screenResults').style.display='none';
+  document.getElementById('screenExam').style.display='block';
+  document.getElementById('timerbar').classList.remove('hidden');
+  renderTabs();
+  renderSubjectI(); renderSubjectII(); renderSubjectIII();
+  document.getElementById('timerClock').textContent = formatTime(timeLeft);
+  clearInterval(timerHandle);
+  timerHandle = setInterval(tick, 1000);
+  saveState();
+}
+
+function scoreAutoItem(item){
+  const a = ANSWERS[item.key] || {};
+  if(item.type === 'text') return answerMatches(a.text, item.accept) ? item.points : 0;
+  if(item.type === 'mc') return a.choice === item.correctIdx ? item.points : 0;
+  return 0;
+}
+function showKeysAfterSubmit(items){
+  items.forEach(item=>{
+    if(item.type==='mc'){
+      const key = document.createElement('div');
+      key.className='answer-key shown';
+      key.innerHTML = 'Răspuns corect: '+item.options[item.correctIdx]+' — Puncte: '+scoreAutoItem(item)+' / '+item.points;
+      const block = [...document.querySelectorAll('.item')].find(it=>it.querySelector(`input[name="mc-${item.key}"]`));
+      if(block) block.appendChild(key);
+    }
+    if(item.type==='text'){
+      const pts = scoreAutoItem(item);
+      const noteEl = document.createElement('div');
+      noteEl.className='answer-key shown';
+      noteEl.textContent = 'Puncte obținute: '+pts+' / '+item.points;
+      const block = [...document.querySelectorAll('.item')].find(it=>it.querySelector(`[data-item="${item.key}"]`));
+      if(block) block.appendChild(noteEl);
+    }
+  });
+}
+function autoTotal(items){ return items.reduce((s,i)=> s + (i.type==='open' ? 0 : scoreAutoItem(i)), 0); }
+
+function doSubmit(){
+  if(submitted) return;
+  submitted = true;
+  clearInterval(timerHandle);
+  collectAnswers();
+  showKeysAfterSubmit(EXAM_ITEMS.I);
+  showKeysAfterSubmit(EXAM_ITEMS.II);
+  showKeysAfterSubmit(EXAM_ITEMS.III);
+  saveState();
+
+  document.getElementById('timerbar').classList.add('hidden');
+  document.getElementById('screenExam').style.display='none';
+  document.getElementById('screenResults').style.display='block';
+
+  let html = '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;color:var(--ink-dim);">Itemii obiectivi (literă/an/nume) sunt deja corectați automat. Completează punctajul pentru itemii deschiși, folosind baremul afișat pe pagina subiectului, apoi calculează scorul final.</p>';
+  ['I','II','III'].forEach(sub=>{
+    const openItems = EXAM_ITEMS[sub].filter(i=>i.type==='open');
+    if(openItems.length){
+      html += `<p style="font-family:'Spectral',Georgia,'Times New Roman',serif;font-size:14px;margin:14px 0 6px;">Subiectul ${sub} — itemi deschiși</p>`;
+      openItems.forEach(i=>{
+        html += `<div class="self-score">${i.q.slice(0,70)}${i.q.length>70?'…':''} <input type="number" min="0" max="${i.points}" value="0" id="score-${i.key}" data-max="${i.points}"> / ${i.points}p</div>`;
+      });
+    }
+  });
+  html += '<button class="start-btn" id="calcBtn" style="margin-top:16px;">Calculează scorul final</button>';
+  document.getElementById('resultsDetail').innerHTML = html;
+
+  document.getElementById('calcBtn').addEventListener('click', ()=>{
+    ['I','II','III'].forEach(sub=>{
+      let total = autoTotal(EXAM_ITEMS[sub]);
+      EXAM_ITEMS[sub].filter(i=>i.type==='open').forEach(i=>{
+        const el = document.getElementById('score-'+i.key);
+        if(el) total += Math.min(parseInt(el.value,10)||0, parseInt(el.dataset.max,10));
+      });
+      document.getElementById('bd'+sub).textContent = Math.min(total,30);
+    });
+    const total = parseInt(document.getElementById('bdI').textContent,10) + parseInt(document.getElementById('bdII').textContent,10) + parseInt(document.getElementById('bdIII').textContent,10) + 10;
+    document.getElementById('finalScore').textContent = total;
+  });
+}
+
+function renderVariantTabs(){
+  const el = document.getElementById('variantTabs');
+  el.innerHTML = '';
+  Object.keys(VARIANT_CONFIG).forEach(key=>{
+    const b = document.createElement('button');
+    b.className = 'tab' + (key === currentVariant ? ' active' : '');
+    b.textContent = VARIANT_CONFIG[key].label;
+    b.addEventListener('click', ()=>{
+      currentVariant = key;
+      [...el.children].forEach(c=>c.classList.remove('active'));
+      b.classList.add('active');
+    });
+    el.appendChild(b);
+  });
+}
+renderVariantTabs();
+
+document.getElementById('startBtn').addEventListener('click', startExam);
+document.getElementById('submitBtn').addEventListener('click', ()=>{ if(confirm('Sigur predai lucrarea?')) doSubmit(); });
+document.getElementById('restartBtn').addEventListener('click', ()=>{
+  document.getElementById('screenResults').style.display='none';
+  document.getElementById('screenIntro').style.display='block';
+});
+
+(function init(){ if(loadState() && !submitted){ beginUI(); } })();
+
+</script>
+</body>
+</html>

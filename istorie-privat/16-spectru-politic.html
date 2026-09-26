@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spectrul politic — Democrație și Totalitarism (test)</title>
+<style>
+  :root{
+    --bg:#0c1117;
+    --bg-panel:#131a23;
+    --bg-card:#161e29;
+    --line:#26303c;
+    --ink:#e9e6dd;
+    --ink-dim:#9aa4b0;
+    --left-ext:#3a6ea8;
+    --left-dem:#5f96c7;
+    --center:#c9a227;
+    --right-dem:#c77a5f;
+    --auth:#a8503a;
+    --right-ext:#7a2020;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:900px; margin:0 auto; padding:0 18px 60px; }
+
+  header{ padding:28px 0 16px; }
+  .eyebrow{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin:0 0 8px;
+  }
+  h1{
+    font-family:'Spectral',Georgia,'Times New Roman',serif;
+    font-weight:600;
+    font-size:clamp(24px,5.5vw,34px);
+    margin:0 0 10px;
+  }
+  .sub{
+    color:var(--ink-dim);
+    font-size:14px;
+    line-height:1.55;
+    max-width:60ch;
+    margin:0;
+  }
+
+  /* ---- region toggle ---- */
+  .region-tabs{
+    display:flex;
+    gap:8px;
+    margin:22px 0 4px;
+  }
+  .region-tab{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:13px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    padding:9px 16px;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .region-tab.active{ color:var(--bg); background:var(--center); border-color:var(--center); font-weight:600; }
+
+  /* ---- the axis (signature element) ---- */
+  .axis-wrap{
+    position:relative;
+    margin:34px 0 10px;
+    padding:0 6px;
+  }
+  .axis-zones{
+    position:relative;
+    height:10px;
+    border-radius:5px;
+    overflow:hidden;
+    display:flex;
+    box-shadow:0 0 0 1px var(--line);
+  }
+  .zone{ height:100%; }
+  .axis-ticks{
+    position:relative;
+    height:20px;
+  }
+  .tick{
+    position:absolute;
+    top:0;
+    width:1px;
+    height:8px;
+    background:var(--line);
+  }
+  .tick.center{ background:var(--ink-dim); height:12px; width:2px; }
+
+  .axis-labels{
+    display:flex;
+    justify-content:space-between;
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:9.5px;
+    letter-spacing:.02em;
+    color:var(--ink-dim);
+    text-transform:uppercase;
+    margin-top:2px;
+    padding:0 0;
+  }
+  .axis-labels span{ flex:1; text-align:center; }
+  .axis-labels span:first-child{ text-align:left; }
+  .axis-labels span:last-child{ text-align:right; }
+
+  .markers-track{
+    position:relative;
+    height:170px;
+    margin-top:6px;
+  }
+  .marker{
+    position:absolute;
+    top:50%;
+    transform:translate(-50%,-50%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    cursor:pointer;
+  }
+  .marker .dot{
+    width:13px; height:13px;
+    border-radius:50%;
+    border:2px solid var(--bg);
+    box-shadow:0 0 0 1px var(--line);
+    transition:transform .12s;
+  }
+  .marker:hover .dot{ transform:scale(1.3); }
+  .marker .lbl{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:10.5px;
+    color:var(--ink);
+    white-space:nowrap;
+    margin-top:6px;
+    text-align:center;
+    max-width:100px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .marker.above{ flex-direction:column-reverse; }
+  .marker.above .lbl{ margin-top:0; margin-bottom:6px; }
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin:28px 0 8px;
+    padding:16px 18px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+  }
+  .legend-item .dot{ width:9px; height:9px; border-radius:50%; flex:none; }
+
+  footer{
+    padding:20px 0 10px;
+    color:var(--ink-dim);
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:10.5px;
+    text-align:center;
+  }
+
+  /* ---- detail card ---- */
+  .shade{
+    position:fixed; inset:0;
+    background:rgba(6,9,13,.72);
+    opacity:0; pointer-events:none;
+    transition:opacity .18s;
+    z-index:50;
+  }
+  .shade.open{ opacity:1; pointer-events:auto; }
+  .card{
+    position:fixed;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    width:min(480px, 92vw);
+    max-height:82vh;
+    overflow-y:auto;
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:24px 24px 22px;
+    z-index:51;
+    opacity:0; pointer-events:none;
+    transition:opacity .18s;
+    box-shadow:0 30px 70px rgba(0,0,0,.55);
+  }
+  .card.open{ opacity:1; pointer-events:auto; }
+  .card-close{
+    float:right;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    width:28px; height:28px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:15px;
+  }
+  .card-cat{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:10.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin:0 0 8px;
+  }
+  .card h2{
+    font-family:'Spectral',Georgia,'Times New Roman',serif;
+    font-size:21px;
+    font-weight:600;
+    margin:0 0 4px;
+    line-height:1.3;
+    clear:right;
+  }
+  .card .years{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:12px;
+    color:var(--ink-dim);
+    margin:0 0 14px;
+  }
+  .card p.desc{
+    font-size:13.5px;
+    line-height:1.6;
+    color:var(--ink);
+    margin:0;
+  }
+</style>
+
+<script>
+// shared visit-tracking for the unified progress page — writes only, never reads elsewhere in this tool
+try {
+  const gbVisited = JSON.parse(localStorage.getItem('gb_progress_visited') || '{}');
+  gbVisited['spectru'] = new Date().toISOString();
+  localStorage.setItem('gb_progress_visited', JSON.stringify(gbVisited));
+} catch(e) {}
+</script>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Materie · Democrație și Totalitarism</p>
+    <h1>Spectrul politic interbelic</h1>
+    <p class="sub">De la extrema stângă la extrema dreaptă — unde s-a poziționat fiecare partid, mișcare sau regim în România și în Europa, între cele două războaie mondiale.</p>
+  </header>
+
+  <div class="region-tabs" id="regionTabs"></div>
+
+  <div class="axis-wrap">
+    <div class="axis-zones" id="axisZones"></div>
+    <div class="axis-ticks" id="axisTicks"></div>
+    <div class="axis-labels">
+      <span>Extremă stângă</span>
+      <span>Stânga democratică</span>
+      <span>Idealul democratic</span>
+      <span>Dreapta democratică</span>
+      <span>Guvernare autoritară</span>
+      <span>Extremă dreaptă</span>
+    </div>
+  </div>
+
+  <div class="markers-track" id="markersTrack"></div>
+
+  <div class="legend" id="legendBox"></div>
+
+  <footer>geo-bac · test intern — nu e integrat în site</footer>
+</div>
+
+<div class="shade" id="shade"></div>
+<div class="card" id="card">
+  <button class="card-close" id="cardClose">✕</button>
+  <p class="card-cat" id="cardCat"></p>
+  <h2 id="cardTitle"></h2>
+  <p class="years" id="cardYears"></p>
+  <p class="desc" id="cardDesc"></p>
+  <div id="cardLinkWrap"></div>
+</div>
+
+<script>
+const DATA = {"categories": {"extrema-stanga": {"label": "Extremă stângă", "color": "#3a6ea8"}, "stanga-democratica": {"label": "Stânga democratică", "color": "#5f96c7"}, "centru": {"label": "Idealul democratic", "color": "#c9a227"}, "dreapta-democratica": {"label": "Dreapta democratică", "color": "#c77a5f"}, "autoritar": {"label": "Guvernare autoritară", "color": "#a8503a"}, "extrema-dreapta": {"label": "Extremă dreaptă", "color": "#7a2020"}}, "zones": [{"cat": "extrema-stanga", "from": -100, "to": -60}, {"cat": "stanga-democratica", "from": -60, "to": -15}, {"cat": "centru", "from": -15, "to": 15}, {"cat": "dreapta-democratica", "from": 15, "to": 45}, {"cat": "autoritar", "from": 45, "to": 70}, {"cat": "extrema-dreapta", "from": 70, "to": 100}], "entities": {"romania": [{"name": "PCR — Partidul Comunist Român", "cat": "extrema-stanga", "pos": -85, "years": "1921–1944 (clandestin)", "desc": "Fondat în 1921, subordonat Internaționalei Comuniste (Comintern). Scos în afara legii în 1924 (Legea Mârzescu) — susținea cedarea Basarabiei, Bucovinei de Nord și Transilvaniei ca „ținuturi ocupate”. Membri recrutați mai ales din rândul minorităților naționale și al muncitorimii."}, {"name": "PNȚ — Partidul Național Țărănesc", "cat": "stanga-democratica", "pos": -20, "years": "1926–", "desc": "Fuziune (1926) a Partidului Țărănesc (Ion Mihalache) cu Partidul Național din Transilvania (Iuliu Maniu). Politică de deschidere economică externă. La guvernare 1928–1930 și 1932–1933."}, {"name": "Idealul democratic", "cat": "centru", "pos": 0, "years": "Constituția din 1923", "desc": "Cadrul democrației parlamentare interbelice românești — una dintre cele mai avansate constituții europene ale vremii, deși fără vot feminin."}, {"name": "PNL — Partidul Național Liberal", "cat": "dreapta-democratica", "pos": 25, "years": "1875–", "desc": "Fondat de Ion C. Brătianu; doctrina burgheziei, politica „prin noi înșine”. Realizări: Constituția din 1923, legea unificării administrative."}, {"name": "Dictatura regală (Carol II)", "cat": "autoritar", "pos": 52, "years": "1938–1940", "desc": "Martie 1938 — Carol II instaurează dictatura regală prin plebiscit, suspendă regimul democratic și interzice partidele politice."}, {"name": "Regimul Antonescu", "cat": "autoritar", "pos": 60, "years": "1940–1944", "desc": "Regim militar-autoritar. Alianță inițială cu Garda de Fier (Statul Național-Legionar, sept. 1940), apoi conducere unică după înăbușirea rebeliunii legionare din ianuarie 1941."}, {"name": "LANC — Liga Apărării Național-Creștine", "cat": "extrema-dreapta", "pos": 76, "years": "1923–", "desc": "Fondată de A.C. Cuza și Octavian Goga la Iași. Antisemitism virulent, ultranaționalism, anticomunism — terenul ideologic din care va apărea Legiunea, patru ani mai târziu."}, {"name": "Garda de Fier / Legiunea Arhanghelului Mihail", "cat": "extrema-dreapta", "pos": 94, "years": "1927–1941", "desc": "Fondată de Corneliu Zelea Codreanu (1927): misticism ortodox, antisemitism radical, antiparlamentarism. Braț politic din 1930, „Totul pentru Țară” din 1934 — locul 3 la alegerile din 1937."}], "europa": [{"name": "URSS — regimul comunist sovietic", "cat": "extrema-stanga", "pos": -95, "years": "1917–", "desc": "Instaurat după Revoluția din 1917 (Lenin): partid unic, economie centralizată, proletcultism ideologic — model pentru mișcările comuniste din toată Europa."}, {"name": "Frontul Popular (Franța)", "cat": "stanga-democratica", "pos": -30, "years": "1936", "desc": "Coaliție de stânga (socialiști, radicali, sprijin comunist) ajunsă la guvernare pe cale democratică în Franța, în 1936."}, {"name": "Partidul Laburist (Marea Britanie)", "cat": "stanga-democratica", "pos": -18, "years": "interbelic", "desc": "Reprezintă stânga democratică într-un sistem parlamentar stabil, alternând la guvernare cu conservatorii, fără rupturi de regim."}, {"name": "A Treia Republică Franceză", "cat": "centru", "pos": 5, "years": "1918–1940", "desc": "Coaliții succesive stânga-dreapta reușesc să blocheze extremele pe tot parcursul perioadei interbelice, spre deosebire de alte state europene."}, {"name": "Partidul Conservator (Marea Britanie)", "cat": "dreapta-democratica", "pos": 20, "years": "interbelic", "desc": "Reprezintă dreapta democratică britanică, într-un sistem bipartid stabil, fără rupturi de regim în perioada interbelică."}, {"name": "Regimul lui Franco (Spania)", "cat": "autoritar", "pos": 55, "years": "1939–", "desc": "Instaurat după Războiul Civil Spaniol (1936–1939); regim autoritar-catolic, corporatist, aliat ideologic cu Axa dar oficial neutru în al Doilea Război Mondial."}, {"name": "PNF — Partidul Național Fascist (Italia)", "cat": "extrema-dreapta", "pos": 85, "years": "1922–1943", "desc": "Mussolini, la putere din 1922 (Marșul asupra Romei). Corporatism de stat, poliția politică OVRA, cultul liderului („Il Duce”)."}, {"name": "NSDAP (Germania)", "cat": "extrema-dreapta", "pos": 97, "years": "1933–1945", "desc": "Hitler, cancelar din 1933. Ideologie rasială, Legile de la Nürnberg (1935), Holocaust — cel mai radical regim totalitar de dreapta al secolului XX."}]}};
+const CATEGORIES = DATA.categories;
+const ZONES = DATA.zones;
+const ENTITIES = DATA.entities;
+
+let currentRegion = 'romania';
+
+// position (-100..100) -> percentage (0..100) across the axis
+function posToPct(pos){ return ((pos + 100) / 200) * 100; }
+
+function renderAxis(){
+  const zonesEl = document.getElementById('axisZones');
+  zonesEl.innerHTML = '';
+  ZONES.forEach(z=>{
+    const widthPct = ((z.to - z.from) / 200) * 100;
+    const div = document.createElement('div');
+    div.className = 'zone';
+    div.style.width = widthPct + '%';
+    div.style.background = CATEGORIES[z.cat].color;
+    div.style.opacity = '0.55';
+    zonesEl.appendChild(div);
+  });
+
+  const ticksEl = document.getElementById('axisTicks');
+  ticksEl.innerHTML = '';
+  [-100,-60,-15,0,15,45,70,100].forEach(v=>{
+    const t = document.createElement('div');
+    t.className = 'tick' + (v===0 ? ' center' : '');
+    t.style.left = posToPct(v) + '%';
+    ticksEl.appendChild(t);
+  });
+}
+
+function renderLegend(){
+  const box = document.getElementById('legendBox');
+  box.innerHTML = '';
+  Object.values(CATEGORIES).forEach(c=>{
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `<span class="dot" style="background:${c.color}"></span>${c.label}`;
+    box.appendChild(item);
+  });
+}
+
+function renderMarkers(){
+  const track = document.getElementById('markersTrack');
+  track.innerHTML = '';
+  const list = ENTITIES[currentRegion];
+
+  // simple alternating tiers by sorted position, to reduce label collisions
+  const sorted = [...list].sort((a,b)=>a.pos-b.pos);
+  sorted.forEach((e, i)=>{
+    const level = Math.floor(i/2) % 3; // 0,1,2 stacking depth
+    const above = i % 2 === 0;
+    const node = document.createElement('div');
+    node.className = 'marker' + (above ? ' above' : '');
+    node.style.left = posToPct(e.pos) + '%';
+    node.style.top = (above ? (30 + level*38) : (140 - level*38)) + 'px';
+    const color = CATEGORIES[e.cat].color;
+    node.innerHTML = `<div class="dot" style="background:${color}"></div><div class="lbl">${e.name}</div>`;
+    node.addEventListener('click', ()=> openCard(e));
+    track.appendChild(node);
+  });
+}
+
+const shade = document.getElementById('shade');
+const card = document.getElementById('card');
+// Cross-link to the timeline, only for entities that have a genuine matching event there —
+// same restraint as the battles/story links: no button unless it leads somewhere real.
+// chapter=5 is Cap.6 (Democrație/Totalitarism, 0-indexed); chapter=8 is Cap.9 (Constituțiile).
+const TIMELINE_LINKS = {
+  'PCR — Partidul Comunist Român': { title: 'Fondarea Partidului Comunist Român', chapter: 5 },
+  'PNȚ — Partidul Național Țărănesc': { title: 'Fuziunea în Partidul Național Țărănesc', chapter: 5 },
+  'Idealul democratic': { title: 'Constituția din 1923', chapter: 8 },
+  'PNL — Partidul Național Liberal': { title: 'Fondarea Partidului Național Liberal', chapter: 5 },
+  'Dictatura regală (Carol II)': { title: 'Constituția din 1938 și pogromul de Cristal', chapter: 5 },
+  'Regimul Antonescu': { title: 'Statul Național-Legionar', chapter: 5 },
+  'LANC — Liga Apărării Național-Creștine': { title: 'Liga Apărării Național-Creștine (LANC)', chapter: 5 },
+  'Garda de Fier / Legiunea Arhanghelului Mihail': { title: 'Fondarea Legiunii Arhanghelului Mihail', chapter: 5 },
+  'URSS — regimul comunist sovietic': { title: 'Revoluția Bolșevică și Tezele din aprilie', chapter: 5 },
+  'A Treia Republică Franceză': { title: 'Instabilitatea politică a Franței interbelice', chapter: 5 },
+  'PNF — Partidul Național Fascist (Italia)': { title: 'Marșul asupra Romei', chapter: 5 },
+  'NSDAP (Germania)': { title: 'Hitler devine cancelar; asasinarea lui I.G. Duca', chapter: 5 }
+};
+
+function openCard(e){
+  const cat = CATEGORIES[e.cat];
+  document.getElementById('cardCat').textContent = cat.label;
+  document.getElementById('cardCat').style.color = cat.color;
+  document.getElementById('cardTitle').textContent = e.name;
+  document.getElementById('cardYears').textContent = e.years;
+  document.getElementById('cardDesc').textContent = e.desc;
+  const linkWrap = document.getElementById('cardLinkWrap');
+  const link = TIMELINE_LINKS[e.name];
+  linkWrap.innerHTML = link
+    ? `<a href="istorie-timeline-test.html?search=${encodeURIComponent(link.title)}&chapter=${link.chapter}" target="_blank" rel="noopener"
+         style="display:block;margin-top:16px;padding:10px 13px;background:var(--bg-panel);border:1px solid var(--gold);border-radius:5px;color:var(--gold);font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:11.5px;text-align:center;text-decoration:none;">
+         🕐 Vezi pe cronologie →</a>`
+    : '';
+  shade.classList.add('open');
+  card.classList.add('open');
+}
+function closeCard(){
+  shade.classList.remove('open');
+  card.classList.remove('open');
+}
+shade.addEventListener('click', closeCard);
+document.getElementById('cardClose').addEventListener('click', closeCard);
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeCard(); });
+
+const regionTabsEl = document.getElementById('regionTabs');
+[['romania','România'],['europa','Europa']].forEach(([key,label])=>{
+  const b = document.createElement('button');
+  b.className = 'region-tab' + (key===currentRegion ? ' active' : '');
+  b.textContent = label;
+  b.addEventListener('click', ()=>{
+    currentRegion = key;
+    [...regionTabsEl.children].forEach(c=>c.classList.toggle('active', c===b));
+    renderMarkers();
+  });
+  regionTabsEl.appendChild(b);
+});
+
+renderAxis();
+renderLegend();
+renderMarkers();
+
+</script>
+</body>
+</html>

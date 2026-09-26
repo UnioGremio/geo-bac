@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Poveste vie — domnitorii povestesc (test)</title>
+<style>
+  :root{
+    --bg:#0c1117; --bg-panel:#131a23; --bg-card:#161e29; --line:#26303c;
+    --ink:#e9e6dd; --ink-dim:#9aa4b0; --gold:#c9a227;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; min-height:100vh; overflow-x:hidden; }
+  .wrap{ max-width:640px; margin:0 auto; padding:0 16px 50px; position:relative; z-index:1; }
+  header{ padding:26px 0 10px; }
+  .eyebrow{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 8px; }
+  h1{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-weight:600; font-size:clamp(22px,5.5vw,30px); margin:0 0 8px; }
+  .sub{ color:var(--ink-dim); font-size:13.5px; line-height:1.55; max-width:60ch; margin:0; }
+
+  /* animated background wash, shifts per character */
+  #bgWash{
+    position:fixed; inset:0; z-index:0; opacity:.5;
+    background:radial-gradient(circle at 30% 20%, var(--wash1,#1a2230), transparent 60%),
+               radial-gradient(circle at 80% 80%, var(--wash2,#1a2230), transparent 60%);
+    transition:background 1.2s ease;
+  }
+
+  /* ---- character select ---- */
+  .select-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:24px; }
+  @media (max-width:480px){ .select-grid{ grid-template-columns:1fr; } }
+  .char-card{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:10px;
+    padding:18px 12px 14px; text-align:center; cursor:pointer; transition:transform .15s, border-color .15s;
+  }
+  .char-card:hover{ transform:translateY(-3px); border-color:var(--c); }
+  .char-card .avatar-sm{ width:64px; height:64px; margin:0 auto 10px; }
+  .char-card .nm{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:14px; font-weight:600; line-height:1.3; }
+  .char-card .yrs{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10px; color:var(--ink-dim); margin-top:3px; }
+
+  /* ---- story screen ---- */
+  .story-screen{ display:none; margin-top:10px; }
+  .story-screen.active{ display:block; }
+  .back-btn{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11.5px;
+    background:none; border:1px solid var(--line); color:var(--ink-dim);
+    padding:6px 11px; border-radius:4px; cursor:pointer; margin-bottom:18px;
+  }
+
+  .stage{ display:flex; flex-direction:column; align-items:center; padding:20px 0 6px; }
+  .avatar-big{ width:150px; height:150px; animation:bob 3.2s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{ transform:translateY(0) rotate(0deg);} 50%{ transform:translateY(-9px) rotate(-1deg);} }
+  .avatar-big.enter{ animation:bob 3.2s ease-in-out infinite, popin .45s ease-out; }
+  @keyframes popin{ from{ transform:scale(.7); opacity:0; } to{ transform:scale(1); opacity:1; } }
+
+  .nameplate{ text-align:center; margin-top:8px; }
+  .nameplate .nm{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:20px; font-weight:600; }
+  .nameplate .region{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--gold); margin-top:2px; }
+
+  .dialogue-box{
+    background:var(--bg-card); border:1px solid var(--line); border-left:3px solid var(--gold);
+    border-radius:8px; padding:20px 22px; margin-top:20px; min-height:110px;
+    position:relative;
+  }
+  .dialogue-box::before{
+    content:''; position:absolute; top:-9px; left:36px;
+    width:16px; height:16px; background:var(--bg-card); border-left:1px solid var(--line); border-top:1px solid var(--line);
+    transform:rotate(45deg);
+  }
+  .dialogue-text{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:15.5px; line-height:1.65; min-height:78px; }
+  .dialogue-text .cursor{ display:inline-block; width:2px; background:var(--gold); animation:blink 1s step-start infinite; margin-left:1px; }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .controls{ display:flex; justify-content:space-between; align-items:center; margin-top:16px; gap:8px; }
+  .sound-btn{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px;
+    background:var(--bg-panel); border:1px solid var(--line); color:var(--ink-dim);
+    padding:10px 13px; border-radius:5px; cursor:pointer; flex:none;
+  }
+  .sound-btn.on{ color:var(--gold); border-color:var(--gold); }
+
+  .voice-panel{
+    display:none; margin-top:10px; padding:14px 16px;
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:8px;
+  }
+  .voice-panel.show{ display:block; }
+  .voice-row{ margin-bottom:12px; }
+  .voice-row:last-child{ margin-bottom:0; }
+  .voice-row label{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--ink-dim);
+    letter-spacing:.04em; text-transform:uppercase; margin-bottom:6px;
+  }
+  .voice-row select{
+    width:100%; background:var(--bg-card); border:1px solid var(--line); color:var(--ink);
+    font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; font-size:13px; padding:9px 10px; border-radius:5px;
+  }
+  .voice-row input[type=range]{ width:100%; accent-color:var(--gold); }
+  .voice-hint{ font-size:11px; color:var(--ink-dim); margin-top:8px; line-height:1.5; }
+  .progress-dots{ display:flex; gap:5px; }
+  .progress-dots .d{ width:6px; height:6px; border-radius:50%; background:var(--line); }
+  .progress-dots .d.done{ background:var(--gold); }
+  .progress-dots .d.now{ background:var(--ink); }
+  .continue-btn{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:13px; font-weight:600;
+    background:var(--gold); color:var(--bg); border:none;
+    padding:11px 20px; border-radius:5px; cursor:pointer;
+  }
+  .continue-btn:active{ transform:scale(.97); }
+
+  .end-panel{ text-align:center; margin-top:24px; padding:22px; background:var(--bg-panel); border:1px solid var(--line); border-radius:8px; display:none; }
+  .end-panel.show{ display:block; }
+  .end-panel p{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:15px; margin:0 0 14px; }
+
+  footer{ padding:34px 0 10px; color:var(--ink-dim); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; text-align:center; }
+</style>
+
+<script>
+// shared visit-tracking for the unified progress page — writes only, never reads elsewhere in this tool
+try {
+  const gbVisited = JSON.parse(localStorage.getItem('gb_progress_visited') || '{}');
+  gbVisited['poveste'] = new Date().toISOString();
+  localStorage.setItem('gb_progress_visited', JSON.stringify(gbVisited));
+} catch(e) {}
+</script>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+<div id="bgWash"></div>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Prototip · Poveste vie</p>
+    <h1>Domnitorii povestesc</h1>
+    <p class="sub">Alege un domnitor și ascultă-i povestea, spusă de el însuși. (Avatarele sunt simboluri heraldice simple — portretele reale se adaugă separat.)</p>
+  </header>
+
+  <div class="select-grid" id="selectGrid"></div>
+
+  <div class="story-screen" id="storyScreen">
+    <button class="back-btn" id="backBtn">← Alege alt domnitor</button>
+    <div class="stage">
+      <div class="avatar-big enter" id="avatarBig"></div>
+      <div class="nameplate">
+        <div class="nm" id="stageName"></div>
+        <div class="region" id="stageRegion"></div>
+      </div>
+    </div>
+    <div class="dialogue-box">
+      <div class="dialogue-text" id="dialogueText"></div>
+    </div>
+    <div class="controls">
+      <div class="progress-dots" id="progressDots"></div>
+      <button class="sound-btn" id="soundBtn">🔇 Sunet</button>
+      <button class="continue-btn" id="continueBtn">Continuă ▶</button>
+    </div>
+
+    <div class="voice-panel" id="voicePanel">
+      <div class="voice-row">
+        <label>Voce disponibilă pe acest dispozitiv</label>
+        <select id="voiceSelect"></select>
+      </div>
+      <div class="voice-row">
+        <label><span>Ton (mai jos = mai grav)</span><span id="pitchVal"></span></label>
+        <input type="range" id="pitchRange" min="0.3" max="1.4" step="0.02">
+      </div>
+      <div class="voice-row">
+        <label><span>Viteză</span><span id="rateVal"></span></label>
+        <input type="range" id="rateRange" min="0.6" max="1.3" step="0.02">
+      </div>
+      <p class="voice-hint">Lista de voci vine direct din telefonul tău — dacă nu apare nicio voce română de bărbat, telefonul pur și simplu nu are una instalată; poți încerca oricare altă voce și regla tonul manual.</p>
+    </div>
+    <div class="end-panel" id="endPanel">
+      <p id="endText"></p>
+      <button class="continue-btn" id="replayBtn">↺ Ascultă din nou</button>
+    </div>
+  </div>
+
+  <footer>geo-bac · test intern — nu e integrat în site</footer>
+</div>
+
+<script>
+function heraldicSVG(letter, color){
+  return `<svg viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 108 C20 100 10 78 10 50 L10 8 L90 8 L90 50 C90 78 80 100 50 108 Z"
+          fill="${color}" fill-opacity="0.18" stroke="${color}" stroke-width="3"/>
+    <path d="M18 8 L28 22 L38 8 L50 24 L62 8 L72 22 L82 8"
+          fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="28" cy="14" r="2.6" fill="${color}"/>
+    <circle cx="50" cy="16" r="2.6" fill="${color}"/>
+    <circle cx="72" cy="14" r="2.6" fill="${color}"/>
+    <text x="50" y="70" font-family="Spectral, serif" font-size="42" font-weight="600"
+          fill="${color}" text-anchor="middle">${letter}</text>
+  </svg>`;
+}
+
+// ---------- sound engine: synthesized clicks/chimes (Web Audio) + native voice narration (Speech Synthesis) ----------
+let soundOn = false;
+let audioCtx = null;
+function ensureAudioCtx(){
+  if(!audioCtx && (window.AudioContext || window.webkitAudioContext)){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
+function playTone(freq, duration, type, gainPeak){
+  const ctx = ensureAudioCtx();
+  if(!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(gainPeak || 0.08, ctx.currentTime + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + duration);
+}
+function sfxClick(){ if(soundOn) playTone(520, 0.09, 'triangle', 0.06); }
+function sfxChime(){
+  if(!soundOn) return;
+  [660, 880, 1100].forEach((f,i)=> setTimeout(()=> playTone(f, 0.35, 'sine', 0.05), i*90));
+}
+
+let allVoices = [];
+let selectedVoice = null;
+let userPitch = 0.85;
+let userRate = 0.94;
+
+// The Web Speech API doesn't expose voice gender at all — only a name and language, and even
+// the name is inconsistent across devices/OSes. Rather than keep guessing, we list every real
+// voice available on THIS device and let the person pick + fine-tune pitch/rate themselves.
+const MALE_NAME_HINTS = ['male','andrei','mihai','ion ','george','radu','bogdan','dan','cristian'];
+
+const soundBtn = document.getElementById('soundBtn');
+const voicePanel = document.getElementById('voicePanel');
+const voiceSelect = document.getElementById('voiceSelect');
+const pitchRange = document.getElementById('pitchRange');
+const rateRange = document.getElementById('rateRange');
+const pitchVal = document.getElementById('pitchVal');
+const rateVal = document.getElementById('rateVal');
+
+function refreshVoiceList(){
+  if(!('speechSynthesis' in window)) return;
+  allVoices = window.speechSynthesis.getVoices();
+  if(!allVoices.length) return;
+
+  const roVoices = allVoices.filter(v => v.lang && v.lang.toLowerCase().startsWith('ro'));
+  const otherVoices = allVoices.filter(v => !roVoices.includes(v));
+  const ordered = [...roVoices, ...otherVoices];
+
+  voiceSelect.innerHTML = '';
+  ordered.forEach(v=>{
+    const opt = document.createElement('option');
+    opt.value = allVoices.indexOf(v);
+    opt.textContent = v.name + ' (' + v.lang + ')';
+    voiceSelect.appendChild(opt);
+  });
+
+  // default selection: prefer a Romanian voice whose name hints male, else first Romanian, else first available
+  const looksMale = v => MALE_NAME_HINTS.some(h => v.name.toLowerCase().includes(h));
+  const defaultVoice = roVoices.find(looksMale) || roVoices[0] || allVoices[0];
+  if(defaultVoice){
+    voiceSelect.value = allVoices.indexOf(defaultVoice);
+    selectedVoice = defaultVoice;
+  }
+}
+if('speechSynthesis' in window){
+  refreshVoiceList();
+  window.speechSynthesis.onvoiceschanged = refreshVoiceList;
+}
+
+function narrate(text){
+  if(!soundOn || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  if(selectedVoice) utt.voice = selectedVoice;
+  utt.lang = selectedVoice ? selectedVoice.lang : 'ro-RO';
+  utt.rate = userRate;
+  utt.pitch = userPitch;
+  window.speechSynthesis.speak(utt);
+}
+function stopNarration(){
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
+pitchRange.value = userPitch;
+rateRange.value = userRate;
+pitchVal.textContent = userPitch.toFixed(2);
+rateVal.textContent = userRate.toFixed(2);
+
+voiceSelect.addEventListener('change', ()=>{
+  selectedVoice = allVoices[parseInt(voiceSelect.value, 10)] || null;
+  if(current) narrate(current.lines[lineIdx]);
+});
+pitchRange.addEventListener('input', ()=>{
+  userPitch = parseFloat(pitchRange.value);
+  pitchVal.textContent = userPitch.toFixed(2);
+});
+pitchRange.addEventListener('change', ()=>{ if(current) narrate(current.lines[lineIdx]); });
+rateRange.addEventListener('input', ()=>{
+  userRate = parseFloat(rateRange.value);
+  rateVal.textContent = userRate.toFixed(2);
+});
+rateRange.addEventListener('change', ()=>{ if(current) narrate(current.lines[lineIdx]); });
+
+soundBtn.addEventListener('click', ()=>{
+  soundOn = !soundOn;
+  soundBtn.classList.toggle('on', soundOn);
+  soundBtn.textContent = (soundOn ? '🔊' : '🔇') + ' Sunet';
+  voicePanel.classList.toggle('show', soundOn);
+  ensureAudioCtx();
+  if(soundOn){
+    sfxClick();
+    refreshVoiceList();
+    if(current) narrate(current.lines[lineIdx]);
+  } else {
+    stopNarration();
+  }
+});
+
+const CHARACTERS = [
+  {
+    key:'mircea', name:'Mircea cel Bătrân', region:'Țara Românească', years:'1386–1418', color:'#c9a227',
+    lines:[
+      'Sunt Mircea, voievod al Țării Românești din anul 1386. Am domnit treizeci și doi de ani, într-o vreme în care puterea otomană creștea neîncetat la hotarele mele.',
+      'În 1388 am integrat Dobrogea în stăpânirea mea, profitând de slăbirea Bizanțului și a Bulgariei la gurile Dunării.',
+      'Am căutat aliați puternici: în 1389 am încheiat tratatul de la Radom cu Polonia, iar în 1395 pe cel de la Brașov, cu Sigismund de Luxemburg.',
+      'În 1395, la Rovine, l-am înfrânt pe sultanul Baiazid I însuși — pădurea și mlaștina au luptat alături de oastea mea.',
+      'Un an mai târziu, la Nicopole, o mare coaliție creștină a încercat să oprească înaintarea otomană. Am fost înfrânți.',
+      'În 1402, la Ankara, Timur Lenk l-a zdrobit pe Baiazid — am profitat de haosul din tabăra otomană.',
+      'În 1412 am reînnoit alianța cu Polonia, la Lublin, garantându-mi granița de nord.',
+      'Dar în 1413, otomanii mi-au smuls Dobrogea. Iar în 1417, sub presiunea lor, am acceptat să plătesc primul tribut al Țării Românești.',
+      'Am murit în 1418, lăsând în urmă o țară care știuse, pentru o vreme, să țină piept celui mai mare imperiu al vremii.'
+    ]
+  },
+  {
+    key:'stefan', name:'Ștefan cel Mare', region:'Moldova', years:'1457–1504', color:'#b6572f',
+    lines:[
+      'Sunt Ștefan, domn al Moldovei timp de patruzeci și șapte de ani — cea mai lungă domnie din istoria țării mele.',
+      'În 1467, la Baia, am înfrânt oastea ungurească și mi-am consolidat puterea asupra scaunului domnesc.',
+      'În 1473 am refuzat să mai plătesc tribut Porții — am aruncat mănușa direct sultanului.',
+      'Răspunsul a venit la Vaslui, în 1475: cea mai mare victorie a mea, și una dintre cele mai mari ale creștinătății împotriva otomanilor. Papa m-a numit „atlet al lui Hristos”.',
+      'Am plătit scump, un an mai târziu, la Valea Albă — o înfrângere tactică, dar Moldova a supraviețuit.',
+      'În 1484 am pierdut Chilia și Cetatea Albă — porțile mele către mare. Nu le-am mai recuperat niciodată.',
+      'Am scris curților Europei o scrisoare circulară, cerând ajutor — puțini au răspuns.',
+      'În 1497, la Codrii Cosminului, i-am învins pe poloni, iar doi ani mai târziu am semnat pacea de la Hârlău.',
+      'Am murit în 1504. Am purtat treizeci și șase de bătălii pentru Moldova — și am pierdut doar două.'
+    ]
+  },
+  {
+    key:'mihai', name:'Mihai Viteazul', region:'Cele trei țări unite', years:'1593–1601', color:'#4a8f5c',
+    lines:[
+      'Sunt Mihai, domn al Țării Românești din 1593. Domnia mea a fost scurtă, dar pentru un an, am unit ceea ce nimeni nu mai unise.',
+      'În 1594 am declanșat răscoala împotriva otomanilor — nu mai puteam plăti tributul lor nesfârșit.',
+      'La Călugăreni și la Giurgiu, în 1595, i-am învins.',
+      'Tot atunci, la Alba Iulia, am încheiat alianță cu Transilvania.',
+      'În 1599, la Șelimbăr, l-am înfrânt pe Andrei Báthory — Transilvania a intrat sub stăpânirea mea.',
+      'În 1600 am intrat și în Moldova. Pentru prima dată, Țara Românească, Moldova și Transilvania au avut un singur domn.',
+      'Unirea nu a durat. La Miraslău și Guruslău am luptat să o păstrez.',
+      'În 1601 am fost asasinat la Câmpia Turzii — dar ceea ce am făcut a rămas viu în amintirea urmașilor.',
+      'Nu am unit trei țări pentru totdeauna. Dar am arătat că se poate.'
+    ]
+  }
+];
+
+const selectGrid = document.getElementById('selectGrid');
+CHARACTERS.forEach(c=>{
+  const card = document.createElement('div');
+  card.className = 'char-card';
+  card.style.setProperty('--c', c.color);
+  card.innerHTML = `<div class="avatar-sm">${heraldicSVG(c.name[0], c.color)}</div>
+    <div class="nm">${c.name}</div><div class="yrs">${c.years}</div>`;
+  card.addEventListener('click', ()=>{ sfxClick(); startStory(c); });
+  selectGrid.appendChild(card);
+});
+
+const storyScreen = document.getElementById('storyScreen');
+const avatarBig = document.getElementById('avatarBig');
+const stageName = document.getElementById('stageName');
+const stageRegion = document.getElementById('stageRegion');
+const dialogueText = document.getElementById('dialogueText');
+const progressDots = document.getElementById('progressDots');
+const continueBtn = document.getElementById('continueBtn');
+const endPanel = document.getElementById('endPanel');
+const endText = document.getElementById('endText');
+const bgWash = document.getElementById('bgWash');
+
+let current = null;
+let lineIdx = 0;
+let typing = false;
+let typeTimer = null;
+
+function startStory(c){
+  current = c;
+  lineIdx = 0;
+  document.querySelector('header').style.display = 'none';
+  selectGrid.style.display = 'none';
+  storyScreen.classList.add('active');
+  endPanel.classList.remove('show');
+  continueBtn.style.display = '';
+
+  avatarBig.innerHTML = heraldicSVG(c.name[0], c.color);
+  avatarBig.classList.remove('enter'); void avatarBig.offsetWidth; avatarBig.classList.add('enter');
+  stageName.textContent = c.name;
+  stageRegion.textContent = c.region + ' · ' + c.years;
+  bgWash.style.setProperty('--wash1', c.color + '33');
+  bgWash.style.setProperty('--wash2', c.color + '15');
+
+  buildDots();
+  showLine();
+}
+
+function buildDots(){
+  progressDots.innerHTML = '';
+  current.lines.forEach((_, i)=>{
+    const d = document.createElement('div');
+    d.className = 'd';
+    progressDots.appendChild(d);
+  });
+}
+function updateDots(){
+  [...progressDots.children].forEach((d,i)=>{
+    d.classList.toggle('done', i < lineIdx);
+    d.classList.toggle('now', i === lineIdx);
+  });
+}
+
+function showLine(){
+  updateDots();
+  const text = current.lines[lineIdx];
+  dialogueText.innerHTML = '<span class="cursor"></span>';
+  typing = true;
+  narrate(text);
+  let i = 0;
+  clearTimeout(typeTimer);
+  function step(){
+    if(i <= text.length){
+      dialogueText.innerHTML = text.slice(0, i) + '<span class="cursor"></span>';
+      i++;
+      typeTimer = setTimeout(step, 16);
+    } else {
+      typing = false;
+      dialogueText.textContent = text;
+    }
+  }
+  step();
+}
+
+continueBtn.addEventListener('click', ()=>{
+  sfxClick();
+  if(typing){
+    // skip to full text immediately
+    clearTimeout(typeTimer);
+    dialogueText.textContent = current.lines[lineIdx];
+    typing = false;
+    return;
+  }
+  stopNarration();
+  lineIdx++;
+  if(lineIdx >= current.lines.length){
+    updateDots();
+    continueBtn.style.display = 'none';
+    endText.textContent = `Ai aflat povestea lui ${current.name}.`;
+    endPanel.classList.add('show');
+    sfxChime();
+  } else {
+    showLine();
+  }
+});
+
+document.getElementById('replayBtn').addEventListener('click', ()=>{ sfxClick(); startStory(current); });
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  sfxClick();
+  stopNarration();
+  storyScreen.classList.remove('active');
+  document.querySelector('header').style.display = '';
+  selectGrid.style.display = '';
+  bgWash.style.setProperty('--wash1', '#1a2230');
+  bgWash.style.setProperty('--wash2', '#1a2230');
+});
+
+// if linked directly from another tool (e.g. the map's ruler card) with ?character=mircea, start that story right away
+const urlParams = new URLSearchParams(window.location.search);
+const preselect = urlParams.get('character');
+if(preselect){
+  const match = CHARACTERS.find(c => c.key === preselect);
+  if(match) startStory(match);
+}
+</script>
+</body>
+</html>

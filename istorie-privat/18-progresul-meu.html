@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Progresul tău — geo-bac (test)</title>
+<style>
+  :root{
+    --bg:#0c1117; --bg-panel:#131a23; --bg-card:#161e29; --line:#26303c;
+    --ink:#e9e6dd; --ink-dim:#9aa4b0; --gold:#c9a227; --green:#4a8f5c; --red:#a8503a;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; }
+  a{ text-decoration:none; color:inherit; }
+  .wrap{ max-width:720px; margin:0 auto; padding:0 18px 50px; }
+
+  header{ padding:28px 0 16px; text-align:center; }
+  .eyebrow{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 8px; }
+  h1{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-weight:600; font-size:clamp(24px,5.5vw,32px); margin:0 0 10px; }
+  .sub{ color:var(--ink-dim); font-size:13.5px; line-height:1.55; max-width:56ch; margin:0 auto; }
+
+  .ring-wrap{ display:flex; justify-content:center; margin:28px 0 8px; }
+  .ring-num{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:40px; font-weight:700; fill:var(--gold); }
+  .ring-label{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; fill:var(--ink-dim); }
+
+  h2.sec{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:18px; font-weight:600; margin:36px 0 4px; }
+  .sec-note{ color:var(--ink-dim); font-size:12px; margin:0 0 14px; }
+
+  .checklist{ display:flex; flex-direction:column; gap:6px; }
+  .check-item{
+    display:flex; align-items:center; gap:12px;
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:6px;
+    padding:11px 14px; transition:border-color .15s;
+  }
+  .check-item:hover{ border-color:var(--gold); }
+  .check-item .mark{ font-size:16px; flex:none; width:20px; text-align:center; }
+  .check-item.done .mark{ color:var(--green); }
+  .check-item.pending .mark{ color:var(--ink-dim); opacity:.4; }
+  .check-item .info{ flex:1; min-width:0; }
+  .check-item .nm{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:13.5px; font-weight:600; }
+  .check-item .dt{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--ink-dim); margin-top:2px; }
+
+  .scores-grid{ display:flex; flex-direction:column; gap:8px; }
+  .score-item{
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--bg-card); border:1px solid var(--line); border-radius:6px;
+    padding:12px 14px;
+  }
+  .score-item .nm{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:14px; font-weight:600; }
+  .score-item .dt{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--ink-dim); margin-top:2px; }
+  .score-item .val{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:22px; font-weight:700; color:var(--gold); flex:none; }
+  .empty-note{ color:var(--ink-dim); font-size:12.5px; font-style:italic; padding:10px 0; }
+
+  .reset-row{ text-align:center; margin-top:40px; }
+  .reset-btn{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11.5px;
+    background:transparent; border:1px solid var(--line); color:var(--ink-dim);
+    padding:8px 14px; border-radius:4px; cursor:pointer;
+  }
+
+  footer{ padding:30px 0 10px; color:var(--ink-dim); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; text-align:center; }
+</style>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">geo-bac · Progresul tău</p>
+    <h1>Cât ai acoperit până acum</h1>
+    <p class="sub">Adună automat ce ai vizitat și ce scoruri ai obținut în toate instrumentele — pune acest fișier în același folder cu celelalte.</p>
+  </header>
+
+  <div class="ring-wrap">
+    <svg width="160" height="160" viewBox="0 0 160 160">
+      <circle cx="80" cy="80" r="68" fill="none" stroke="#26303c" stroke-width="12"/>
+      <circle id="ringProgress" cx="80" cy="80" r="68" fill="none" stroke="#c9a227" stroke-width="12"
+              stroke-linecap="round" transform="rotate(-90 80 80)"/>
+      <text x="80" y="76" text-anchor="middle" class="ring-num" id="ringPct">0%</text>
+      <text x="80" y="98" text-anchor="middle" class="ring-label">instrumente vizitate</text>
+    </svg>
+  </div>
+
+  <h2 class="sec">Instrumente vizitate</h2>
+  <p class="sec-note">Se marchează automat de îndată ce deschizi fiecare pagină o dată.</p>
+  <div class="checklist" id="checklist"></div>
+
+  <h2 class="sec">Scoruri</h2>
+  <p class="sec-note">Ultimul scor salvat pentru fiecare examen; recapitularea din cronologie e din memoria spațiată (SM-2).</p>
+  <div class="scores-grid" id="scoresGrid"></div>
+
+  <div class="reset-row">
+    <button class="reset-btn" id="resetBtn">↺ Resetează progresul (doar tracker-ul, nu răspunsurile din examene)</button>
+  </div>
+
+  <footer>geo-bac · test intern — nu e integrat în site</footer>
+</div>
+
+<script>
+const TOOLS = [
+  { id:'timeline', name:'Cronologie generală', file:'istorie-timeline-test.html' },
+  { id:'examen', name:'Simulator examen istorie', file:'istorie-examen-test.html' },
+  { id:'harta', name:'Hartă istorică', file:'istorie-harta-test.html' },
+  { id:'spectru', name:'Cap.6 — Spectru politic', file:'istorie-spectru-politic-test.html' },
+  { id:'constitutii', name:'Cap.9 — Constituțiile', file:'istorie-constitutii-carte-test.html' },
+  { id:'cap1', name:'Cap.1 — Romanitatea', file:'istorie-cap1-romanitatea-test.html' },
+  { id:'cap2', name:'Cap.2 — Autonomii Locale', file:'istorie-cap2-institutii-test.html' },
+  { id:'cap3', name:'Cap.3 — Diplomație și Conflict', file:'istorie-cap3-batalii-test.html' },
+  { id:'cap4', name:'Cap.4 — Statul Modern', file:'istorie-cap4-unire-test.html' },
+  { id:'cap5', name:'Cap.5 — Concertul European', file:'istorie-cap5-aliante-test.html' },
+  { id:'cap7', name:'Cap.7 — România Postbelică', file:'istorie-cap7-represiune-test.html' },
+  { id:'cap8', name:'Cap.8 — Războiul Rece', file:'istorie-cap8-razboiul-rece-test.html' },
+  { id:'poveste', name:'Poveste vie', file:'istorie-poveste-vie-test.html' },
+  { id:'geografie', name:'Simulator examen geografie', file:'geografie-bac-test.html' },
+  { id:'carte_romanitate', name:'Carte · Cap.I', file:'bac-istorie-offline.html' },
+  { id:'carte_autonomii', name:'Carte · Cap.II', file:'bac-istorie-offline.html' },
+  { id:'carte_diplomatie', name:'Carte · Cap.III', file:'bac-istorie-offline.html' },
+  { id:'carte_statmodern', name:'Carte · Cap.IV', file:'bac-istorie-offline.html' },
+  { id:'carte_concert', name:'Carte · Cap.V', file:'bac-istorie-offline.html' },
+  { id:'carte_secxx', name:'Carte · Cap.VI', file:'bac-istorie-offline.html' },
+  { id:'carte_postbelic', name:'Carte · Cap.VII', file:'bac-istorie-offline.html' },
+  { id:'carte_constitutii', name:'Carte · Cap.VIII', file:'bac-istorie-offline.html' }
+];
+
+function loadJSON(key){
+  try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch(e){ return {}; }
+}
+
+function formatDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('ro-RO', { day:'numeric', month:'short', year:'numeric' }) + ' · ' +
+         d.toLocaleTimeString('ro-RO', { hour:'2-digit', minute:'2-digit' });
+}
+
+function render(){
+  const visited = loadJSON('gb_progress_visited');
+  const scores = loadJSON('gb_progress_scores');
+
+  // ---- checklist ----
+  const checklistEl = document.getElementById('checklist');
+  checklistEl.innerHTML = '';
+  let doneCount = 0;
+  TOOLS.forEach(t=>{
+    const ts = visited[t.id];
+    if(ts) doneCount++;
+    const item = document.createElement('a');
+    item.href = t.file;
+    item.className = 'check-item ' + (ts ? 'done' : 'pending');
+    item.innerHTML = `
+      <span class="mark">${ts ? '✓' : '○'}</span>
+      <div class="info">
+        <div class="nm">${t.name}</div>
+        <div class="dt">${ts ? formatDate(ts) : 'nevizitat încă'}</div>
+      </div>`;
+    checklistEl.appendChild(item);
+  });
+
+  // ---- progress ring ----
+  const pct = Math.round((doneCount / TOOLS.length) * 100);
+  document.getElementById('ringPct').textContent = pct + '%';
+  const circumference = 2 * Math.PI * 68;
+  const ring = document.getElementById('ringProgress');
+  ring.style.strokeDasharray = circumference;
+  ring.style.strokeDashoffset = circumference * (1 - pct/100);
+
+  // ---- scores ----
+  const scoresGridEl = document.getElementById('scoresGrid');
+  scoresGridEl.innerHTML = '';
+  const scoreLabels = {
+    'examen_istorie': 'Simulator examen — Istorie',
+    'examen_geografie_2026-3': 'Simulator examen — Geografie (2026, V3)',
+    'examen_geografie_2025-1': 'Simulator examen — Geografie (2025, V1)',
+    'examen_geografie_2024-3': 'Simulator examen — Geografie (2024, V3)',
+    'carte_romanitate': 'Quiz carte — Cap.I',
+    'carte_autonomii': 'Quiz carte — Cap.II',
+    'carte_diplomatie': 'Quiz carte — Cap.III',
+    'carte_statmodern': 'Quiz carte — Cap.IV',
+    'carte_concert': 'Quiz carte — Cap.V',
+    'carte_secxx': 'Quiz carte — Cap.VI',
+    'carte_postbelic': 'Quiz carte — Cap.VII',
+    'carte_constitutii': 'Quiz carte — Cap.VIII'
+  };
+  let anyScore = false;
+  Object.entries(scoreLabels).forEach(([key, label])=>{
+    const s = scores[key];
+    if(!s) return;
+    anyScore = true;
+    const item = document.createElement('div');
+    item.className = 'score-item';
+    item.innerHTML = `<div><div class="nm">${label}</div><div class="dt">${formatDate(s.date)}</div></div><div class="val">${s.score}/${s.max}</div>`;
+    scoresGridEl.appendChild(item);
+  });
+
+  // ---- timeline quiz progress (SM-2 recap) ----
+  const srs = loadJSON('istorie_bac_srs_v1');
+  const reviewed = Object.values(srs).filter(r => r.reps > 0).length;
+  if(reviewed > 0){
+    anyScore = true;
+    const item = document.createElement('div');
+    item.className = 'score-item';
+    item.innerHTML = `<div><div class="nm">Recapitulare cronologie (SM-2)</div><div class="dt">evenimente recapitulate cel puțin o dată</div></div><div class="val">${reviewed}/278</div>`;
+    scoresGridEl.appendChild(item);
+  }
+
+  if(!anyScore){
+    scoresGridEl.innerHTML = '<p class="empty-note">Niciun scor încă — dă un examen sau folosește quiz-ul din cronologie.</p>';
+  }
+}
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(confirm('Sigur ștergi tracker-ul de progres? Răspunsurile salvate în examene nu sunt afectate.')){
+    localStorage.removeItem('gb_progress_visited');
+    localStorage.removeItem('gb_progress_scores');
+    render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>

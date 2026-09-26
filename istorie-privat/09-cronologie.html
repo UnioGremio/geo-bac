@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Timeline — Istorie BAC pe capitole (test)</title>
+<style>
+  :root{
+    --bg:#0c1117;
+    --bg-panel:#131a23;
+    --bg-card:#161e29;
+    --line:#26303c;
+    --ink:#e9e6dd;
+    --ink-dim:#9aa4b0;
+    --politic:#b6402e;
+    --social:#c9a227;
+    --cultural:#2e8f86;
+    --militar:#6b7280;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    padding:28px 20px 18px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin:0 0 8px;
+  }
+  h1{
+    font-family:'Spectral',Georgia,'Times New Roman',serif;
+    font-weight:600;
+    font-size:clamp(24px,5vw,34px);
+    margin:0 0 6px;
+    letter-spacing:.01em;
+  }
+  .sub{
+    color:var(--ink-dim);
+    font-size:14px;
+    max-width:56ch;
+    line-height:1.5;
+    margin:0;
+  }
+
+  .filters{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    padding:16px 20px;
+    border-bottom:1px solid var(--line);
+  }
+  .fbtn{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:12px;
+    letter-spacing:.03em;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    padding:7px 12px;
+    border-radius:3px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    transition:border-color .15s, color .15s;
+  }
+  .fbtn .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--dotc,#888);
+  }
+  .fbtn.active, .fbtn:hover{
+    color:var(--ink);
+    border-color:var(--dotc,#888);
+  }
+
+  /* --- timeline: styled as a punch-tape / archive thread --- */
+  .timeline-wrap{
+    padding:36px 0 44px;
+    overflow-x:auto;
+    overflow-y:visible;
+  }
+  .timeline{
+    position:relative;
+    min-width:1500px;
+    margin:0 40px;
+    height:280px;
+  }
+  .decades{
+    position:absolute; top:0; left:0; right:0; bottom:0;
+  }
+  .decade-tick{
+    position:absolute;
+    top:16px; bottom:0;
+    width:1px;
+    background:var(--line);
+  }
+  .decade-label{
+    position:absolute;
+    top:0;
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+    transform:translateX(-50%);
+  }
+  .spine{
+    position:absolute;
+    top:140px; left:0; right:0;
+    height:2px;
+    background:repeating-linear-gradient(to right, var(--line) 0 6px, transparent 6px 11px);
+  }
+  .event{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    cursor:pointer;
+  }
+  .event .leader{
+    position:absolute;
+    left:50%;
+    width:1px;
+    background:var(--line);
+    transform:translateX(-50%);
+  }
+  .event .stamp{
+    width:15px;height:15px;
+    border-radius:50%;
+    border:2px solid var(--dotc,#888);
+    background:var(--bg);
+    transition:transform .15s, background .15s;
+  }
+  .event:hover .stamp, .event.active .stamp{
+    background:var(--dotc,#888);
+    transform:scale(1.25);
+  }
+  .lbl{
+    position:absolute;
+    left:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    cursor:pointer;
+    width:132px;
+    margin-left:-66px;
+  }
+  .lbl.above{ transform:translateY(-100%); padding-bottom:4px; }
+  .lbl.below{ padding-top:4px; }
+  .lbl .yr{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+    white-space:nowrap;
+  }
+  .lbl .ttl{
+    font-family:'Spectral',Georgia,'Times New Roman',serif;
+    font-size:12px;
+    font-weight:500;
+    color:var(--ink);
+    text-align:center;
+    line-height:1.25;
+    opacity:.9;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .lbl.above .ttl{ order:-1; }
+
+  /* --- card panel --- */
+  .panel-shade{
+    position:fixed; inset:0;
+    background:rgba(6,9,13,.6);
+    opacity:0; pointer-events:none;
+    transition:opacity .18s;
+    z-index:10;
+  }
+  .panel-shade.open{ opacity:1; pointer-events:auto; }
+
+  .card{
+    position:fixed;
+    left:50%; top:50%;
+    transform:translate(-50%,-46%);
+    width:min(560px, 92vw);
+    max-height:80vh;
+    overflow-y:auto;
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-left:3px solid var(--dotc,#888);
+    border-radius:4px;
+    padding:26px 26px 22px;
+    z-index:11;
+    opacity:0; pointer-events:none;
+    transition:opacity .18s, transform .18s;
+    box-shadow:0 24px 60px rgba(0,0,0,.5);
+  }
+  .card.open{
+    opacity:1; pointer-events:auto;
+    transform:translate(-50%,-50%);
+  }
+  .card-close{
+    position:absolute; top:14px; right:16px;
+    background:none; border:none;
+    color:var(--ink-dim);
+    font-size:20px; cursor:pointer;
+    line-height:1;
+  }
+  .card-eyebrow{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--dotc,#888);
+    margin:0 0 8px;
+  }
+  .card h2{
+    font-family:'Spectral',Georgia,'Times New Roman',serif;
+    font-size:24px;
+    font-weight:600;
+    margin:0 0 16px;
+    line-height:1.25;
+  }
+  .card .field{ margin-bottom:14px; }
+  .card .field .k{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin:0 0 4px;
+  }
+  .card .field .v{
+    font-size:14px;
+    line-height:1.55;
+    margin:0;
+    color:var(--ink);
+  }
+
+  footer{
+    padding:14px 20px 30px;
+    color:var(--ink-dim);
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:11px;
+    text-align:center;
+  }
+
+  .chapter-tabs{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding:16px 20px 0;
+    -webkit-overflow-scrolling:touch;
+  }
+  .ctab{
+    flex:none;
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:11.5px;
+    white-space:nowrap;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    padding:8px 13px;
+    border-radius:3px;
+    cursor:pointer;
+  }
+  .ctab.active{
+    color:var(--bg);
+    background:#c9a227;
+    border-color:#c9a227;
+    font-weight:600;
+  }
+
+  .toolbar{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+    padding:12px 20px 0;
+  }
+  .search-wrap{
+    position:relative;
+    flex:1 1 220px;
+    min-width:180px;
+  }
+  #searchInput{
+    width:100%;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif;
+    font-size:13px;
+    padding:9px 11px;
+    border-radius:3px;
+    outline:none;
+  }
+  #searchInput:focus{ border-color:#c9a227; }
+  .search-results{
+    position:absolute;
+    top:100%; left:0; right:0;
+    margin-top:4px;
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    max-height:260px;
+    overflow-y:auto;
+    z-index:20;
+    display:none;
+  }
+  .search-results.open{ display:block; }
+  .search-item{
+    padding:9px 11px;
+    cursor:pointer;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+  }
+  .search-item:last-child{ border-bottom:none; }
+  .search-item:hover{ background:var(--bg-panel); }
+  .search-item .si-meta{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:10.5px;
+    color:var(--ink-dim);
+    display:block;
+    margin-bottom:2px;
+  }
+  .toggle-pill{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:12px;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    padding:8px 12px;
+    border-radius:3px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .toggle-pill.active{
+    color:var(--bg);
+    background:#2e8f86;
+    border-color:#2e8f86;
+    font-weight:600;
+  }
+
+  .stamp.known{
+    background:var(--dotc,#888);
+  }
+  .stamp.known::after{
+    content:'✓';
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    font-size:9px;
+    color:var(--bg);
+    line-height:1;
+  }
+
+  .known-toggle{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+    cursor:pointer;
+    margin-top:6px;
+    user-select:none;
+  }
+  .known-toggle input{ accent-color:#2e8f86; }
+
+  .related-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:4px;
+  }
+  .related-chip{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:10.5px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    padding:5px 9px;
+    border-radius:3px;
+    cursor:pointer;
+  }
+  .related-chip:hover{ color:var(--ink); border-color:#c9a227; }
+
+  /* quiz overlay */
+  .quiz-card{
+    position:fixed;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    width:min(520px, 92vw);
+    max-height:80vh;
+    overflow-y:auto;
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-left:3px solid #c9a227;
+    border-radius:4px;
+    padding:26px;
+    z-index:31;
+    opacity:0; pointer-events:none;
+    transition:opacity .18s;
+    box-shadow:0 24px 60px rgba(0,0,0,.5);
+  }
+  .quiz-card.open{ opacity:1; pointer-events:auto; }
+  .quiz-shade{
+    position:fixed; inset:0;
+    background:rgba(6,9,13,.6);
+    opacity:0; pointer-events:none;
+    transition:opacity .18s;
+    z-index:30;
+  }
+  .quiz-shade.open{ opacity:1; pointer-events:auto; }
+  .quiz-close{
+    position:absolute; top:14px; right:16px;
+    background:none; border:none;
+    color:var(--ink-dim);
+    font-size:20px; cursor:pointer;
+  }
+  .quiz-eyebrow{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:#c9a227;
+    margin:0 0 8px;
+  }
+  .quiz-card h2{
+    font-family:'Spectral',Georgia,'Times New Roman',serif;
+    font-size:22px;
+    font-weight:600;
+    margin:0 0 18px;
+    line-height:1.3;
+  }
+  .quiz-answer{ display:none; }
+  .quiz-answer.shown{ display:block; }
+  .quiz-answer .field{ margin-bottom:12px; }
+  .quiz-answer .k{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin:0 0 4px;
+  }
+  .quiz-answer .v{ font-size:14px; line-height:1.5; margin:0; }
+  .quiz-btn-row{ display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+  .quiz-btn{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:12.5px;
+    padding:10px 14px;
+    border-radius:3px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--ink);
+    cursor:pointer;
+    flex:1 1 auto;
+  }
+  .quiz-btn.reveal{ border-color:#c9a227; color:#c9a227; }
+  .quiz-btn.yes{ border-color:#2e8f86; color:#2e8f86; }
+  .quiz-btn.no{ border-color:#b6402e; color:#b6402e; }
+  .quiz-progress{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+    margin-top:14px;
+  }
+</style>
+
+<script>
+// shared visit-tracking for the unified progress page — writes only, never reads elsewhere in this tool
+try {
+  const gbVisited = JSON.parse(localStorage.getItem('gb_progress_visited') || '{}');
+  gbVisited['timeline'] = new Date().toISOString();
+  localStorage.setItem('gb_progress_visited', JSON.stringify(gbVisited));
+} catch(e) {}
+</script>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Pilot · Timeline interactiv · pe baza Îndrumarului BAC</p>
+  <h1 id="chapTitle">România postbelică — 1944 → 2007</h1>
+  <p class="sub" id="chapSub">Fir cronologic de tip fișă de arhivă. Click pe un marcaj deschide fișa evenimentului (cauze / desfășurare / urmări).</p>
+</header>
+
+<div class="chapter-tabs" id="chapterTabs"></div>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="Caută un eveniment (orice capitol)…" autocomplete="off">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+  <button class="toggle-pill" id="quizBtn">🧠 Test cunoștințe</button>
+  <button class="toggle-pill" id="unreviewedBtn">◻ Doar de revizuit azi</button>
+</div>
+
+<div class="filters" id="filters"></div>
+
+<div class="timeline-wrap">
+  <div class="timeline" id="timeline">
+    <div class="decades" id="decades"></div>
+    <div class="spine"></div>
+  </div>
+</div>
+
+<footer>geo-bac · test intern — nu e integrat în site</footer>
+
+<div class="panel-shade" id="shade"></div>
+<div class="card" id="card">
+  <button class="card-close" id="cardClose">✕</button>
+  <p class="card-eyebrow" id="cardCat"></p>
+  <h2 id="cardTitle"></h2>
+  <div class="field"><p class="k">Cauze</p><p class="v" id="cardCauze"></p></div>
+  <div class="field"><p class="k">Desfășurare</p><p class="v" id="cardDesf"></p></div>
+  <div class="field"><p class="k">Urmări</p><p class="v" id="cardUrm"></p></div>
+  <label class="known-toggle"><input type="checkbox" id="cardKnownCheck"> Am revizuit acest eveniment</label>
+  <div class="related-chips" id="relatedChips"></div>
+</div>
+
+<div class="quiz-shade" id="quizShade"></div>
+<div class="quiz-card" id="quizCard">
+  <button class="quiz-close" id="quizClose">✕</button>
+  <p class="quiz-eyebrow" id="quizMeta">Test cunoștințe</p>
+  <h2 id="quizTitle"></h2>
+  <div class="quiz-answer" id="quizAnswer">
+    <div class="field"><p class="k">Cauze</p><p class="v" id="quizCauze"></p></div>
+    <div class="field"><p class="k">Desfășurare</p><p class="v" id="quizDesf"></p></div>
+    <div class="field"><p class="k">Urmări</p><p class="v" id="quizUrm"></p></div>
+  </div>
+  <div class="quiz-btn-row" id="quizBtnRowReveal">
+    <button class="quiz-btn reveal" id="quizRevealBtn">Arată răspunsul</button>
+  </div>
+  <div class="quiz-btn-row" id="quizBtnRowJudge" style="display:none;">
+    <button class="quiz-btn yes" id="quizYesBtn">✓ Știam</button>
+    <button class="quiz-btn no" id="quizNoBtn">✗ Nu știam</button>
+  </div>
+  <p class="quiz-progress" id="quizProgress"></p>
+</div>
+
+<script>
+const CATS = {
+  politic:   {label:"Politic",         color:"var(--politic)"},
+  social:    {label:"Social-economic", color:"var(--social)"},
+  cultural:  {label:"Cultural",        color:"var(--cultural)"},
+  militar:   {label:"Militar/extern",  color:"var(--militar)"}
+};
+
+const CHAPTERS = [{"id": "cap1", "label": "1. Romanitatea Românilor", "yearMin": -100, "yearMax": 2000, "events": [{"an": -100, "cat": "cultural", "titlu": "Tracii și ramurile lor", "cauze": "Populație indo-europeană așezată la nord și sud de Dunăre, considerată de Strabon a vorbi aceeași limbă.", "desf": "Ramuri: geto-dacii (nord de Dunăre), moesii, besii și odrizii (sud de Dunăre); societate tribală, așezări fortificate cu terminația „-dava” (Capidava, Sucidava); religie politeistă (Zalmoxis, Gebeleizis, Bendis).", "urm": "Substratul etnic și lingvistic peste care se va suprapune romanizarea."}, {"an": -90, "cat": "social", "titlu": "Structura socială a geto-dacilor", "cauze": "Organizarea tribală a societății tracice.", "desf": "Societate împărțită în comati (oameni liberi) și tarabostes (nobili).", "urm": "Ierarhia socială preluată parțial și de administrația romană ulterioară."}, {"an": -82, "anEnd": -44, "cat": "politic", "titlu": "Regatul lui Burebista", "cauze": "Unificarea triburilor geto-dace sub o singură autoritate.", "desf": "Burebista extinde regatul până la Tisa, Nipru și sudul Dunării, fără conflict direct cu Roma.", "urm": "Cel mai întins stat geto-dac, bază pentru regatul lui Decebal."}, {"an": 87, "anEnd": 106, "cat": "politic", "titlu": "Regatul lui Decebal", "cauze": "Romanii cuceriseră deja Moesia și Dobrogea, amenințare directă la graniță.", "desf": "Regat mai mic dar omogen, condus de Decebal, cu un război de apărare a teritoriului și suveranității.", "urm": "Devine ținta celor două campanii ale împăratului Traian (98-117 d.Hr.)."}, {"an": 101, "anEnd": 102, "cat": "militar", "titlu": "Primul război daco-roman", "cauze": "Bogățiile Daciei (aur, argint) și amenințarea militară la granița de NE a imperiului.", "desf": "Armata romană înaintează, cucerește fortificații importante.", "urm": "Pace temporară — Decebal acceptă vasalitatea, dar se reînarmează rapid."}, {"an": 105, "anEnd": 106, "cat": "militar", "titlu": "Al doilea război daco-roman", "cauze": "Reînarmarea lui Decebal după pacea temporară.", "desf": "Ofensivă decisivă condusă personal de Traian; romanii cuceresc Sarmizegetusa.", "urm": "Desființarea regatului dac; Dacia devine provincie romană (Dacia Traiană)."}, {"an": 106, "cat": "social", "titlu": "Consecințele cuceririi romane", "cauze": "Desființarea statului dac.", "desf": "O parte a populației daco-romane e romanizată și integrată în imperiu; dacii liberi din NE (Moldova, Maramureș) nu sunt cuceriți.", "urm": "Coexistă romanizarea oficială cu zone care păstrează elemente autohtone."}, {"an": 106, "anEnd": 271, "cat": "cultural", "titlu": "Romanizarea oficială a Daciei", "cauze": "Integrarea Daciei ca provincie a Imperiului Roman.", "desf": "Armata (legiunile XIII Gemina și V Macedonica, ~55.000 de soldați), veteranii, administrația (capitala Ulpia Traiana Sarmizegetusa), coloniștii, urbanizarea (Drobeta, Napoca, Dierna), religia și școala răspândesc limba și cultura latină.", "urm": "Substrat pentru etnogeneza românească, alături de dacii liberi neromanizați."}, {"an": 200, "anEnd": 800, "cat": "cultural", "titlu": "Etnogeneza românească", "cauze": "Contactul prelungit daco-roman, apoi influențele slave.", "desf": "Proces lent, sec. II-VIII, în spațiul carpato-danubiano-pontic; rezultă poporul român și limba română.", "urm": "Structura vocabularului: substrat dac ~10%, strat latin ~60%, adstrat slav ~20%, alte influențe (ungurești, grecești, turcești) ~10%."}, {"an": 900, "cat": "cultural", "titlu": "Dialectele limbii române", "cauze": "Fragmentarea teritorială a romanității balcanice și carpatice.", "desf": "Patru forme: daco-română (oficială în România/R. Moldova), aromâna (sudul Balcanilor), istro-româna (Istria, Croația), meglenoromâna (Meglen, Macedonia-Grecia).", "urm": "Dovadă a unei romanități răspândite pe o arie mult mai largă decât teritoriul românesc actual."}, {"an": 650, "cat": "cultural", "titlu": "„Strategikon” îi numește „romani”", "cauze": "Primele mențiuni bizantine ale populației nord-dunărene.", "desf": "Izvorul din sec. VII folosește termenul „romani”, alături de vlahi/valahi/blachi în alte surse.", "urm": "Prima atestare directă a conștiinței romanice la nord de Dunăre."}, {"an": 850, "cat": "cultural", "titlu": "„Oguzname” — „Țara vlahilor”", "cauze": "Interesul surselor orientale pentru populațiile din regiune.", "desf": "Izvorul din sec. IX vorbește despre „Țara vlahilor”.", "urm": "Confirmă prezența unei populații romanice distincte la nord de Dunăre."}, {"an": 1150, "cat": "cultural", "titlu": "„Gesta Hungarorum” — voievodatele românești", "cauze": "Cronica ungară (Anonymus) descrie cucerirea teritoriilor de la est de Tisa.", "desf": "Menționează voievodatele lui Gelu, Glad și Menumorut.", "urm": "Cea mai veche atestare a unor structuri politice românești."}, {"an": 1450, "cat": "cultural", "titlu": "Umaniștii reafirmă legătura romană", "cauze": "Redescoperirea antichității în Renaștere.", "desf": "Poggio Bracciolini, Papa Pius II, Antonio Bonfini susțin originea romană; Nicolaus Olahus susține unitatea poporului român; Johannes Honterus realizează harta „Dacia”.", "urm": "Latinitatea românilor devine temă europeană recunoscută."}, {"an": 1650, "cat": "cultural", "titlu": "Cronicarii și Școala Ardeleană", "cauze": "Nevoia elitelor românești de a-și fundamenta identitatea.", "desf": "Grigore Ureche („Noi de la Rîm ne tragem”), Miron Costin, Dimitrie Cantemir; apoi Școala Ardeleană (Petru Maior, Gheorghe Șincai, Samuil Micu) promovează purismul latin.", "urm": "Se conturează teoria continuității daco-romane."}, {"an": 1850, "cat": "cultural", "titlu": "Teoria imigraționistă vs. teoria continuității", "cauze": "Dezbaterea istoriografică europeană asupra originii românilor.", "desf": "Imigraționistă (Sulzer, Engel, Roesler): formare la sud de Dunăre, migrație spre nord în sec. XII. Continuității (Xenopol, Hasdeu, Iorga): continuitate daco-romană neîntreruptă.", "urm": "Teoria imigraționistă, folosită politic în mediile habsburgice; teoria continuității, susținută de istoricii români ca argument al unității naționale."}, {"an": 1900, "cat": "cultural", "titlu": "Exagerarea elementului latin", "cauze": "Nevoia de legitimare națională a Școlii Ardelene, continuată de istoriografia de la 1900.", "desf": "Nicolae Iorga formulează metafora „insulei de latinitate într-o mare slavă”.", "urm": "Influențele slave sunt minimizate în istoriografia națională."}, {"an": 1950, "anEnd": 1965, "cat": "politic", "titlu": "Exagerarea elementului slav", "cauze": "Regimul Gheorghiu-Dej, sub influență sovietică directă.", "desf": "Rolul slavilor în etnogeneză e supraevaluat, latinitatea minimizată.", "urm": "Istoriografia devine instrument de propagandă politică."}, {"an": 1970, "anEnd": 1989, "cat": "politic", "titlu": "Exagerarea elementului dac", "cauze": "Naționalismul regimului Ceaușescu.", "desf": "„Dacismul” glorifică civilizația dacică drept rol primordial în formarea națiunii.", "urm": "A treia mare distorsiune ideologică a istoriografiei românești."}]}, {"id": "cap2", "label": "2. Autonomii Locale (IX-XVIII)", "yearMin": 830, "yearMax": 1720, "events": [{"an": 830, "cat": "social", "titlu": "Contextul intern al formării statelor medievale", "cauze": "Evoluția societății românești din primele secole ale mileniului I.", "desf": "Creșterea demografică, dezvoltarea economică (târguri și orașe), ierarhizarea socială — desprinderea „mai marilor pământului”.", "urm": "Premisele interne pentru formarea statelor medievale extracarpatice."}, {"an": 830, "cat": "militar", "titlu": "Ungurii se așează în Câmpia Panoniei", "cauze": "Migrația triburilor maghiare spre Europa Centrală.", "desf": "Sec. IX (895-896) — instalarea în Panonia, urmată de expansiune spre est.", "urm": "Începe presiunea maghiară asupra spațiului intracarpatic."}, {"an": 900, "cat": "politic", "titlu": "Voievodatele lui Gelu, Menumorut și Glad", "cauze": "Formațiuni politice prestatale românești, atestate de „Gesta Hungarorum” (Anonymus, sec. XII).", "desf": "Gelu — centrul Transilvaniei, reședința Dăbâca; Menumorut — Crișana, reședința Biharea; Glad — Banat, reședința Cuvin.", "urm": "Gelu moare în conflict cu coroana maghiară, urmat de Tuhutum."}, {"an": 1000, "cat": "politic", "titlu": "Voievodatele lui Ahtum și Gyla", "cauze": "Formațiuni politice atestate de „Legenda Sfântului Gerard” (sec. XII, despre sec. XI).", "desf": "Ahtum — Banat, centrul la Morisena; Gyla — centrul Transilvaniei, centrul la Bălgrad.", "urm": "Ultimele voievodate românești independente înainte de cucerirea maghiară completă."}, {"an": 1000, "cat": "politic", "titlu": "Creștinarea Ungariei sub Ștefan I", "cauze": "Consolidarea statului maghiar după modelul occidental.", "desf": "Ștefan I creștinează regatul (anul 1000); conflicte cu voievodul Gyla (1002-1003).", "urm": "Statul maghiar capătă legitimitate pentru expansiune spre est."}, {"an": 1045, "cat": "militar", "titlu": "Cucerirea cetăților de graniță", "cauze": "Continuarea expansiunii maghiare în spațiul intracarpatic.", "desf": "Cucerirea cetăților Turda, Biharea, Mediaș (înaintarea urmează linia: 900 Someșul Mic, 1000 Valea Mureșului, 1100 Valea Târnavei Mari, 1150 linia Oltului, 1200 Carpații Meridionali și Răsăriteni).", "urm": "Consolidarea treptată a stăpânirii maghiare asupra Transilvaniei."}, {"an": 1111, "cat": "politic", "titlu": "Primul comitat pe model occidental — Bihor", "cauze": "Nevoia coroanei maghiare de instrumente administrative de control.", "desf": "Se înființează comitatul Bihor (1111), urmat de Crasna și Dăbâca (1164), Cluj/Alba/Timiș (1175), Arad/Zarand/Târnava (sec. XIII).", "urm": "Model administrativ care va înlocui treptat voievodatele românești."}, {"an": 1111, "anEnd": 1113, "cat": "politic", "titlu": "Încercarea instituirii principatului — Mercurius", "cauze": "Tentativa coroanei maghiare de a înlocui voievodatul cu un principat controlat direct.", "desf": "Mercurius Princeps Ultrasilvanus conduce experimentul; urmează împotrivirea românilor (1113-1176).", "urm": "Experimentul eșuează; se revine la sistemul voievodal, dar subordonat coroanei."}, {"an": 1176, "cat": "politic", "titlu": "Voievodul Leustachius, subordonat coroanei maghiare", "cauze": "Consolidarea controlului maghiar asupra Transilvaniei.", "desf": "Leustachius (comite de Dăbâca ~1164) devine voievod subordonat coroanei.", "urm": "Deschide etapa Transilvaniei ca voievodat vasal Ungariei (1176-1541)."}, {"an": 1200, "cat": "cultural", "titlu": "Colonizarea sașilor", "cauze": "Politica regalității maghiare de populare și apărare a graniței de sud-est.", "desf": "Sașii vin din zona Rin-Flandra-Saxonia (sec. XII-XIII), se așează în Orăștie, Sibiu, Târnave, SE Transilvaniei; unitate administrativă: Universitatea (7 scaune + 2 districte).", "urm": "1224 — „Bula de Aur” (Andreanum) le acordă privilegii extinse."}, {"an": 1211, "anEnd": 1225, "cat": "militar", "titlu": "Cavalerii teutoni în Țara Bârsei", "cauze": "Andrei al II-lea îi colonizează (1211) pentru a opri invaziile cumane și a deschide expansiunea maghiară la sud/est de Carpați.", "desf": "Cavalerii se instalează în Țara Bârsei, dar manifestă tendințe de independență față de coroana maghiară.", "urm": "Sunt alungați în 1225 din cauza acestor tendințe."}, {"an": 1220, "cat": "cultural", "titlu": "Colonizarea secuilor", "cauze": "Politica de populare a regatului maghiar.", "desf": "Secuii (sec. XIII) sunt deplasați spre răsăritul Transilvaniei — Bihor, Târnave, Mureș, Subcarpații Răsăriteni; unitate administrativă: scaunele.", "urm": "A treia „națiune” privilegiată alături de maghiari și sași."}, {"an": 1224, "cat": "cultural", "titlu": "Bula de Aur (Andreanum)", "cauze": "Colonizarea sașilor în sud-estul Transilvaniei.", "desf": "Andrei al II-lea acordă sașilor privilegii extinse.", "urm": "Bază pentru autonomia „Universității săsești” (Universitas Saxonum, 7 scaune + 2 districte, comite regal la Sibiu)."}, {"an": 1241, "cat": "militar", "titlu": "Marea Invazie Mongolă", "cauze": "Expansiunea Imperiului Mongol spre Europa.", "desf": "Invazia distruge structuri politice și demografice locale.", "urm": "Lichidează hegemonia Regatului Ungar la sud și est de Carpați."}, {"an": 1247, "cat": "politic", "titlu": "Diploma cavalerilor ioaniți — formațiuni prestatale în Țara Românească", "cauze": "Regalitatea maghiară organizează spațiul de la sud de Carpați.", "desf": "Documentul atestă voievodatul lui Litovoi (Oltenia, Valea Jiului), voievodatul lui Seneslau (Muntenia), cnezatul lui Ioan (S. Olteniei), cnezatul lui Farcaș (N. Olteniei) și Țara Severinului.", "urm": "Prima atestare documentară a structurilor politice din spațiul viitoarei Țări Românești."}, {"an": 1274, "cat": "militar", "titlu": "Litovoi luptă cu maghiarii", "cauze": "Extinderea autorității voievodatului lui Litovoi asupra Olteniei.", "desf": "Conflict cu regalitatea maghiară; Litovoi este urmat de Bărbat.", "urm": "Confirmă capacitatea militară a voievodatelor românești în fața presiunii maghiare."}, {"an": 1288, "cat": "politic", "titlu": "Adunarea Obștească Nobiliară a Transilvaniei — prima atestare", "cauze": "Nevoia stărilor privilegiate de reprezentare colectivă.", "desf": "Atestată în 1288, devine Congregații Nobiliare din 1437.", "urm": "Precursor al Dietei Transilvaniei."}, {"an": 1308, "cat": "politic", "titlu": "Stingerea dinastiei arpadiene", "cauze": "Lipsa unui moștenitor direct al regatului maghiar.", "desf": "Vine dinastia de Anjou la conducerea Ungariei.", "urm": "Schimbare de dinastie cu impact asupra politicii maghiare față de statele românești în formare."}, {"an": 1290, "cat": "politic", "titlu": "Descălecatul lui Negru-Vodă (legendar)", "cauze": "Tradiția aportului transilvănean la formarea Țării Românești, pe fondul organizărilor sistematice și cuceririi Transilvaniei de maghiari (regele Andrei al III-lea).", "desf": "Negru-Vodă vine din Țara Făgărașului la Câmpulung și Argeș.", "urm": "Etapă legendară premergătoare întemeierii propriu-zise a Țării Românești."}, {"an": 1310, "anEnd": 1352, "cat": "politic", "titlu": "Basarab I „Întemeietorul”", "cauze": "Unirea cnezatelor și voievodatelor din Muntenia și Oltenia.", "desf": "Basarab I se intitulează „voievodul nostru transalpin” și „mare voievod și domn”; deține și Banatul de Severin.", "urm": "Pune bazele statului Țara Românească."}, {"an": 1330, "cat": "militar", "titlu": "Bătălia de la Posada", "cauze": "Tentativa lui Carol Robert d'Anjou de a impune suzeranitatea maghiară.", "desf": "Basarab I învinge armata maghiară (9-13 noiembrie 1330); relatată de „Cronica Pictată de la Viena”.", "urm": "Câștigarea independenței Țării Românești."}, {"an": 1352, "anEnd": 1364, "cat": "politic", "titlu": "Nicolae Alexandru", "cauze": "Consolidarea statului întemeiat de Basarab I.", "desf": "1359 — întemeiază mitropolia Argeș, dependentă de Constantinopol, centru de legitimare a puterii domnești.", "urm": "Prima mitropolie a Țării Românești, model urmat de Moldova (1401)."}, {"an": 1352, "anEnd": 1360, "cat": "politic", "titlu": "Descălecatele lui Dragoș și Bogdan", "cauze": "Regele maghiar Ludovic d'Anjou trimite o marcă de apărare antitătară (Dragoș din Bedeu, Maramureș, 1352-1353); Bogdan din Cuhea se răscoală împotriva urmașilor lui Dragoș (Sas și Balc).", "desf": "Bogdan descalecă la est de Carpați (1359-1360); surse: „Letopisețul Țării Moldovei” (Ureche), „Cronica lui Ioan de Târnave”.", "urm": "1365 — lupte cu maghiarii, Bogdan câștigă independența Moldovei."}, {"an": 1364, "anEnd": 1377, "cat": "politic", "titlu": "Vladislav Vlaicu", "cauze": "Nevoia de consolidare economică și religioasă a Țării Românești.", "desf": "Bate monedă proprie, stăpânește Amlaș și Făgăraș ca feude maghiare, confirmă privilegiile comerciale ale brașovenilor; 1370 — întemeiază a doua mitropolie, la Severin, pentru a opri expansiunea catolicismului.", "urm": "Mitropolitul Țării Românești devine „exarh al plaiurilor”."}, {"an": 1365, "anEnd": 1374, "cat": "politic", "titlu": "Latcu al Moldovei", "cauze": "Nevoia de recunoaștere internațională a tânărului stat moldovean.", "desf": "Întreține relații cu papalitatea; crearea unei episcopii catolice la Siret.", "urm": "Prima deschidere diplomatică a Moldovei spre Occident."}, {"an": 1366, "cat": "cultural", "titlu": "Diplomele lui Ludovic d'Anjou", "cauze": "Politica de întărire a catolicismului în Transilvania.", "desf": "Catolicismul devine religie receptă (privilegiată); ortodoxia devine religie interzisă, fără drepturi politice.", "urm": "Românii ortodocși pierd drepturi politice în Transilvania pentru secole."}, {"an": 1375, "anEnd": 1391, "cat": "politic", "titlu": "Petru I Mușat", "cauze": "Consolidarea instituțională a Moldovei.", "desf": "Întemeiază mitropolia Sucevei (nerecunoscută inițial de patriarhia ecumenică, fiind condusă de un român); bate monedă; 1387 — jurământ de vasalitate față de regele Poloniei; 1402 — legături diplomatice cu Polonia.", "urm": "1401 — mitropolia Sucevei e recunoscută, la insistențele lui Alexandru cel Bun."}, {"an": 1388, "cat": "politic", "titlu": "Mircea cel Bătrân integrează Dobrogea", "cauze": "Declinul stăpânirii bizantine și bulgare la Dunărea de Jos, apariția otomanilor la Dunăre.", "desf": "Mircea cel Bătrân anexează Dobrogea Țării Românești.", "urm": "Dobrogea rămâne românească până la cucerirea otomană din 1417."}, {"an": 1391, "anEnd": 1394, "cat": "politic", "titlu": "Roman I al Moldovei", "cauze": "Continuarea consolidării teritoriale începute de Petru I Mușat.", "desf": "Desăvârșește unificarea statului moldovean „de la munți până la Marea cea mare”.", "urm": "Moldova capătă întinderea sa maximă medievală, incluzând litoralul."}, {"an": 1401, "cat": "cultural", "titlu": "Recunoașterea mitropoliei Sucevei", "cauze": "Insistențele lui Alexandru cel Bun pe lângă patriarhia ecumenică.", "desf": "Mitropolia Sucevei, întemeiată de Petru I Mușat, e recunoscută oficial.", "urm": "Prima mitropolie a Moldovei, dependentă de Constantinopol, alături de cele două ale Țării Românești."}, {"an": 1417, "cat": "militar", "titlu": "Dobrogea intră în Imperiul Otoman; tributul Țării Românești", "cauze": "Expansiunea otomană la Dunăre.", "desf": "Otomanii ocupă Dobrogea; Mircea cel Bătrân e nevoit să plătească primul tribut otoman al Țării Românești.", "urm": "Moldova va plăti tribut din 1456 (Petru Aron)."}, {"an": 1437, "cat": "politic", "titlu": "Unio Trium Nationum", "cauze": "Nevoia stărilor privilegiate de a-și consolida puterea în Transilvania, pe fondul răscoalei de la Bobâlna.", "desf": "Uniunea celor trei „națiuni” privilegiate: maghiari, sași, secui; Congregațiile Nobiliare înlocuiesc Adunarea Obștească.", "urm": "Românii, majoritari numeric, rămân în afara sistemului politic privilegiat."}, {"an": 1441, "cat": "politic", "titlu": "Prima atestare a Adunării Țării în Moldova", "cauze": "Nevoia de reprezentare a stărilor privilegiate în procesul decizional.", "desf": "Adunarea Țării — boierimea mare și mică, cler, oștire, târgoveți, țărănime liberă — hotăra problemele importante și sancționa alegerea domnului.", "urm": "În Țara Românească instituția similară e atestată din 1522."}, {"an": 1500, "cat": "politic", "titlu": "Sec. XVI — Tripartitum-ul lui Werboczi", "cauze": "Codificarea statutului juridic al stărilor din Transilvania.", "desf": "Românii ortodocși sunt declarați „tolerați”; religiile protestante (calvinism, luteranism, unitarianism) devin recepte.", "urm": "Confirmă marginalizarea politică și religioasă a majorității românești."}, {"an": 1522, "cat": "politic", "titlu": "Prima atestare a Adunării Țării în Țara Românească", "cauze": "Nevoia de reprezentare a stărilor privilegiate, după modelul deja atestat în Moldova (1441).", "desf": "Adunarea Țării era consultată în probleme fiscale și administrative și sancționa alegerea domnului.", "urm": "Instituție paralelă celei din Moldova, parte a structurii statului medieval românesc."}, {"an": 1541, "cat": "politic", "titlu": "Transilvania — principat autonom otoman", "cauze": "Dispariția Regatului Maghiar după cucerirea otomană a Ungariei centrale (Pașalâcul Budei; NV Ungariei — ocupație austriacă).", "desf": "Transilvania devine principat autonom sub suzeranitate otomană, condus de un principe ales de Dietă; rămân privilegiate cele trei „națiuni”.", "urm": "Regim politic păstrat până la ocupația habsburgică (1688-1699)."}, {"an": 1688, "anEnd": 1699, "cat": "militar", "titlu": "Ocuparea austriacă a Transilvaniei", "cauze": "Declinul otoman și expansiunea Imperiului Habsburgic în urma asediului Vienei (1683).", "desf": "Transilvania e ocupată treptat de habsburgi; Guberniul preia atribuțiile Dietei, condus de un guvernator militar.", "urm": "1691 — „Diploma Leopoldină” păstrează inițial privilegiile Unio Trium Nationum."}, {"an": 1701, "cat": "cultural", "titlu": "Formarea Bisericii Greco-Catolice", "cauze": "Diploma lui Leopold I, ca soluție de compromis pentru integrarea religioasă a românilor ortodocși.", "desf": "Se formează Biserica Greco-Catolică (unită cu Roma, rit ortodox), subordonată Papei.", "urm": "Va juca un rol esențial în emanciparea culturală a românilor transilvăneni (Școala Ardeleană)."}, {"an": 1711, "anEnd": 1716, "cat": "politic", "titlu": "Instaurarea domniilor fanariote", "cauze": "Neîncrederea Porții în domnii pământeni, mai ales după alianța lui Cantemir cu Rusia; ultimii domni pământeni au fost Dimitrie Cantemir (Moldova) și Constantin Brâncoveanu (Țara Românească).", "desf": "Domni greci din Fanar sunt numiți la Iași (1711) și București (1716).", "urm": "Degradarea instituției domniei, până la Revoluția lui Tudor Vladimirescu (1822)."}, {"an": 1350, "cat": "politic", "titlu": "Instituția Domniei — titulatură și atribute", "cauze": "Nevoia legitimării puterii centrale în noile state medievale (sec. XIV).", "desf": "Titulatura domnului combină tradiția latină (dominus), bizantină (autocrat), slavă (mare voievod) și creștină („Io” — cel ales de Dumnezeu); dinastii: Basarabii (Țara Românească), Mușatinii (Moldova); atribute interne (militare, administrative, fiscale, judecătorești) și externe (război, pace, tratate).", "urm": "Domnia — ereditar-electivă, rezervată familiei domnitoare, de origine divină a puterii."}, {"an": 1400, "cat": "politic", "titlu": "Sfatul Domnesc și marile dregătorii", "cauze": "Nevoia domnului de un organ central care să îl ajute în guvernare.", "desf": "Sfatul Domnesc — inițial marii boieri („boierii domniei mele”), apoi boierii cu dregătorii („boierii țării”, sec. XIV); dregătorii: Banul (cel mai important în Țara Românească, funcțiile domnului în Oltenia), Portarul Sucevei (cel mai important în Moldova), Logofătul, Spătarul, Stolnicul, Paharnicul, Postelnicul.", "urm": "Structura administrativă centrală a celor două state, funcțională până la domniile fanariote."}]}, {"id": "cap3", "label": "3. Diplomație și Conflict (Ev Mediu)", "yearMin": 1386, "yearMax": 1711, "events": [{"an": 1389, "cat": "militar", "titlu": "Bătălia de la Kosovo Polje", "cauze": "Solidaritatea creștină antiotomană la sud de Dunăre.", "desf": "Mircea cel Bătrân susține pe sârbi împotriva otomanilor.", "urm": "Prima confruntare cu expansiunea otomană în care se implică un domn român."}, {"an": 1389, "cat": "politic", "titlu": "Tratatul de la Radom", "cauze": "Nevoia lui Mircea cel Bătrân de un aliat împotriva expansiunii otomane și maghiare.", "desf": "Alianță cu Polonia, cu sprijin militar reciproc.", "urm": "Consolidează poziția diplomatică a Țării Românești în regiune."}, {"an": 1395, "cat": "militar", "titlu": "Bătălia de la Rovine", "cauze": "Continuarea presiunii otomane asupra Țării Românești.", "desf": "Mircea cel Bătrân învinge pe Baiazid I prin tactici de pădure și teren mlăștinos.", "urm": "Confirmă capacitatea militară a Țării Românești în fața expansiunii otomane."}, {"an": 1395, "cat": "politic", "titlu": "Tratatul de la Brașov", "cauze": "Nevoia unei alianțe antiotomane solide.", "desf": "Mircea cel Bătrân încheie alianță cu Sigismund de Luxemburg, cu recunoaștere reciprocă a granițelor.", "urm": "Consolidează frontul antiotoman în regiune, înaintea cruciadei de la Nicopole."}, {"an": 1396, "cat": "militar", "titlu": "Cruciada de la Nicopole", "cauze": "Coaliție europeană antiotomană, cu participare românească.", "desf": "Înfrângere creștină la Dunăre în fața otomanilor.", "urm": "Otomanii își consolidează poziția la Dunărea de Jos."}, {"an": 1402, "cat": "militar", "titlu": "Bătălia de la Ankara", "cauze": "Conflictul dintre Imperiul Otoman și Timur Lenk pentru dominație în Asia Mică.", "desf": "Timur Lenk învinge decisiv otomanii; Mircea cel Bătrân profită de dezordinea internă otomană.", "urm": "Slăbește temporar presiunea otomană asupra Țării Românești."}, {"an": 1412, "cat": "politic", "titlu": "Tratatul de la Lublin", "cauze": "Nevoia reînnoirii alianței polono-române.", "desf": "Mircea cel Bătrân reînnoiește alianța cu Polonia, garantând frontiera de nord.", "urm": "Securizează granița nordică a Țării Românești."}, {"an": 1413, "cat": "militar", "titlu": "Cucerirea Dobrogei de turci", "cauze": "Continuarea expansiunii otomane la Dunăre.", "desf": "Otomanii ocupă Dobrogea, pierdută de Țara Românească.", "urm": "Otomanii capătă acces direct la Dunăre, lângă Țara Românească."}, {"an": 1402, "cat": "politic", "titlu": "Jurământul de vasalitate al lui Alexandru cel Bun", "cauze": "Nevoia unei protecții externe pentru tânărul stat moldovean.", "desf": "Alexandru cel Bun jură vasalitate față de Vladislav Jagello, regele Poloniei.", "urm": "Moldova se orientează diplomatic spre Polonia pentru un secol."}, {"an": 1410, "cat": "militar", "titlu": "Bătălia de la Grunwald", "cauze": "Conflictul polono-lituanian cu Ordinul Teuton.", "desf": "Victoria alianței polono-lituaniene asupra Ordinului Teuton; Moldova participă ca aliat indirect.", "urm": "Consolidează alianța Moldovei cu Polonia."}, {"an": 1420, "cat": "militar", "titlu": "Apărarea Cetății Albe", "cauze": "Atac otoman asupra Moldovei lui Alexandru cel Bun.", "desf": "Apărare eroică a cetății.", "urm": "Confirmă rolul strategic al cetăților moldovenești la Marea Neagră."}, {"an": 1442, "cat": "militar", "titlu": "Sântimbru și Sibiu", "cauze": "Ofensivă otomană în Transilvania.", "desf": "Iancu de Hunedoara învinge turcii la Sântimbru și Sibiu, eliberând Transilvania.", "urm": "Cronicile occidentale îl numesc „atlet al creștinătății”."}, {"an": 1443, "anEnd": 1444, "cat": "militar", "titlu": "Campania cea lungă", "cauze": "Dorința lui Iancu de Hunedoara de a respinge definitiv otomanii din Balcani.", "desf": "Ofensivă antiotomană extinsă în Balcani.", "urm": "Deschide calea cruciadei de la Varna."}, {"an": 1444, "cat": "militar", "titlu": "Dezastrul de la Varna", "cauze": "Coaliția creștină reia ofensiva antiotomană.", "desf": "Coaliția e înfrântă dezastruos; moare regele Vladislav.", "urm": "Eșecul cruciadei antiotomane a Europei Centrale."}, {"an": 1456, "cat": "militar", "titlu": "Apărarea Belgradului", "cauze": "Ofensiva otomană spre Europa Centrală, sub Mahomed al II-lea.", "desf": "Iancu de Hunedoara apără cu succes Belgradul, stopând înaintarea otomană.", "urm": "Iancu de Hunedoara e considerat salvatorul Europei centrale; moare la scurt timp după victorie."}, {"an": 1462, "cat": "militar", "titlu": "Atacul de noapte de la Târgoviște", "cauze": "Ofensivă otomană condusă personal de Mahomed al II-lea împotriva lui Vlad Țepeș.", "desf": "Atac-surpriză nocturn asupra taberei otomane.", "urm": "Descris în scrisorile occidentale ca exemplu de cruzime și tactică militară."}, {"an": 1467, "cat": "militar", "titlu": "Bătălia de la Baia", "cauze": "Tentativa regelui maghiar Matei Corvin de a impune supremația asupra Moldovei.", "desf": "Ștefan cel Mare învinge armata ungară.", "urm": "Ștefan cel Mare își consolidează autoritatea internă și externă."}, {"an": 1473, "cat": "politic", "titlu": "Refuzul tributului otoman de către Ștefan cel Mare", "cauze": "Dorința de a-și afirma independența față de Poartă.", "desf": "Ștefan cel Mare refuză plata tributului — provocare deschisă adresată Imperiului Otoman.", "urm": "Declanșează represaliile otomane care culminează cu Vaslui (1475) și Războieni (1476)."}, {"an": 1475, "cat": "militar", "titlu": "Bătălia de la Vaslui (Podul Înalt)", "cauze": "Represalii otomane pentru refuzul tributului.", "desf": "Cea mai mare victorie antiotomană a Moldovei medievale.", "urm": "Ștefan cel Mare e proclamat „atlet al creștinătății” de Papă."}, {"an": 1475, "cat": "politic", "titlu": "Scrisoarea circulară a lui Ștefan cel Mare", "cauze": "Nevoia de sprijin european după victoria de la Vaslui.", "desf": "Chemare la cruciadă adresată curților europene — propagandă diplomatică.", "urm": "Consolidează imaginea Moldovei ca „poartă a creștinătății”."}, {"an": 1476, "cat": "militar", "titlu": "Valea Albă (Războieni)", "cauze": "Represalii otomane majore pentru victoria de la Vaslui.", "desf": "Înfrângere tactică a lui Ștefan cel Mare, dar otomanii se retrag.", "urm": "Moldova e salvată, deși grav afectată."}, {"an": 1497, "cat": "militar", "titlu": "Codrii Cosminului", "cauze": "Tentativa Poloniei de a-și impune influența asupra Moldovei.", "desf": "Ștefan cel Mare organizează o ambuscadă devastatoare asupra polonezilor.", "urm": "Confirmă independența Moldovei față de pretențiile polone."}, {"an": 1499, "cat": "politic", "titlu": "Tratatul de la Hârlău", "cauze": "Nevoia normalizării relațiilor moldo-polone după conflictul din 1497.", "desf": "Reglementarea relațiilor dintre Moldova și Polonia.", "urm": "Pace de durată pe frontiera nordică a Moldovei."}, {"an": 1594, "cat": "militar", "titlu": "Răscoala antiotomană a lui Mihai Viteazul", "cauze": "Presiunea fiscală otomană tot mai apăsătoare.", "desf": "Revoltă generală, începutul campaniei de eliberare a Țării Românești.", "urm": "Deschide etapa militară cea mai activă a domniei lui Mihai Viteazul."}, {"an": 1595, "cat": "militar", "titlu": "Călugăreni și Giurgiu", "cauze": "Continuarea răscoalei antiotomane.", "desf": "Victorii importante ale lui Mihai Viteazul împotriva otomanilor.", "urm": "Consolidează poziția militară a Țării Românești."}, {"an": 1595, "cat": "politic", "titlu": "Tratatul de la Alba Iulia", "cauze": "Nevoia unui aliat pentru continuarea luptei antiotomane.", "desf": "Mihai Viteazul încheie alianță cu Transilvania.", "urm": "Pregătește unirea Transilvaniei sub Mihai, patru ani mai târziu."}, {"an": 1599, "cat": "militar", "titlu": "Bătălia de la Șelimbăr", "cauze": "Obiectivul lui Mihai Viteazul de a-și extinde autoritatea asupra Transilvaniei.", "desf": "Înfrângerea lui Andrei Báthory; unirea Transilvaniei sub Mihai Viteazul.", "urm": "Prima unire a Transilvaniei cu Țara Românească sub aceeași autoritate."}, {"an": 1600, "cat": "militar", "titlu": "Miraslău și Guruslău", "cauze": "Lupte pentru menținerea unirii celor trei țări sub Mihai Viteazul.", "desf": "Confruntări militare pentru păstrarea controlului asupra Transilvaniei și Moldovei.", "urm": "Unirea celor trei țări se dovedește de scurtă durată."}, {"an": 1601, "cat": "politic", "titlu": "Asasinarea lui Mihai Viteazul la Câmpia Turzii", "cauze": "Opoziția nobilimii transilvănene și a Habsburgilor față de autoritatea lui Mihai.", "desf": "Mihai Viteazul e asasinat la Câmpia Turzii.", "urm": "Sfârșitul domniei sale; rămâne simbol al unității naționale pentru istoriografia ulterioară."}, {"an": 1711, "cat": "militar", "titlu": "Bătălia de la Stănilești", "cauze": "Alianța secretă a lui Dimitrie Cantemir cu Petru cel Mare al Rusiei.", "desf": "Înfrângere moldo-rusă în fața otomanilor.", "urm": "Eșecul alianței cu Rusia grăbește instaurarea domniilor fanariote în Moldova."}, {"an": 1711, "cat": "politic", "titlu": "Tratatul de la Lutk", "cauze": "Nevoia lui Cantemir de a găsi un protector împotriva Porții.", "desf": "Alianță secretă cu Rusia, cu promisiunea eliberării Moldovei de sub otomani.", "urm": "Promisiunea rusă nu se materializează după înfrângerea de la Stănilești."}]}, {"id": "cap4", "label": "4. Statul Modern — România Mare", "yearMin": 1683, "yearMax": 1920, "events": [{"an": 1683, "cat": "militar", "titlu": "Asediul Vienei", "cauze": "Ultima mare ofensivă otomană spre centrul Europei.", "desf": "Eșecul asediului marchează declinul Imperiului Otoman.", "urm": "Se deschide „problema orientală” — disputa marilor puteri pentru moștenirea otomană."}, {"an": 1711, "anEnd": 1716, "cat": "politic", "titlu": "Instaurarea domniilor fanariote", "cauze": "Neîncrederea Porții în domnii pământeni.", "desf": "Moldova (1711), apoi Țara Românească (1716) primesc domni fanarioți.", "urm": "După 1750 apare și se dezvoltă conștiința națională, cu proiecte ale „partidei naționale”: modernizare, drepturi și libertăți, autonomie, independență, unire."}, {"an": 1744, "cat": "cultural", "titlu": "Supplex Libellus — episcopul Inochentie Micu", "cauze": "Lipsa recunoașterii politice a românilor transilvăneni.", "desf": "Memoriu către Curtea de la Viena, cerând statutul de a patra națiune receptă și reprezentare în sistemul de Stări.", "urm": "Prima mare revendicare națională românească oficială."}, {"an": 1772, "cat": "politic", "titlu": "Memoriul de la Focșani", "cauze": "Contextul războaielor ruso-turce.", "desf": "Divanul muntean cere domnii pământene, neutralitate teritorială, independență administrativă și unirea Moldovei cu Țara Românească sub protecția Rusiei, Austriei și Prusiei.", "urm": "Prima propunere oficială de unire a celor două principate."}, {"an": 1791, "cat": "politic", "titlu": "Memoriul de la Șiștov", "cauze": "Continuarea revendicărilor de autonomie ale Țării Românești.", "desf": "Prevederi similare celui de la Focșani: domnii pământene, neutralitate teritorială, unirea sub protecția Rusiei și Austriei.", "urm": "Reafirmă, la 20 de ani distanță, aceleași obiective naționale."}, {"an": 1791, "cat": "cultural", "titlu": "Supplex Libellus Valachorum", "cauze": "Continuarea revendicărilor naționale transilvănene.", "desf": "Gheorghe Șincai, Ion Budai-Deleanu, Petru Maior, Samuil Micu cer reprezentare proporțională în Dietă și funcții.", "urm": "Bază ideologică pentru mișcarea națională a secolului XIX."}, {"an": 1730, "anEnd": 1769, "cat": "politic", "titlu": "Reformele lui Constantin Mavrocordat", "cauze": "Nevoia modernizării instituțiilor celor două principate.", "desf": "Reorganizarea instituțiilor fiscale, administrative și judiciare, realizarea unei monarhii moderate; 1746/1749 — desființarea șerbiei în Muntenia/Moldova (foștii șerbi devin clăcași, liberi juridic, dar fără pământ).", "urm": "Cel mai amplu program reformator al secolului XVIII fanariot."}, {"an": 1780, "cat": "politic", "titlu": "Pravilniceasca condică", "cauze": "Nevoia unui cod de legi unitar în Țara Românească.", "desf": "Alexandru Ipsilanti elaborează primul cod de legi fanariot.", "urm": "Precursor al codurilor Callimachi (1817) și Caragea (1818)."}, {"an": 1802, "cat": "politic", "titlu": "Planul de oblăduire aristo-democraticească", "cauze": "Nemulțumirea față de regimul fanariot.", "desf": "Dumitrache Sturdza propune un proiect republican de nuanță aristocratică și aducerea unui prinț străin.", "urm": "Idee premergătoare aducerii lui Carol I, patru decenii mai târziu."}, {"an": 1817, "cat": "politic", "titlu": "Codul Callimachi", "cauze": "Nevoia unui cadru juridic modern în Moldova.", "desf": "Scarlat Callimachi elaborează codul de legi al Moldovei.", "urm": "Alături de Legiuirea Caragea, reprezintă vârful reformismului juridic fanariot."}, {"an": 1818, "cat": "politic", "titlu": "Legiuirea Caragea", "cauze": "Nevoia unui cadru juridic modern în Țara Românească.", "desf": "Ioan Caragea elaborează codul de legi al Țării Românești.", "urm": "Rămâne în vigoare până la Regulamentele Organice."}, {"an": 1821, "cat": "politic", "titlu": "Revoluția lui Tudor Vladimirescu", "cauze": "Legăturile lui Tudor Vladimirescu cu Eteria (societate secretă grecească pentru eliberarea Greciei), sentimente antifanariote și antiturcești.", "desf": "1820-1821 — trei boieri munteni organizează răscoala, Tudor devine comandant militar; „Proclamația de la Padeș” / „Cererile norodului românesc” cer revenirea la domniile pământene.", "urm": "Mai 1821 — Tudor e judecat, condamnat și executat de eteriști; 1822 — revin domniile pământene (Grigore IV Ghica în Țara Românească, Ionița Sandu Sturdza în Moldova)."}, {"an": 1826, "cat": "politic", "titlu": "Convenția de la Akkerman", "cauze": "Presiunea rusă asupra Porții după Revoluția din 1821.", "desf": "Alegerea domnilor dintre boierii pământeni pe 7 ani, libertatea comerțului, încetarea exilului boierilor din 1821, comisii pentru îmbunătățirea situației Principatelor.", "urm": "Pregătește terenul pentru Tratatul de la Adrianopol."}, {"an": 1829, "cat": "politic", "titlu": "Tratatul de la Adrianopol", "cauze": "Războiul ruso-turc din 1828-1829.", "desf": "Protectorat rusesc, autonomie administrativă, restituirea cetăților de pe malul stâng al Dunării (Turnu, Giurgiu, Brăila), granițe pe Dunăre, numirea domnilor pe viață, libertatea comerțului.", "urm": "Pregătește terenul pentru Regulamentele Organice (1831-1832)."}, {"an": 1831, "anEnd": 1832, "cat": "politic", "titlu": "Regulamentele Organice", "cauze": "Nevoia unui cadru juridic modern, sub supravegherea lui Pavel Kiseleff.", "desf": "Prima separare a puterilor în stat: legislativ (Adunarea Obștească), executiv (Domnul + Sfatul Domnesc + Sfatul Administrativ, 6 miniștri), judecătoresc (instanțe + Înaltul Divan Domnesc) — „actul de naștere al parlamentarismului românesc”.", "urm": "Limite: încalcă autonomia țării prin influența Rusiei, menține privilegiile boierimii; rămân în vigoare până în 1858."}, {"an": 1848, "cat": "politic", "titlu": "„Petițiunea-proclamație” de la Iași (27 martie 1848)", "cauze": "Sincronizarea cu mișcările revoluționare europene.", "desf": "Vasile Alecsandri, Alexandru Ioan Cuza, Grigore Cuza propun desființarea cenzurii, funcții pe merit, reforma școlilor.", "urm": "Primul document programatic al Revoluției de la 1848 în Moldova."}, {"an": 1848, "cat": "politic", "titlu": "„Petiția națională” de la Blaj (3-5 mai 1848)", "cauze": "Mișcarea națională românească din Transilvania.", "desf": "Simion Bărnuțiu: „Noi vrem să ne unim cu Țara” — respingerea anexării Transilvaniei la Ungaria.", "urm": "Cel mai important document al Revoluției de la 1848 în Transilvania."}, {"an": 1848, "cat": "politic", "titlu": "„Principiile noastre pentru reformarea patriei” — Brașov (12 mai 1848)", "cauze": "Necesitatea coordonării obiectivelor unioniste dintre Moldova și Țara Românească.", "desf": "Costache Negri și Vasile Alecsandri formulează: „Unirea Moldovei și Valahiei într-un singur stat neatârnat românesc”.", "urm": "Prima formulare explicită a obiectivului Unirii ca stat unic independent."}, {"an": 1848, "cat": "politic", "titlu": "„Proclamația de la Islaz” (9 iunie 1848)", "cauze": "Radicalizarea mișcării revoluționare în Țara Românească.", "desf": "Ion Heliade Rădulescu proclamă independența administrativă și legislativă, emanciparea clăcașilor cu despăgubire, dezrobirea țiganilor.", "urm": "Cel mai radical document programatic al Revoluției de la 1848 din Țara Românească."}, {"an": 1848, "cat": "politic", "titlu": "„Petiția neamului românesc din Ungaria și Banat” — Lugoj (15 iunie 1848)", "cauze": "Necesitatea reprezentării românilor bănățeni în mișcarea națională.", "desf": "Eftimie Murgu cere respectarea națiunii române, autonomia provinciei, oficializarea limbii române.", "urm": "Extinde revendicările naționale și asupra Banatului."}, {"an": 1848, "cat": "politic", "titlu": "„Dorințele Partidei Naționale din Moldova” — Cernăuți (august 1848)", "cauze": "Nevoia unei sinteze programatice a mișcării naționale moldovene.", "desf": "Mihail Kogălniceanu: „Unirea Moldovei cu Muntenia este cheia bolții fără de care s-ar prăbuși tot edificiul național”.", "urm": "Formulare devenită emblematică pentru cauza Unirii."}, {"an": 1853, "anEnd": 1856, "cat": "militar", "titlu": "Războiul Crimeii", "cauze": "Rivalitatea marilor puteri pentru controlul asupra Imperiului Otoman.", "desf": "Rusia se confruntă cu Imperiul Otoman, Anglia și Franța; echilibrul european e perturbat.", "urm": "Deschide calea unui nou statut internațional pentru Principate."}, {"an": 1856, "cat": "politic", "titlu": "Tratatul de Pace de la Paris (30 martie 1856)", "cauze": "Încheierea Războiului Crimeii.", "desf": "Nou statut politico-juridic al Principatelor: garanția colectivă a celor 7 mari puteri înlocuiește protectoratul rusesc; Franța (Napoleon III) — prounionistă, Austria și Imperiul Otoman — antiunioniste.", "urm": "Deschide calea Unirii Principatelor."}, {"an": 1857, "cat": "politic", "titlu": "Adunările ad-hoc", "cauze": "Prevederile Tratatului de la Paris privind consultarea populației.", "desf": "Adunări cu caracter consultativ și reprezentativ; rezoluții: unirea Principatelor sub un prinț străin, neutralitate teritorială, adunare reprezentativă.", "urm": "Legitimează pe plan intern și internațional proiectul Unirii."}, {"an": 1858, "cat": "politic", "titlu": "Convenția de la Paris", "cauze": "Necesitatea unui nou cadru constituțional care să înlocuiască Regulamentele Organice.", "desf": "Denumire: Principatele Unite ale Moldovei și Valahiei; două adunări, două guverne, doi domni pământeni, dar instituții comune: Comisia Centrală de la Focșani și Înalta Curte de Justiție.", "urm": "Cadrul juridic în baza căruia va fi ales Cuza, un an mai târziu."}, {"an": 1859, "cat": "politic", "titlu": "Dubla alegere a lui Alexandru Ioan Cuza", "cauze": "Adunările ad-hoc din 1857 ceruseră unirea sub un singur domn.", "desf": "Cuza e ales domn în Moldova (5 ianuarie) și în Țara Românească (24 ianuarie).", "urm": "Unire de facto a celor două principate, sub aceeași persoană."}, {"an": 1861, "cat": "politic", "titlu": "Recunoașterea și proclamarea unirii depline", "cauze": "Nevoia legitimării internaționale a dublei alegeri din 1859.", "desf": "22 noiembrie 1861 — Conferința de la Constantinopol recunoaște oficial unirea; 11 decembrie 1861 — se proclamă înfăptuirea unirii depline.", "urm": "22 ianuarie 1862 — primul guvern unic, condus de Barbu Catargiu (Partidul Conservator)."}, {"an": 1863, "cat": "social", "titlu": "Legea secularizării averilor mănăstirești", "cauze": "Nevoia de resurse fiscale și de reformă agrară a statului unificat.", "desf": "13/25 decembrie 1863 — 25,6% din suprafața agricolă trece în proprietatea statului/țăranilor.", "urm": "Sursă de finanțare esențială pentru reformele ulterioare ale lui Cuza."}, {"an": 1864, "cat": "politic", "titlu": "Codul penal și de procedură penală", "cauze": "Nevoia unui cadru juridic penal modern.", "desf": "23 martie 1864 — adoptat după modelul francez (1810) și prusac (1851).", "urm": "Modernizarea sistemului judiciar românesc."}, {"an": 1864, "cat": "politic", "titlu": "Lovitura de stat a lui Cuza și Statutul Dezvoltător", "cauze": "Blocajul politic dintre domn și Adunare.", "desf": "2 mai 1864 — Cuza dizolvă Adunarea și promulgă Statutul Dezvoltător al Convenției de la Paris; se creează primul Senat (Corpul Ponderator) și primul Parlament bicameral.", "urm": "Domnitorul capătă puteri legislative sporite; Consiliul de Stat elaborează legile."}, {"an": 1864, "cat": "social", "titlu": "Reforma agrară a lui Cuza", "cauze": "Nevoia emancipării economice a țărănimii, după secularizare.", "desf": "14/26 august 1864 — 460.000 de familii de țărani primesc 1.800.000 ha de pământ.", "urm": "Cea mai amplă reformă agrară din istoria românească până la acel moment."}, {"an": 1864, "cat": "politic", "titlu": "Legea organizării armatei", "cauze": "Nevoia unei armate naționale moderne.", "desf": "27 noiembrie/9 decembrie 1864 — ia ființă oficial Armata Națională Română.", "urm": "Bază pentru participarea la Războiul de Independență din 1877-1878."}, {"an": 1864, "cat": "cultural", "titlu": "Legea instrucțiunii publice", "cauze": "Nevoia modernizării educaționale a statului unificat.", "desf": "Gratuitatea și obligativitatea învățământului primar (4 ani); Universitatea de la Iași (1860) și cea de la București (1864) sunt deja funcționale.", "urm": "Bază a sistemului de învățământ românesc modern."}, {"an": 1864, "cat": "politic", "titlu": "Codul Civil", "cauze": "Nevoia unui cadru juridic civil unitar și modern.", "desf": "16 decembrie 1864 — adoptarea Codului Civil.", "urm": "Ultima mare reformă legislativă a domniei lui Cuza, care abdică silit în 1866."}, {"an": 1866, "cat": "politic", "titlu": "Adoptarea Constituției din 1866 și venirea lui Carol I", "cauze": "Nevoia unui monarh străin și a unui cadru constituțional stabil după abdicarea lui Cuza.", "desf": "Se adoptă Constituția din 1866; Carol de Hohenzollern-Sigmaringen devine domnitor.", "urm": "Cea mai longevivă constituție românească (57 de ani)."}, {"an": 1867, "cat": "social", "titlu": "Apariția monedei naționale — leul", "cauze": "Nevoia unei monede naționale unificate.", "desf": "Se introduce leul ca monedă oficială a României.", "urm": "Simbol al suveranității economice a statului modern."}, {"an": 1868, "cat": "politic", "titlu": "Legea armatei (Carol I)", "cauze": "Continuarea modernizării militare începute de Cuza.", "desf": "Se adoptă o nouă lege a armatei, sub domnia lui Carol I.", "urm": "Consolidează capacitatea militară în perspectiva Războiului de Independență."}, {"an": 1875, "cat": "politic", "titlu": "Apariția Partidului Național Liberal", "cauze": "Structurarea vieții politice moderne românești.", "desf": "Se fondează PNL, pe doctrina burgheziei — „prin noi înșine”.", "urm": "Va deveni, alături de conservatori, unul dintre cei doi mari poli politici ai României moderne."}, {"an": 1877, "anEnd": 1878, "cat": "militar", "titlu": "Războiul pentru Independență", "cauze": "Dorința eliberării de sub suzeranitatea otomană.", "desf": "Kogălniceanu declară independența (mai 1877); luptele de la Plevna, Grivița, Vidin.", "urm": "Independența e recunoscută la Tratatul de la Berlin (1878)."}, {"an": 1880, "cat": "social", "titlu": "Apariția Băncii Naționale și a Partidului Conservator", "cauze": "Nevoia unei instituții financiare centrale și a structurării taberei politice de dreapta.", "desf": "Se înființează Banca Națională a României; apare Partidul Conservator (doctrina „pașilor mărunți”, sprijinit de moșierime).", "urm": "România capătă instituțiile financiare și politice specifice unui stat modern."}, {"an": 1881, "cat": "politic", "titlu": "Proclamarea Regatului", "cauze": "Consolidarea statului după independență.", "desf": "10 mai 1881 — Carol I e uns rege; România devine regat.", "urm": "Instituții tot mai stabile: Banca Națională, partide moderne."}, {"an": 1883, "cat": "militar", "titlu": "Aderarea la Tripla Alianță", "cauze": "Căutarea unei garanții de securitate față de Rusia.", "desf": "Alianță secretă cu Germania, Austro-Ungaria și Italia.", "urm": "Contrastează cu legăturile culturale ale elitei românești cu Franța."}, {"an": 1885, "cat": "cultural", "titlu": "Autocefalia Bisericii Ortodoxe Române", "cauze": "Nevoia de independență bisericească a statului suveran.", "desf": "Biserica Ortodoxă Română devine autocefală.", "urm": "Ultimă etapă a emancipării instituționale a statului român modern."}, {"an": 1895, "cat": "politic", "titlu": "Rotativa guvernamentală", "cauze": "Nevoia de stabilitate politică într-un sistem bipartid.", "desf": "Se instituie alternanța la guvernare (cicluri de 4 ani) între liberali și conservatori.", "urm": "Aduce o perioadă de stabilitate politică relativă până la Primul Război Mondial."}, {"an": 1916, "cat": "militar", "titlu": "Intrarea în Primul Război Mondial", "cauze": "Obiectivul unirii Transilvaniei cu România.", "desf": "România intră în război de partea Antantei (27 august 1916).", "urm": "Ocuparea temporară a Bucureștiului; guvernul se retrage la Iași."}, {"an": 1917, "cat": "militar", "titlu": "Mărăști, Mărășești, Oituz", "cauze": "Contraofensiva română după retragerea din 1916.", "desf": "Victorii care opresc înaintarea Puterilor Centrale.", "urm": "Salvează Moldova și pregătesc revenirea în război din 1918."}, {"an": 1917, "cat": "politic", "titlu": "Formarea Partidului Național Moldovenesc", "cauze": "Destrămarea Imperiului Rus și mișcarea națională din Basarabia.", "desf": "Martie/aprilie 1917 — se formează partidul care va conduce mișcarea de emancipare a Basarabiei.", "urm": "Pregătește Congresul ostașilor moldoveni și formarea Sfatului Țării."}, {"an": 1917, "cat": "politic", "titlu": "Congresul ostașilor moldoveni și Sfatul Țării", "cauze": "Continuarea mișcării naționale basarabene.", "desf": "Septembrie/octombrie 1917 — Congresul de la Chișinău formează Sfatul Țării, condus de Ion Inculeț.", "urm": "2 decembrie 1917 — Sfatul Țării proclamă autonomia Basarabiei."}, {"an": 1918, "cat": "politic", "titlu": "Independența și Unirea Basarabiei", "cauze": "Destrămarea Imperiului Rus, mișcarea națională moldovenească.", "desf": "24 ianuarie 1918 — Sfatul Țării proclamă independența Republicii Democratice Moldovenești; 27 martie 1918 — adoptă „Declarația de unire” cu România.", "urm": "Basarabia devine prima provincie istorică unită cu România în 1918."}, {"an": 1918, "cat": "politic", "titlu": "Autonomia Bucovinei", "cauze": "Destrămarea Imperiului Austro-Ungar.", "desf": "Toamna 1918 — Consiliul Național Român (deputați români din Parlamentul de la Viena) proclamă autonomia; 14 octombrie 1918 — Adunarea Constituantă (Iancu Flondor) cere sprijin militar, pe fondul pericolului anexării la Ucraina.", "urm": "Pregătește Congresul Național al Bucovinei."}, {"an": 1918, "cat": "politic", "titlu": "Unirea Bucovinei", "cauze": "Destrămarea Imperiului Austro-Ungar și autonomia proclamată în toamna anului 1918.", "desf": "15 noiembrie 1918 — Congresul Național al Bucovinei declară „unirea necondiționată și pentru vecie”.", "urm": "Bucovina se unește cu România."}, {"an": 1918, "cat": "politic", "titlu": "„Declarația de la Oradea”", "cauze": "Necesitatea afirmării dreptului la autodeterminare al românilor din Transilvania.", "desf": "29 septembrie 1918 — Partidul Național Român revendică dreptul la autodeterminare.", "urm": "Deschide etapa finală a mișcării naționale transilvănene din 1918."}, {"an": 1918, "cat": "politic", "titlu": "Consiliul Național Român Central — Arad", "cauze": "Nevoia unei conduceri unitare a mișcării naționale din Transilvania.", "desf": "30 octombrie 1918 — se formează la Arad, cu 6 reprezentanți ai PNR și 6 ai Partidului Social Democrat.", "urm": "Organizează Marea Adunare Națională de la Alba Iulia."}, {"an": 1918, "cat": "politic", "titlu": "Marea Adunare Națională de la Alba Iulia", "cauze": "Mișcarea națională românească din Transilvania, susținută de dreptul la autodeterminare.", "desf": "1 decembrie 1918 — 1228 de delegați și peste 100.000 de participanți adoptă Rezoluția Unirii, prezentată de Vasile Goldiș; se formează Marele Sfat Național și Consiliul Dirigent.", "urm": "24 decembrie 1918 — Ferdinand I emite decretul de unire; se formează România Mare."}, {"an": 1919, "cat": "politic", "titlu": "Tratatul de la Saint-Germain", "cauze": "Nevoia legitimării internaționale a Unirii, la Conferința de Pace de la Paris.", "desf": "10 septembrie 1919 — tratatul cu Austria recunoaște unirea Bucovinei.", "urm": "Primul tratat internațional care confirmă o unire teritorială din 1918."}, {"an": 1920, "cat": "politic", "titlu": "Tratatul de la Trianon", "cauze": "Nevoia legitimării internaționale a unirii Transilvaniei.", "desf": "4 iunie 1920 — tratatul cu Ungaria recunoaște unirea Transilvaniei.", "urm": "Cel mai important act internațional de recunoaștere a României Mari."}, {"an": 1920, "cat": "politic", "titlu": "Tratatul de la Paris privind Basarabia", "cauze": "Nevoia legitimării internaționale a unirii Basarabiei.", "desf": "28 octombrie 1920 — Franța, Italia, Japonia și Marea Britanie recunosc unirea Basarabiei.", "urm": "Ultimul act al recunoașterii internaționale a României Mari (nu a fost ratificat de Japonia)."}]}, {"id": "cap5", "label": "5. România și Concertul European", "yearMin": 1699, "yearMax": 1947, "events": [{"an": 1711, "anEnd": 1821, "cat": "social", "titlu": "Regimul fanariot — caracteristici", "cauze": "Domnitorii erau numiți de Poartă prin intermediari greci din cartierul Fanar.", "desf": "Administrație centralizată, marcată de impostură și abuzuri, colectare exagerată a dărilor.", "urm": "Pauperizare și îndatorare, tensiuni sociale ce generează mișcări naționale și ideea de Unire."}, {"an": 1699, "cat": "politic", "titlu": "Tratatul de la Karlowitz", "cauze": "Eșecul celui de-al doilea asediu otoman al Vienei (1683).", "desf": "Otomanii cedează Ungaria; Principatele rămân sub suzeranitate otomană.", "urm": "Declinul otoman devine vizibil în Europa."}, {"an": 1718, "cat": "politic", "titlu": "Pacea de la Passarowitz", "cauze": "Continuarea războaielor austro-otomane.", "desf": "Câștiguri teritoriale pentru Austria.", "urm": "Extinde temporar influența habsburgică spre sud-estul Europei."}, {"an": 1774, "cat": "politic", "titlu": "Tratatul de la Kuciuk-Kainargi", "cauze": "Războaiele ruso-turce.", "desf": "Rusia obține Crimeea și protectoratul asupra creștinilor otomani.", "urm": "Rusia devine actor major în „chestiunea orientală”."}, {"an": 1812, "cat": "politic", "titlu": "Pacea de la București — anexarea Basarabiei", "cauze": "Războiul ruso-turc din 1806-1812.", "desf": "Basarabia e anexată de Imperiul Rus.", "urm": "Prima mare pierdere teritorială a Moldovei istorice."}, {"an": 1856, "cat": "politic", "titlu": "Tratatul de la Paris", "cauze": "Înfrângerea Rusiei în Războiul Crimeii.", "desf": "Nou statut al Principatelor, garanție colectivă a celor 7 mari puteri.", "urm": "Deschide drumul spre Unirea Principatelor."}, {"an": 1877, "cat": "militar", "titlu": "Declararea independenței", "cauze": "Convenția din aprilie 1877 cu Rusia privind trecerea armatei ruse pe teritoriul românesc.", "desf": "Kogălniceanu declară independența României în Parlament (9/21 mai 1877).", "urm": "Armata română luptă la Plevna, Grivița, Vidin."}, {"an": 1878, "cat": "politic", "titlu": "Tratatul de la Berlin", "cauze": "Recunoașterea rezultatului războiului ruso-turc din 1877-1878.", "desf": "13 iulie 1878 — România e recunoscută independentă; cedează sudul Basarabiei către Rusia; primește Dobrogea, Delta Dunării și Insula Șerpilor.", "urm": "Consolidează statutul internațional al României."}, {"an": 1883, "cat": "militar", "titlu": "Alianța secretă cu Puterile Centrale", "cauze": "Căutarea unei garanții de securitate față de Rusia.", "desf": "România se aliază secret cu Puterile Centrale, păstrând legături culturale și economice cu Franța și Marea Britanie.", "urm": "Ambiguitate care va determina neutralitatea inițială din 1914."}, {"an": 1914, "anEnd": 1916, "cat": "militar", "titlu": "Neutralitatea României", "cauze": "România era aliată formal cu Puterile Centrale, dar opinia publică era pro-Antantă.", "desf": "România alege neutralitatea; Carol I moare în 1914, îi succede Ferdinand.", "urm": "Deschide calea negocierilor cu Antanta pentru intrarea în război."}, {"an": 1916, "cat": "militar", "titlu": "Intrarea în război de partea Antantei", "cauze": "Obiectivul unirii Transilvaniei cu România.", "desf": "27 august 1916 — România intră în război; contraatacul Puterilor Centrale duce la ocuparea Bucureștiului, guvernul se retrage la Iași.", "urm": "Deschide etapa cea mai dificilă a participării românești la război."}, {"an": 1917, "anEnd": 1918, "cat": "militar", "titlu": "Campaniile din 1917 și Pacea de la Buftea-București", "cauze": "Necesitatea stabilizării frontului după ocuparea Bucureștiului.", "desf": "Victorii la Mărăști, Mărășești, Oituz (1917); pace separată la Buftea-București (1918).", "urm": "Octombrie 1918 — România reintră în război, de partea Antantei, până la final."}, {"an": 1919, "cat": "politic", "titlu": "Tratatul de la Saint-Germain", "cauze": "Conferința de Pace de la Paris (1919-1920).", "desf": "Tratatul cu Austria recunoaște unirea Bucovinei cu România.", "urm": "Primul tratat de recunoaștere a graniței postbelice a României."}, {"an": 1919, "cat": "politic", "titlu": "Tratatul de la Neuilly", "cauze": "Conferința de Pace de la Paris.", "desf": "Tratatul cu Bulgaria confirmă Dobrogea de Sud (Cadrilaterul) ca teritoriu românesc.", "urm": "Consolidează granița sudică a României Mari."}, {"an": 1920, "cat": "politic", "titlu": "Tratatul de la Trianon", "cauze": "Conferința de Pace de la Paris.", "desf": "Tratatul cu Ungaria recunoaște unirea Transilvaniei, Crișanei și Maramureșului.", "urm": "Cel mai important tratat de recunoaștere a României Mari."}, {"an": 1921, "cat": "politic", "titlu": "Mica Înțelegere", "cauze": "Teama de revizionismul Ungariei.", "desf": "Alianță defensivă România-Cehoslovacia-Iugoslavia.", "urm": "Parte a sistemului de securitate al Europei de Est interbelice."}, {"an": 1934, "cat": "politic", "titlu": "Înțelegerea Balcanică", "cauze": "Nevoia menținerii statu-quo-ului teritorial în Balcani.", "desf": "Alianță România-Iugoslavia-Grecia-Turcia.", "urm": "Completează sistemul de alianțe al României interbelice."}, {"an": 1939, "anEnd": 1940, "cat": "politic", "titlu": "Neutralitatea României la începutul celui de-al Doilea Război Mondial", "cauze": "Expansionismul german-sovietic (Pactul Ribbentrop-Molotov, august 1939).", "desf": "România încearcă să rămână neutră, dar suferă presiuni teritoriale din toate direcțiile.", "urm": "1940 — pierderile teritoriale masive marchează eșecul acestei politici."}, {"an": 1940, "cat": "militar", "titlu": "Pierderile teritoriale din 1940", "cauze": "Pactul Ribbentrop-Molotov și presiunile Axei.", "desf": "România pierde Basarabia și nordul Bucovinei (URSS), NV Transilvaniei (Dictatul de la Viena), Cadrilaterul (Bulgaria).", "urm": "Carol II abdică; Antonescu instaurează regim militar."}, {"an": 1941, "anEnd": 1944, "cat": "militar", "titlu": "Alianța cu Axa", "cauze": "Dorința recuperării teritoriilor pierdute în 1940, mai ales Basarabia.", "desf": "Iunie 1941 — România intră în război alături de Germania împotriva URSS; participă la asediul Odessei și la Stalingrad, cu pierderi uriașe.", "urm": "Eșecul militar de la Stalingrad marchează începutul declinului alianței cu Axa."}, {"an": 1944, "cat": "militar", "titlu": "Întoarcerea armelor", "cauze": "Înaintarea Armatei Roșii și eșecul militar al Axei.", "desf": "23 august 1944 — regele Mihai organizează lovitura de stat, România întoarce armele împotriva Germaniei; participă la eliberarea Transilvaniei, Ungariei și Cehoslovaciei.", "urm": "Armistițiul din 12 septembrie 1944 aduce totuși prezența trupelor sovietice și pierderea definitivă a Basarabiei și nordului Bucovinei."}, {"an": 1947, "cat": "politic", "titlu": "Tratatul de Pace de la Paris", "cauze": "Încheierea oficială a stării de război după cel de-al Doilea Război Mondial.", "desf": "Se confirmă granițele postbelice de după 1940; NV Transilvaniei revine României.", "urm": "Ultimul act al „Concertului European” clasic dinaintea Războiului Rece."}]}, {"id": "cap6", "label": "6. Democrație și Totalitarism", "yearMin": 1875, "yearMax": 1945, "events": [{"an": 1875, "cat": "politic", "titlu": "Fondarea Partidului Național Liberal", "cauze": "Structurarea vieții politice moderne românești.", "desf": "Ion C. Brătianu fondează PNL; doctrina burgheziei, accent pe industrie, politica „prin noi înșine”; teoreticieni: Ștefan Zeletin, I.G. Duca, Vintilă și C.I.C. Brătianu.", "urm": "Realizări: Constituția din 1923, Legea minelor, legea electorală, legea unificării administrative — partid de centru-dreapta."}, {"an": 1868, "anEnd": 1918, "cat": "politic", "titlu": "Conservatorismul românesc", "cauze": "Reprezentarea politică a marilor proprietari funciari.", "desf": "Format în 1868; doctrina moșierimii, politica „porților deschise” (capital străin); teoreticieni: Lascăr Catargiu, Petre Carp, Titu Maiorescu.", "urm": "Dispare în 1918, nemaicorespunzând realităților sociale de după Marea Unire."}, {"an": 1917, "cat": "politic", "titlu": "Revoluția Bolșevică și Tezele din aprilie", "cauze": "Abdicarea țarului, criza Primului Război Mondial.", "desf": "Lenin elaborează Tezele din aprilie: doctrina comunistă și proletcultismul.", "urm": "Instaurarea regimului sovietic în Rusia; 1922 — Rusia devine URSS."}, {"an": 1919, "cat": "politic", "titlu": "Mussolini fondează Fasciile de Luptă", "cauze": "Instabilitatea postbelică din Italia.", "desf": "Mussolini fondează Fascio Italiani di Combattimento.", "urm": "Nucleul mișcării fasciste italiene."}, {"an": 1921, "cat": "politic", "titlu": "Fondarea Partidului Comunist Român", "cauze": "Influența Internaționalei Comuniste (Comintern).", "desf": "8-12 mai 1921 — Congresul de la București; PCR era subordonat Moscovei, susținând inclusiv cedarea Basarabiei, Bucovinei de Nord și Transilvaniei ca „ținuturi ocupate”.", "urm": "Membrii erau recrutați mai ales din rândul minorităților naționale și al muncitorimii."}, {"an": 1922, "cat": "militar", "titlu": "Marșul asupra Romei", "cauze": "Presiunea maselor fasciste și slăbiciunea guvernului liberal italian.", "desf": "Regele Victor Emanuel III îl numește pe Mussolini prim-ministru.", "urm": "Începe regimul fascist italian."}, {"an": 1923, "cat": "cultural", "titlu": "Liga Apărării Național-Creștine (LANC)", "cauze": "Curentul antisemit și ultranaționalist postbelic.", "desf": "A.C. Cuza și Octavian Goga fondează LANC la Iași — antisemitism virulent, ultranaționalism, anticomunism.", "urm": "Constituie terenul ideologic din care va emerge Legiunea Arhanghelului Mihail."}, {"an": 1923, "cat": "politic", "titlu": "Constituția din 1923 și Codreanu — primele acțiuni", "cauze": "Consacrarea juridică a României Mari; radicalizarea studențească antisemită.", "desf": "24 iunie 1923 — Corneliu Zelea Codreanu (student la Iași) organizează primele acțiuni violente antisemite și asasinează pe prefectul de poliție Manciu, fiind achitat de un juriu simpatizant; se fondează Frăția de Cruce.", "urm": "Deschide etapa violenței politice ce va culmina cu fondarea Legiunii, în 1927."}, {"an": 1924, "cat": "politic", "titlu": "Legea Mârzescu — PCR scos în afara legii", "cauze": "Caracterul antinaționalist al PCR și subordonarea față de Moscova.", "desf": "1924 — PCR e interzis, considerat organizație subversivă și antistatală.", "urm": "PCR trece în activitate clandestină, controlat de agenți sovietici (Ana Pauker, Vasile Luca, Emil Bodnăraș)."}, {"an": 1924, "cat": "politic", "titlu": "Alegerile din Italia și consolidarea fascistă", "cauze": "Consolidarea puterii lui Mussolini după Marșul asupra Romei.", "desf": "Camera Deputaților devine predominant formată din reprezentanți ai Partidului Fascist.", "urm": "Se instituie treptat corporatismul și poliția politică OVRA."}, {"an": 1926, "cat": "politic", "titlu": "Fuziunea în Partidul Național Țărănesc", "cauze": "Nevoia unificării forțelor politice de centru-stânga.", "desf": "Fuziunea Partidului Țărănesc (Ion Mihalache) cu Partidul Național din Transilvania (Iuliu Maniu) formează PNȚ; teoreticieni: Virgil Madgearu, Constantin Stere.", "urm": "La guvernare 1928-1930 și 1932-1933, cu politică de deschidere economică externă."}, {"an": 1927, "cat": "cultural", "titlu": "Fondarea Legiunii Arhanghelului Mihail", "cauze": "Radicalizarea lui Corneliu Zelea Codreanu, desprins din LANC.", "desf": "24 iunie 1927 — Legiunea e fondată la Iași, cu misticism ortodox (cultul morții și sacrificiului, „Omul Nou”), antisemitism radical, antiparlamentarism, organizare în „cuiburi”.", "urm": "Devine cea mai importantă mișcare fascistă românească."}, {"an": 1929, "anEnd": 1933, "cat": "social", "titlu": "Marea Criză Economică", "cauze": "Prăbușirea bursei americane din 1929.", "desf": "Recesiune economică globală severă.", "urm": "Teren fertil pentru extremismele de dreapta și de stânga în toată Europa, inclusiv în România."}, {"an": 1930, "cat": "politic", "titlu": "Garda de Fier", "cauze": "Nevoia Legiunii de un braț politic electoral.", "desf": "Se creează Garda de Fier, care obține reprezentare parlamentară; 1932-1933 devine forță politică semnificativă.", "urm": "Deschide un deceniu de violență politică legionară."}, {"an": 1932, "cat": "politic", "titlu": "NSDAP câștigă alegerile pentru Reichstag", "cauze": "Marea Criză Economică și radicalizarea electoratului german.", "desf": "Partidul Național Socialist Muncitoresc German devine cea mai mare forță din Reichstag.", "urm": "Deschide calea numirii lui Hitler ca cancelar, în 1933."}, {"an": 1933, "cat": "politic", "titlu": "Hitler devine cancelar; asasinarea lui I.G. Duca", "cauze": "Marea Criză Economică; radicalizarea politică în Germania și România.", "desf": "Hindenburg îl numește pe Hitler cancelar, incendierea Reichstagului duce la Legea împuternicirilor; 29 decembrie 1933 — legionarii îl asasinează pe prim-ministrul liberal I.G. Duca.", "urm": "Guvernul liberal scoate Mișcarea Legionară în afara legii; în Germania începe consolidarea totalitară nazistă, cu primul lagăr de concentrare la Dachau."}, {"an": 1934, "cat": "politic", "titlu": "„Totul pentru Țară”", "cauze": "Interzicerea Mișcării Legionare în 1933.", "desf": "Garda de Fier reapare sub numele „Totul pentru Țară”.", "urm": "Va obține locul 3 la alegerile din 1937."}, {"an": 1935, "cat": "social", "titlu": "Legile de la Nürnberg", "cauze": "Ideologia rasială a regimului nazist.", "desf": "Evreii pierd cetățenia și drepturile civile în Germania.", "urm": "Pas major spre persecuția sistematică ce va duce la Holocaust."}, {"an": 1937, "cat": "politic", "titlu": "Alegerile din decembrie 1937", "cauze": "Instabilitatea partidelor tradiționale românești (PNL, PNȚ).", "desf": "„Totul pentru Țară” obține 15,58%, locul 3 după PNL și PNȚ.", "urm": "Niciun partid nu atinge 40% — instabilitate politică accentuată, care va duce la dictatura regală."}, {"an": 1938, "cat": "politic", "titlu": "Constituția din 1938 și pogromul de Cristal", "cauze": "Instabilitatea politică din România și radicalizarea nazistă în Germania.", "desf": "Carol II instaurează dictatura regală prin plebiscit (martie 1938), suspendă regimul democratic și interzice partidele; Kristallnacht (noaptea de 9-10 noiembrie) — pogrom antisemit organizat de stat în Germania.", "urm": "Democrația e suspendată în ambele state, pe căi diferite."}, {"an": 1939, "cat": "militar", "titlu": "Începutul celui de-al Doilea Război Mondial și asasinarea lui Armand Călinescu", "cauze": "Expansionismul german, Pactul Ribbentrop-Molotov.", "desf": "Germania invadează Polonia (septembrie 1939); legionarii îl asasinează pe prim-ministrul Armand Călinescu.", "urm": "România alunecă spre pierderile teritoriale din 1940."}, {"an": 1940, "cat": "politic", "titlu": "Statul Național-Legionar", "cauze": "Abdicarea forțată a lui Carol II (6 septembrie 1940) și instalarea lui Antonescu.", "desf": "14 septembrie 1940 — alianța Antonescu-Garda de Fier; Horia Sima devine vicepreședinte al Consiliului de Miniștri; legionarii comit abuzuri, pogromuri și asasinate (Nicolae Iorga, Virgil Madgearu).", "urm": "Tensiuni tot mai mari între Antonescu și legionari, care culminează în rebeliunea din ianuarie 1941."}, {"an": 1941, "cat": "politic", "titlu": "Rebeliunea legionară", "cauze": "Conflictul de putere dintre Antonescu și Horia Sima.", "desf": "21-23 ianuarie 1941 — legionarii încearcă o lovitură de stat; Antonescu reprimă revolta cu armata.", "urm": "Garda de Fier e definitiv scoasă din viața politică; Antonescu conduce singur (1941-1944)."}, {"an": 1942, "anEnd": 1945, "cat": "social", "titlu": "Soluția finală — Holocaustul", "cauze": "Ideologia rasială nazistă dusă la extrem (Endlösung).", "desf": "Exterminarea sistematică a aproximativ 6 milioane de evrei în lagăre precum Auschwitz-Birkenau, Treblinka, Sobibor.", "urm": "Una dintre cele mai mari crime din istoria umanității."}, {"an": 1943, "cat": "politic", "titlu": "Demiterea lui Mussolini", "cauze": "Dezastrul militar din Africa de Nord.", "desf": "Mussolini este demis din funcție.", "urm": "Începe destrămarea regimului fascist italian."}, {"an": 1944, "cat": "politic", "titlu": "PCR reapare legal", "cauze": "Actul de la 23 august 1944 și schimbarea de regim.", "desf": "PCR reapare legal, cu circa 1.000 de membri — extrem de slab comparativ cu PNL sau PNȚ.", "urm": "1946 — câștigă alegerile prin fraudă masivă, cu sprijinul Armatei Roșii."}, {"an": 1945, "cat": "militar", "titlu": "Capitularea Germaniei", "cauze": "Înaintarea Aliaților pe toate fronturile.", "desf": "Hitler se sinucide; Germania capitulează la 8 mai 1945.", "urm": "Sfârșitul celui de-al Doilea Război Mondial în Europa; începe Războiul Rece."}, {"an": 1918, "anEnd": 1940, "cat": "politic", "titlu": "Instabilitatea politică a Franței interbelice", "cauze": "Fragmentarea politică și amenințarea extremelor.", "desf": "1918-1940 — coaliții succesive stânga-dreapta încearcă să blocheze extremele.", "urm": "1945 — Franța e condusă de generalul Charles de Gaulle; 1958 — noua Constituție prevede alegerea președintelui prin vot direct."}]}, {"id": "cap7", "label": "7. România Postbelică și Comunistă", "yearMin": 1944, "yearMax": 1989, "events": [{"an": 1944, "cat": "militar", "titlu": "Armata Roșie intră în România", "cauze": "Înaintarea sovietică pe frontul de est.", "desf": "30 august 1944 — Armata Roșie intră pe teritoriul românesc.", "urm": "Deschide etapa ocupației și influenței sovietice directe."}, {"an": 1944, "cat": "militar", "titlu": "Convenția de armistițiu cu URSS", "cauze": "Necesitatea opririi ostilităților după actul de la 23 august 1944.", "desf": "12-13 septembrie 1944 — semnată la Moscova.", "urm": "Deschide calea prezenței militare și politice sovietice pe teritoriul românesc."}, {"an": 1944, "cat": "politic", "titlu": "Acordul de procentaj de la Moscova", "cauze": "Negocierile dintre Churchill și Stalin privind sferele de influență postbelice.", "desf": "Octombrie 1944 — se stabilește informal 90% influență sovietică asupra României.", "urm": "Confirmă, la nivel diplomatic secret, subordonarea viitoare a României față de URSS."}, {"an": 1944, "cat": "militar", "titlu": "Actul de la 23 august 1944", "cauze": "Înaintarea Armatei Roșii spre granițele României și eșecul militar al Axei.", "desf": "Lovitură de stat: regele Mihai I ordonă arestarea mareșalului Ion Antonescu; România intră în război alături de Națiunile Unite.", "urm": "România schimbă tabăra în război, dar rămâne sub ocupație și influență sovietică directă."}, {"an": 1945, "cat": "politic", "titlu": "Conferința de la Yalta", "cauze": "Nevoia aliaților de a stabili organizarea postbelică a Europei.", "desf": "Februarie 1945 — Churchill, Stalin și Roosevelt negociază sferele de influență.", "urm": "Se conturează „Cortina de Fier” dintre Europa de Vest și de Est."}, {"an": 1945, "cat": "politic", "titlu": "Guvernul Dr. Petru Groza", "cauze": "Presiunea directă a reprezentantului sovietic Andrei Vîșinski asupra Regelui Mihai I.", "desf": "6 martie 1945 — se instaurează guvernul Groza, primul cu majoritate comunistă.", "urm": "Comuniștii controlează structurile-cheie ale statului cu mult înainte de proclamarea Republicii."}, {"an": 1946, "cat": "politic", "titlu": "Fraudarea alegerilor din 19 noiembrie 1946", "cauze": "Nevoia comuniștilor de a legitima electoral o putere deja deținută administrativ.", "desf": "Blocul Partidelor Democratice (dominat de PCR) își atribuie o victorie zdrobitoare prin falsificare.", "urm": "Opoziția democratică (PNȚ, PNL) e discreditată electoral, apoi eliminată."}, {"an": 1946, "cat": "politic", "titlu": "Desființarea Senatului și etatizarea BNR", "cauze": "Consolidarea puterii comuniste asupra instituțiilor statului.", "desf": "1946 — Senatul e desființat, Marea Adunare Națională devine organul suprem al puterii de stat; Banca Națională a României e etatizată.", "urm": "Elimină o contrapondere instituțională și pune sub control statul finanțele naționale."}, {"an": 1947, "cat": "politic", "titlu": "Conferința de Pace de la Paris", "cauze": "Încheierea oficială a stării de război după al Doilea Război Mondial.", "desf": "Februarie 1947 — se stabilesc granițele postbelice ale României.", "urm": "Confirmă cadrul internațional în care va fi proclamată Republica, un an mai târziu."}, {"an": 1947, "cat": "politic", "titlu": "Dizolvarea PNȚ și autodizolvarea PNL", "cauze": "Eliminarea sistematică a opoziției democratice de către PCR.", "desf": "Iulie 1947 — dizolvarea Partidului Național Țărănesc; noiembrie 1947 — autodizolvarea Partidului Național Liberal.", "urm": "Monarhia rămâne ultima instituție necontrolată de PCR."}, {"an": 1947, "cat": "politic", "titlu": "Abdicarea forțată a Regelui Mihai I", "cauze": "Dizolvarea PNȚ și autodizolvarea PNL lăsaseră monarhia ultima instituție necontrolată de PCR.", "desf": "30 decembrie 1947 — Mihai I e obligat sub amenințare să abdice; se proclamă Republica Populară Română.", "urm": "Dispare monarhia; puterea comunistă rămâne fără nicio contrapondere instituțională internă."}, {"an": 1948, "cat": "militar", "titlu": "Tratatul de colaborare româno-sovietic", "cauze": "Formalizarea subordonării politico-militare față de URSS.", "desf": "Februarie 1948 — tratat pe 20 de ani între România și URSS.", "urm": "PCR absoarbe PSD, formând Partidul Muncitoresc Român (PMR)."}, {"an": 1948, "cat": "politic", "titlu": "Prima Constituție comunistă", "cauze": "Nevoia de a legitima juridic noua ordine socială, după modelul sovietic din 1936.", "desf": "13 aprilie 1948 — promulgată; legitimează regimul stalinist, cu caracter economic prevalent.", "urm": "Va fi urmată de Constituțiile din 1952 și 1965, tot mai explicite privind rolul partidului unic."}, {"an": 1948, "cat": "social", "titlu": "Legea naționalizării", "cauze": "Programul comunist de trecere la economia centralizată.", "desf": "11 iunie 1948 — întreprinderile, băncile, companiile de asigurări și mijloacele de producție trec în proprietatea statului.", "urm": "Dispare proprietatea privată în sectoarele-cheie; se pun bazele economiei planificate."}, {"an": 1948, "cat": "cultural", "titlu": "Legea cultelor — desființarea Bisericii Greco-Catolice", "cauze": "Politica de uniformizare religioasă și control ideologic al regimului.", "desf": "1948 — se desființează Biserica Greco-Catolică (unită); preoții care refuză convertirea la ortodoxie sunt închiși.", "urm": "Elimină o instituție religioasă cu legături directe la Roma, considerată periculoasă politic."}, {"an": 1948, "cat": "cultural", "titlu": "Cenzura comunistă", "cauze": "Nevoia regimului de control ideologic total asupra culturii.", "desf": "1948 — peste 8.000 de titluri interzise, arderea „cărților burgheze”, rescrierea manualelor pe linie marxist-leninistă.", "urm": "Cultura românească e ruptă temporar de tradiția interbelică."}, {"an": 1948, "cat": "cultural", "titlu": "Legea învățământului comunist", "cauze": "Sovietizarea sistemului educațional.", "desf": "1948 — studiul obligatoriu al limbii ruse; Mihai Roller redactează „Istoria RPR”, exagerând influența slavă și rolul clasei muncitoare.", "urm": "Istoriografia devine instrument de propagandă timp de un deceniu și jumătate."}, {"an": 1948, "anEnd": 1952, "cat": "politic", "titlu": "Formarea Securității și represiunea stalinistă", "cauze": "Nevoia regimului de a elimina orice opoziție reală sau potențială, după modelul NKVD.", "desf": "Se formează Securitatea (Miliție + trupe de securitate); închisori politice la Sighet (Iuliu Maniu, Ion Mihalache, Gheorghe Brătianu), Pitești (experimentul de „reeducare” prin tortură, 1949-1952), Gherla, Arad, Aiud, Jilava.", "urm": "Elita politică și intelectuală interbelică e decimată sau redusă la tăcere prin frică."}, {"an": 1951, "cat": "social", "titlu": "Deportările în Bărăgan", "cauze": "Politica de epurare a „elementelor dușmănoase” din zonele de graniță.", "desf": "Mii de persoane (familii de chiaburi, foști funcționari, comercianți, ofițeri) sunt deportate în Bărăgan.", "urm": "Una dintre cele mai mari operațiuni de deportare internă din istoria comunistă românească."}, {"an": 1949, "anEnd": 1962, "cat": "social", "titlu": "Colectivizarea forțată a agriculturii", "cauze": "Aplicarea modelului sovietic (colhoz/sovhoz); chiaburii declarați „dușmani de clasă”.", "desf": "93% din fondul funciar trece în controlul statului; se formează CAP-urile (model colhoz) și GAS-urile (model sovhoz).", "urm": "Dispare țărănimea ca proprietar de pământ; planificarea centralizată (planuri cincinale) devine regula economiei."}, {"an": 1949, "cat": "politic", "titlu": "Fondarea CAER", "cauze": "Nevoia unei alianțe economice a blocului socialist.", "desf": "România devine membru fondator al Consiliului de Ajutor Economic Reciproc.", "urm": "Integrează economia românească în sistemul planificat sovietic."}, {"an": 1952, "cat": "politic", "titlu": "Constituția din 1952 și epurările de partid", "cauze": "Aprofundarea stalinismului în interiorul PMR.", "desf": "24 septembrie 1952 — nouă Constituție, aservire totală față de URSS; foști membri PCR sunt eliminați prin procese-spectacol (Lucrețiu Pătrășcanu, executat în 1954; Ana Pauker și Vasile Luca, înlăturați din conducere).", "urm": "Se consolidează nomenclatura — funcții rezervate exclusiv membrilor loiali PMR."}, {"an": 1955, "cat": "militar", "titlu": "Tratatul de la Varșovia — România membru fondator", "cauze": "Răspuns sovietic la formarea NATO.", "desf": "Se formează alianța militară a statelor socialiste; România participă ca membru fondator.", "urm": "România rămâne integrată militar în blocul sovietic până în 1989."}, {"an": 1956, "anEnd": 1958, "cat": "militar", "titlu": "România sprijină reprimarea revoluției din Ungaria", "cauze": "Revolta anticomunistă din Ungaria amenința stabilitatea blocului sovietic.", "desf": "România sprijină intervenția sovietică; la Cluj și Timișoara au loc manifestații de solidarizare, urmate de arestări masive.", "urm": "1958 — Armata Roșie se retrage din România, ca „recompensă” pentru loialitate."}, {"an": 1961, "cat": "politic", "titlu": "Începutul distanțării de URSS", "cauze": "Dorința lui Gheorghiu-Dej de a diversifica relațiile externe.", "desf": "1961 — începe distanțarea treptată față de URSS, cu deschidere spre Occident.", "urm": "Pregătește respingerea Planului Valev, trei ani mai târziu."}, {"an": 1964, "cat": "militar", "titlu": "„Declarația de independență” din aprilie 1964", "cauze": "Respingerea Planului Valev, care ar fi transformat România într-o zonă strict agricolă în CAER.", "desf": "PMR declară dreptul fiecărui partid comunist de a-și stabili propria politică, fără amestec sovietic.", "urm": "România capătă un profil distinct în blocul sovietic, exploatat apoi de Ceaușescu."}, {"an": 1965, "cat": "politic", "titlu": "Nicolae Ceaușescu preia conducerea partidului", "cauze": "Moartea lui Gheorghe Gheorghiu-Dej lasă un vid de putere la vârful PMR.", "desf": "PMR redevine PCR; RPR devine Republica Socialistă România; 21 august 1965 — noua Constituție consacră PCR ca „forța politică conducătoare a întregii societăți”.", "urm": "Perioadă de relativă liberalizare: limba rusă nu mai e obligatorie, reintroducerea limbilor occidentale, reabilitarea unor lideri excluși de Dej."}, {"an": 1967, "cat": "politic", "titlu": "Ceaușescu devine președinte al Consiliului de Stat", "cauze": "Consolidarea puterii personale a lui Ceaușescu în primii ani de mandat.", "desf": "1967 — Ceaușescu preia și funcția de președinte al Consiliului de Stat.", "urm": "Primul pas spre cumulul de funcții desăvârșit prin Constituția din 1974."}, {"an": 1968, "cat": "politic", "titlu": "Reorganizarea administrativ-teritorială", "cauze": "Nevoia modernizării administrației, aliniată la etapa de relativă liberalizare.", "desf": "1968 — raioanele redevin județe, orașele mari devin municipii.", "urm": "Structura administrativă rezultată rămâne, în linii mari, valabilă și astăzi."}, {"an": 1968, "cat": "militar", "titlu": "Condamnarea invaziei Cehoslovaciei", "cauze": "Intervenția Tratatului de la Varșovia pentru înăbușirea „Primăverii de la Praga”.", "desf": "Ceaușescu refuză participarea trupelor române și condamnă public invazia.", "urm": "Crește prestigiul internațional al lui Ceaușescu; vizite ale lui De Gaulle (1968), Nixon (1969), Ford (1975)."}, {"an": 1971, "cat": "cultural", "titlu": "Vizitele în China și Coreea de Nord; Tezele din iulie", "cauze": "Impresionat de modelul „revoluției culturale” maoiste și de cultul personalității al lui Kim Il-sung.", "desf": "Iulie 1971 — Ceaușescu vizitează China și Coreea de Nord; la întoarcere lansează Tezele din iulie: ideologizare masivă a culturii, „proletcultism”, cultul eroilor patriei (Decebal, Mihai Viteazul, Ștefan cel Mare) ca modele pentru Ceaușescu.", "urm": "Începe etapa neostalinistă/dinastică a regimului (1971-1989)."}, {"an": 1972, "cat": "politic", "titlu": "Aderarea la FMI și Banca Mondială", "cauze": "Dorința de a proiecta imaginea unui „comunism independent”.", "desf": "1972 — România aderă la Fondul Monetar Internațional și la Banca Mondială.", "urm": "Deschide accesul la împrumuturi occidentale care vor duce, în anii '80, la criza datoriei externe."}, {"an": 1974, "cat": "politic", "titlu": "Cumulul de funcții al lui Ceaușescu", "cauze": "Consolidarea puterii personale, model de „socialism dinastic”.", "desf": "Modificarea Constituției: Ceaușescu devine simultan Președinte al RSR, Secretar General al PCR și Comandant Suprem al armatei — cumul fără precedent în blocul socialist.", "urm": "Deschide etapa cultului personalității absolut: „Conducătorul”, „Geniul Carpaților”, Elena Ceaușescu declarată „savant de talie mondială”."}, {"an": 1977, "cat": "politic", "titlu": "Mișcarea Paul Goma", "cauze": "Solidarizarea cu mișcarea Charta 77 din Cehoslovacia.", "desf": "Scriitorul Paul Goma lansează o scrisoare deschisă, adunând circa 200 de semnături.", "urm": "Goma e arestat și ulterior expulzat din țară."}, {"an": 1977, "cat": "social", "titlu": "Greva minerilor din Valea Jiului", "cauze": "Condiții de muncă și de trai tot mai grele.", "desf": "August 1977 — circa 35.000 de mineri din Lupeni, Petroșani și Vulcan sistează activitatea; Ceaușescu vine personal la negocieri.", "urm": "Liderii grevei sunt arestați ulterior; limitele reale ale „liberalizării” devin evidente."}, {"an": 1966, "anEnd": 1989, "cat": "social", "titlu": "Decretul 770 — politica demografică", "cauze": "Dorința regimului de a crește artificial populația.", "desf": "Interzicerea avortului și a contraceptivelor; controale obligatorii la locul de muncă.", "urm": "Apare „generația decreților”; crește mortalitatea maternă și infantilă."}, {"an": 1985, "cat": "politic", "titlu": "Decretul 408 — obligativitatea raportării la Securitate", "cauze": "Intensificarea paranoiei regimului față de contactele cu străinătatea.", "desf": "1985 — devine obligatorie raportarea la Securitate a oricărei convorbiri cu un cetățean străin.", "urm": "Confirmă amploarea rețelei de supraveghere (estimată la 1 informator la 30 de locuitori)."}, {"an": 1982, "anEnd": 1989, "cat": "social", "titlu": "Achitarea forțată a datoriei externe", "cauze": "Datoria acumulată prin industrializarea forțată și aderarea la FMI (11 miliarde $ în 1985).", "desf": "Plata integrală prin export masiv de alimente și produse industriale; raționalizare severă (pâine, carne, ulei, zahăr), tăierea curentului și căldurii iarna.", "urm": "Martie 1989 — datoria e achitată integral, dar populația trăiește în sărăcie extremă."}, {"an": 1987, "cat": "social", "titlu": "Revolta muncitorească de la Brașov", "cauze": "Reduceri de salarii și condiții de trai tot mai dure.", "desf": "Noiembrie 1987 — muncitorii uzinei Steagul Roșu devastează sediul local al PCR; are loc și o grevă studențească la Iași.", "urm": "Zeci de participanți sunt arestați și trimiși în judecată."}, {"an": 1944, "anEnd": 1960, "cat": "politic", "titlu": "Rezistența armată din munți", "cauze": "Refuzul unor grupuri de a accepta instaurarea regimului comunist.", "desf": "Partizani anticomuniști acționează în munții Făgăraș (Haiducii Muscelului, conduși de Toma Arnăuțoiu), Apuseni, Bucovina (Sumanele Negre).", "urm": "Mișcarea e lichidată cu brutalitate de Securitate până în 1960."}, {"an": 1989, "cat": "politic", "titlu": "Scrisoarea celor Șase", "cauze": "Nemulțumirea unor foști activiști comuniști față de derapajele regimului.", "desf": "Gheorghe Apostol, Alexandru Bârlădeanu, Corneliu Mănescu, Constantin Pârvulescu, Grigore Răceanu și Silviu Brucan cer public respectarea Constituției; scrisoarea e citită la Radio Europa Liberă.", "urm": "Semn public al fisurilor din interiorul fostei nomenclaturi, cu luni înainte de Revoluție."}, {"an": 1989, "cat": "politic", "titlu": "Timișoara — 15-17 decembrie 1989", "cauze": "Manifestații în apărarea pastorului reformat László Tőkés.", "desf": "Represiune violentă a Securității și armatei; zeci de morți.", "urm": "Scânteia care declanșează Revoluția Română."}, {"an": 1989, "cat": "politic", "titlu": "București — 21 decembrie 1989", "cauze": "Extinderea protestelor de la Timișoara la capitală.", "desf": "Mitingul convocat de Ceaușescu se transformă în revoltă deschisă; Ceaușescu fuge cu elicopterul.", "urm": "Armata trece de partea revoluționarilor a doua zi."}, {"an": 1989, "cat": "politic", "titlu": "Capturarea și execuția soților Ceaușescu", "cauze": "Prăbușirea regimului în urma evenimentelor din 21 decembrie.", "desf": "22 decembrie — Ceaușescu e capturat la Târgoviște; 25 decembrie — Nicolae și Elena Ceaușescu sunt judecați sumar și executați prin împușcare.", "urm": "Bilanț: circa 1.104 morți și mii de răniți; revenirea la democrație și adoptarea Constituției din 1991."}]}, {"id": "cap8", "label": "8. România și Războiul Rece", "yearMin": 1946, "yearMax": 1991, "events": [{"an": 1946, "cat": "politic", "titlu": "Discursul de la Fulton — „Cortina de Fier”", "cauze": "Divizarea Europei în sfere de influență după 1945.", "desf": "Churchill folosește metafora „Cortinei de Fier” (5 martie 1946).", "urm": "Declanșarea simbolică a Războiului Rece (1946-1991)."}, {"an": 1947, "cat": "politic", "titlu": "Doctrina Truman și Planul Marshall", "cauze": "Teama de expansiunea comunistă în Europa.", "desf": "SUA lansează politica de stopare a comunismului (Doctrina Truman) și ajutorul economic pentru Europa Occidentală (Planul Marshall).", "urm": "Consolidează blocul occidental; URSS răspunde prin crearea Cominformului, în același an."}, {"an": 1948, "cat": "politic", "titlu": "România sprijină URSS împotriva Iugoslaviei lui Tito", "cauze": "Ruptura Tito-Stalin din cadrul blocului comunist.", "desf": "România se aliniază poziției sovietice.", "urm": "Confirmă subordonarea totală a României față de Moscova în această etapă (1948-1958)."}, {"an": 1945, "anEnd": 1949, "cat": "politic", "titlu": "Împărțirea Germaniei pe zone de ocupație", "cauze": "Înfrângerea Germaniei naziste în 1945.", "desf": "Germania e împărțită în 4 zone de ocupație (SUA, URSS, Marea Britanie, Franța).", "urm": "1949 — se formează RFG (vest, capitala Bonn) și RDG (est, capitala Berlinul de Est)."}, {"an": 1949, "cat": "militar", "titlu": "Formarea NATO", "cauze": "Nevoia occidentalilor de o alianță militară comună în fața amenințării sovietice.", "desf": "Se formează Organizația Tratatului Atlanticului de Nord.", "urm": "Structurează definitiv blocul militar occidental."}, {"an": 1950, "anEnd": 1953, "cat": "militar", "titlu": "Războiul din Coreea", "cauze": "Confruntare indirectă SUA-URSS pentru controlul peninsulei coreene.", "desf": "Conflict armat între Coreea de Nord (sprijinită de URSS/China) și Coreea de Sud (sprijinită de SUA).", "urm": "Primul mare conflict „prin interpuși” al Războiului Rece."}, {"an": 1955, "cat": "militar", "titlu": "Tratatul de la Varșovia — România membru fondator", "cauze": "Răspuns sovietic la formarea NATO.", "desf": "Se formează alianța militară a statelor socialiste; România participă ca membru fondator.", "urm": "România rămâne integrată militar în blocul sovietic până în 1989."}, {"an": 1955, "anEnd": 1975, "cat": "militar", "titlu": "Războiul din Vietnam", "cauze": "Confruntare indirectă SUA-URSS/China pentru controlul Vietnamului.", "desf": "Conflict prelungit între Vietnamul de Nord comunist și Vietnamul de Sud sprijinit de SUA.", "urm": "Unul dintre cele mai lungi și costisitoare conflicte prin interpuși ale Războiului Rece."}, {"an": 1956, "cat": "militar", "titlu": "România sprijină reprimarea revoluției din Ungaria", "cauze": "Revolta anticomunistă din Ungaria amenința stabilitatea blocului sovietic.", "desf": "România sprijină intervenția sovietică.", "urm": "1958 — Armata Roșie se retrage din România, ca „recompensă” pentru loialitate."}, {"an": 1957, "cat": "politic", "titlu": "Comunitatea Economică Europeană", "cauze": "Nevoia de reconstrucție și integrare economică a Europei Occidentale.", "desf": "Se formează CEE, precursoarea Uniunii Europene.", "urm": "Va deveni, decenii mai târziu, structura pe care România o va accesa în 2007."}, {"an": 1958, "cat": "militar", "titlu": "Retragerea Armatei Roșii din România", "cauze": "Loialitatea demonstrată de România în 1956 (reprimarea revoluției maghiare).", "desf": "Trupele sovietice se retrag de pe teritoriul românesc.", "urm": "Prima etapă a distanțării treptate de URSS, continuată după 1960."}, {"an": 1961, "cat": "militar", "titlu": "Zidul Berlinului", "cauze": "Fluxul masiv de refugiați est-germani spre Berlinul de Vest.", "desf": "RDG construiește Zidul Berlinului.", "urm": "Devine simbolul fizic al divizării Europei, dărâmat abia în 1989."}, {"an": 1961, "cat": "politic", "titlu": "Legațiile Franței și Marii Britanii, ridicate la ambasade", "cauze": "Începutul distanțării românești de URSS.", "desf": "1961 — relațiile diplomatice cu Franța și Marea Britanie sunt ridicate la rang de ambasade.", "urm": "Semn timpuriu al deschiderii diplomatice spre Occident."}, {"an": 1962, "cat": "militar", "titlu": "Criza rachetelor din Cuba", "cauze": "Amplasarea de rachete sovietice în Cuba.", "desf": "Confruntare directă SUA-URSS, cea mai periculoasă din Războiul Rece.", "urm": "Se instituie linia telefonică directă Washington-Moscova; destindere relativă ulterioară."}, {"an": 1963, "cat": "politic", "titlu": "Acordul româno-iugoslav pentru Porțile de Fier", "cauze": "Nevoia comună de a valorifica potențialul hidroenergetic al Dunării.", "desf": "România și Iugoslavia convin construirea hidrocentralei Porțile de Fier.", "urm": "Exemplu de cooperare bilaterală independentă de directivele Moscovei."}, {"an": 1964, "cat": "militar", "titlu": "România respinge Planul Valev", "cauze": "Planul sovietic ar fi transformat România într-o zonă strict agricolă în CAER.", "desf": "România respinge planul, afirmându-și dreptul la propria politică economică.", "urm": "Consolidează imaginea de „comunism independent” a lui Ceaușescu."}, {"an": 1967, "cat": "politic", "titlu": "Poziția neutră față de Războiul de șase zile", "cauze": "Conflictul arabo-israelian din 1967.", "desf": "România adoptă o poziție neutră, distinctă de linia sovietică pro-arabă.", "urm": "Confirmă tendința de politică externă independentă a lui Ceaușescu."}, {"an": 1968, "cat": "militar", "titlu": "Refuzul trimiterii trupelor la Praga", "cauze": "Invazia Cehoslovaciei de trupele Tratatului de la Varșovia.", "desf": "România refuză să participe și condamnă public invazia.", "urm": "Vizitele lui De Gaulle (1968), Nixon (1969), Ford (1975) confirmă prestigiul internațional al României."}, {"an": 1975, "cat": "politic", "titlu": "Actul Final de la Helsinki", "cauze": "Politica de destindere Est-Vest din anii '70.", "desf": "România semnează Actul Final de la Helsinki.", "urm": "Angajament formal privind drepturile omului, respectat inegal în practică."}, {"an": 1985, "cat": "politic", "titlu": "Gorbaciov — glasnost și perestroika", "cauze": "Stagnarea economică sovietică.", "desf": "Gorbaciov lansează reformele de transparență (glasnost) și restructurare (perestroika).", "urm": "Deschide calea reformelor și, indirect, a prăbușirii blocului comunist."}, {"an": 1987, "cat": "politic", "titlu": "Vizita lui Gorbaciov în România", "cauze": "Încercarea sovietică de a extinde reformele în tot blocul estic.", "desf": "Ceaușescu refuză aplicarea reformelor gorbacioviste în România.", "urm": "România se izolează tot mai mult, chiar și față de restul blocului sovietic."}, {"an": 1989, "cat": "politic", "titlu": "Căderea regimurilor comuniste din Europa de Est", "cauze": "Criza economică generalizată și reformele lui Gorbaciov.", "desf": "Regimurile comuniste cad, în cea mai mare parte pașnic; în România, revoluția e violentă.", "urm": "Se încheie divizarea Europei impusă după 1945."}, {"an": 1989, "cat": "militar", "titlu": "Dărâmarea Zidului Berlinului", "cauze": "Presiunea populară și deschiderea graniței RDG.", "desf": "9 noiembrie 1989 — Zidul Berlinului e dărâmat.", "urm": "Simbol al sfârșitului divizării Europei."}, {"an": 1990, "cat": "politic", "titlu": "Reunificarea Germaniei", "cauze": "Căderea Zidului Berlinului (9 noiembrie 1989).", "desf": "RFG și RDG se reunifică oficial.", "urm": "Simbol al încheierii Războiului Rece în Europa."}, {"an": 1991, "cat": "politic", "titlu": "Destrămarea URSS", "cauze": "Crizele economice și naționaliste acumulate sub Gorbaciov.", "desf": "Uniunea Sovietică se destramă în 15 state independente.", "urm": "Se încheie oficial Războiul Rece (1946-1991)."}]}, {"id": "cap9", "label": "9. Constituțiile României", "yearMin": 1831, "yearMax": 2003, "events": [{"an": 1831, "anEnd": 1858, "cat": "politic", "titlu": "Regulamentele Organice", "cauze": "Nevoia unui cadru administrativ modern, sub supravegherea generalului Pavel Kiseleff.", "desf": "În vigoare din iulie 1831 (Țara Românească) și ianuarie 1832 (Moldova); separarea puterilor: executiv (domnul pe viață + Sfatul Domnesc), legislativ (Adunarea Obștească, boieri, 5 ani), judecătoresc (Înaltul Divan); instituții noi: Miliția pământeană, Arhivele Statului, Serviciul sanitar.", "urm": "Limite: Rusia introduce un articol care interzice modificarea fără acordul ei și al Porții; rămân în vigoare până în 1858."}, {"an": 1858, "cat": "politic", "titlu": "Convenția de la Paris", "cauze": "Congresul de la Paris (1856) reconfigurează statutul Principatelor.", "desf": "Rol constituțional până în 1864; fiecare principat are domn ales pe viață și adunare electivă; instituții comune: Comisia Centrală (Focșani) și Înalta Curte de Casație și Justiție; se abolesc privilegiile boierimii.", "urm": "Denumire nouă: Principatele Unite ale Moldovei și Valahiei."}, {"an": 1864, "cat": "politic", "titlu": "Statutul Dezvoltător al Convenției de la Paris", "cauze": "Unirea deplină sub Cuza necesita un cadru instituțional comun, aprobat prin plebiscit.", "desf": "Domnitorul capătă puteri sporite și inițiativă legislativă; Corpul Ponderator (Senatul, ¼ numiți de domn); primul Parlament bicameral; Consiliul de Stat elaborează legile.", "urm": "Consolidează statul unificat înainte de Constituția din 1866."}, {"an": 1866, "cat": "politic", "titlu": "Constituția din 1866", "cauze": "Nevoia unui cadru constituțional stabil pentru noul monarh, Carol I.", "desf": "Promulgată la 1 iulie 1866, inspirată din Constituția belgiană (1831), 8 titluri și 133 de articole; monarhie constituțională ereditară; vot cenzitar (sub 5% din populație); drepturi garantate: libertate individuală, a conștiinței, a presei, dreptul de proprietate.", "urm": "Cadru pentru Independență (1877) și Regat (1881); cea mai longevivă constituție românească — 57 de ani."}, {"an": 1923, "cat": "politic", "titlu": "Constituția din 1923", "cauze": "Necesitatea consacrării juridice a României Mari, după Marea Unire din 1918.", "desf": "Regele Ferdinand convoacă Adunarea Constituantă; recunoaște România Mare ca stat național unitar și indivizibil; vot universal masculin (21+); Parlament bicameral.", "urm": "Una dintre cele mai democratice constituții europene ale vremii; limite — fără vot feminin, puteri regale extinse."}, {"an": 1938, "cat": "politic", "titlu": "Constituția din 1938", "cauze": "Instabilitatea politică și ascensiunea extremismelor interbelice.", "desf": "Impusă prin plebiscit (martie 1938) de Carol II; suspendă regimul democratic, interzice partidele; regele devine autoritate supremă.", "urm": "Dictatură regală (1938-1940) până la abdicarea lui Carol II."}, {"an": 1948, "cat": "politic", "titlu": "Constituția din 1948", "cauze": "Legitimarea juridică a noului regim comunist, după modelul sovietic din 1936.", "desf": "Republică Populară Română; rol conducător implicit al PCR; drepturi cetățenești declarative, subordonate proletariatului; libertate religioasă formală, cu interzicerea propagandei.", "urm": "În vigoare până în 1952, când e înlocuită de o Constituție mai explicit stalinistă."}, {"an": 1952, "cat": "politic", "titlu": "Constituția din 1952", "cauze": "Aprofundarea stalinismului în cadrul PMR.", "desf": "Republică Populară Română; rolul PMR e consacrat explicit; drepturi declarative, subordonate „interesului general”; ateism promovat de stat.", "urm": "În vigoare până în 1965, când Ceaușescu adoptă o nouă Constituție."}, {"an": 1965, "cat": "politic", "titlu": "Constituția din 1965", "cauze": "Preluarea puterii de către Nicolae Ceaușescu.", "desf": "Republica Socialistă România; PCR consacrat constituțional ca „forță conducătoare”; drepturi subordonate socialismului; ateism oficial, religia privată tolerată.", "urm": "În vigoare până la Revoluția din 1989."}, {"an": 1991, "cat": "politic", "titlu": "Constituția din 1991", "cauze": "Nevoia unui cadru democratic după Revoluția din 1989.", "desf": "România devine republică semiprezidențială, stat democratic de drept; putere executivă împărțită între președinte și guvern; Parlament bicameral (Camera Deputaților + Senat); justiție independentă (Curtea Constituțională, CSM); vot universal, egal, direct și secret.", "urm": "Bazele juridice ale statului român post-comunist."}, {"an": 2003, "cat": "politic", "titlu": "Revizuirea Constituției din 2003", "cauze": "Armonizarea legislației cu standardele europene, în perspectiva aderării la UE din 2007.", "desf": "Se introduce obiectivul constituțional al integrării europene; mandatul prezidențial se extinde la 5 ani; proprietatea privată garantată și inviolabilă; dreptul de acces la informații publice.", "urm": "Constituția, astfel revizuită, rămâne în vigoare și în prezent."}]}];
+
+// unique ids + flat index across all chapters (for search & cross-chapter links)
+const ALL_EVENTS = [];
+CHAPTERS.forEach((ch, ci)=>{
+  ch.events.forEach((ev, ei)=>{
+    ev.id = ch.id + '-' + ei;
+    ev.chapterIdx = ci;
+    ev.chapterLabel = ch.label;
+    ALL_EVENTS.push(ev);
+  });
+});
+
+// spaced repetition (SM-2 style, simplified) — persisted locally on this device
+const SRS_KEY = 'istorie_bac_srs_v1';
+let SRS = {};
+try { SRS = JSON.parse(localStorage.getItem(SRS_KEY) || '{}'); } catch(e){ SRS = {}; }
+
+function getSrsRecord(id){
+  return SRS[id] || { ease: 2.5, interval: 0, due: 0, reps: 0 };
+}
+function saveSrs(){
+  try { localStorage.setItem(SRS_KEY, JSON.stringify(SRS)); } catch(e){}
+}
+// "due" = never reviewed, or scheduled review date has passed — needs (re)review now
+function isDue(id){
+  const rec = getSrsRecord(id);
+  return rec.due <= Date.now();
+}
+// "known" = reviewed at least once and not currently due — i.e. "on track" for now
+function isKnown(id){
+  const rec = getSrsRecord(id);
+  return rec.reps > 0 && rec.due > Date.now();
+}
+function scheduleReview(id, remembered){
+  const rec = getSrsRecord(id);
+  if(remembered){
+    rec.reps += 1;
+    rec.ease = Math.min(2.8, rec.ease + 0.1);
+    rec.interval = rec.interval === 0 ? 1 : Math.round(rec.interval * rec.ease);
+  } else {
+    rec.reps = 0;
+    rec.ease = Math.max(1.3, rec.ease - 0.2);
+    rec.interval = 0; // due again right away
+  }
+  rec.due = Date.now() + rec.interval * 24 * 3600 * 1000;
+  SRS[id] = rec;
+  saveSrs();
+}
+function setKnown(id, val){
+  scheduleReview(id, val);
+}
+function stripDiacritics(s){
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+}
+
+const SPINE_Y = 140;
+const TIER_STEP = 46;
+const MIN_GAP = 100;
+let TRACK_W = 1500;
+let YEAR_MIN, YEAR_MAX, EVENTS, activeCat = 'all';
+let chapterIdx = 0;
+let onlyUnreviewed = false;
+
+const px = (yr) => ((yr - YEAR_MIN) / (YEAR_MAX - YEAR_MIN)) * (TRACK_W - 80) + 40;
+
+function yearLabel(y){
+  return y < 0 ? (-y) + ' î.Hr.' : String(y);
+}
+
+function niceStep(min, max){
+  const span = Math.max(1, max - min);
+  const target = 8;
+  const raw = span / target;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw / mag;
+  let step;
+  if(norm < 1.5) step = 1*mag;
+  else if(norm < 3) step = 2*mag;
+  else if(norm < 7) step = 5*mag;
+  else step = 10*mag;
+  return Math.max(1, Math.round(step));
+}
+
+// chapter tabs
+const chapterTabsEl = document.getElementById('chapterTabs');
+CHAPTERS.forEach((ch, i)=>{
+  const b = document.createElement('button');
+  b.className = 'ctab' + (i===0 ? ' active' : '');
+  b.textContent = ch.label;
+  b.addEventListener('click', ()=> selectChapter(i));
+  chapterTabsEl.appendChild(b);
+});
+
+function selectChapter(i){
+  chapterIdx = i;
+  const ch = CHAPTERS[i];
+  YEAR_MIN = ch.yearMin;
+  YEAR_MAX = ch.yearMax;
+  EVENTS = ch.events;
+  activeCat = 'all';
+  [...chapterTabsEl.children].forEach((b,idx)=>b.classList.toggle('active', idx===i));
+  [...filtersEl.children].forEach(b=>b.classList.toggle('active', b.dataset.cat==='all'));
+  document.getElementById('chapTitle').textContent = ch.label + ' — ' + yearLabel(ch.yearMin) + ' \u2192 ' + yearLabel(ch.yearMax);
+  document.getElementById('chapSub').textContent = 'Fir cronologic de tip fi\u0219\u0103 de arhiv\u0103, pe baza \u00celndrumarului BAC. Click pe un marcaj deschide fi\u0219a evenimentului (cauze / desf\u0103\u0219urare / urm\u0103ri).';
+  renderEvents();
+}
+
+// filters
+const filtersEl = document.getElementById('filters');
+const allBtn = document.createElement('button');
+allBtn.className = 'fbtn active';
+allBtn.textContent = 'Toate';
+allBtn.dataset.cat = 'all';
+filtersEl.appendChild(allBtn);
+Object.entries(CATS).forEach(([key,c])=>{
+  const b = document.createElement('button');
+  b.className = 'fbtn';
+  b.style.setProperty('--dotc', c.color);
+  b.dataset.cat = key;
+  b.innerHTML = `<span class="dot"></span>${c.label}`;
+  filtersEl.appendChild(b);
+});
+filtersEl.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.fbtn');
+  if(!btn) return;
+  activeCat = btn.dataset.cat;
+  [...filtersEl.children].forEach(b=>b.classList.toggle('active', b===btn));
+  renderEvents();
+});
+
+const timelineEl = document.getElementById('timeline');
+const decadesEl = document.getElementById('decades');
+
+function renderDecades(){
+  decadesEl.innerHTML = '';
+  const step = niceStep(YEAR_MIN, YEAR_MAX);
+  const start = Math.ceil(YEAR_MIN/step)*step;
+  for(let y=start; y<=YEAR_MAX; y+=step){
+    const tick = document.createElement('div');
+    tick.className = 'decade-tick';
+    tick.style.left = px(y)+'px';
+    decadesEl.appendChild(tick);
+    const label = document.createElement('div');
+    label.className = 'decade-label';
+    label.style.left = px(y)+'px';
+    label.textContent = yearLabel(y);
+    decadesEl.appendChild(label);
+  }
+}
+
+function assignTiers(visible){
+  const sorted = [...visible].sort((a,b)=>a.an-b.an);
+  const tierLastX = [];
+  const placed = sorted.map(ev=>{
+    const x = px(ev.an);
+    let tier = 0;
+    while(tierLastX[tier] !== undefined && (x - tierLastX[tier]) < MIN_GAP){
+      tier++;
+    }
+    tierLastX[tier] = x;
+    return {ev, x, tier};
+  });
+  return placed;
+}
+
+function renderEvents(){
+  timelineEl.querySelectorAll('.event, .lbl, .leader').forEach(n=>n.remove());
+  let visible = EVENTS.filter(ev => activeCat==='all' || ev.cat===activeCat);
+  if(onlyUnreviewed) visible = visible.filter(ev => isDue(ev.id));
+
+  TRACK_W = Math.max(1500, visible.length * 95);
+  timelineEl.style.minWidth = TRACK_W + 'px';
+
+  const placed = assignTiers(visible);
+  const maxTier = placed.reduce((m,p)=>Math.max(m,p.tier), 0);
+  timelineEl.style.height = (SPINE_Y + (maxTier+2)*TIER_STEP) + 'px';
+  renderDecades();
+
+  placed.forEach(({ev,x,tier})=>{
+    const c = CATS[ev.cat];
+    const level = Math.floor(tier/2);
+    const above = tier % 2 === 0;
+    const labelY = above ? SPINE_Y - (level+1)*TIER_STEP : SPINE_Y + (level+1)*TIER_STEP;
+
+    const node = document.createElement('div');
+    node.className = 'event';
+    node.style.left = x + 'px';
+    node.style.top = SPINE_Y + 'px';
+    node.style.setProperty('--dotc', c.color);
+    node.innerHTML = `<div class="stamp${isKnown(ev.id) ? ' known':''}"></div>`;
+    node.addEventListener('click', ()=>openCard(ev));
+    timelineEl.appendChild(node);
+
+    if(level > 0){
+      const leader = document.createElement('div');
+      leader.className = 'leader';
+      if(above){
+        leader.style.top = labelY + 'px';
+        leader.style.height = (SPINE_Y - labelY) + 'px';
+      } else {
+        leader.style.top = SPINE_Y + 'px';
+        leader.style.height = (labelY - SPINE_Y) + 'px';
+      }
+      leader.style.left = x + 'px';
+      timelineEl.appendChild(leader);
+    }
+
+    const label = document.createElement('div');
+    label.className = 'lbl ' + (above ? 'above' : 'below');
+    label.style.left = x + 'px';
+    label.style.top = labelY + 'px';
+    label.style.setProperty('--dotc', c.color);
+    label.innerHTML = `
+      <div class="yr">${yearLabel(ev.an)}${ev.anEnd ? '\u2013'+yearLabel(ev.anEnd) : ''}</div>
+      <div class="ttl">${ev.titlu}</div>
+    `;
+    label.addEventListener('click', ()=>openCard(ev));
+    timelineEl.appendChild(label);
+  });
+}
+
+selectChapter(0);
+
+// card
+const shade = document.getElementById('shade');
+const card = document.getElementById('card');
+const cardKnownCheck = document.getElementById('cardKnownCheck');
+const relatedChipsEl = document.getElementById('relatedChips');
+let currentCardEvent = null;
+
+function openCard(ev){
+  currentCardEvent = ev;
+  const c = CATS[ev.cat];
+  card.style.setProperty('--dotc', c.color);
+  document.getElementById('cardCat').textContent = c.label + ' \u00b7 ' + yearLabel(ev.an) + (ev.anEnd ? '\u2013'+yearLabel(ev.anEnd) : '');
+  document.getElementById('cardTitle').textContent = ev.titlu;
+  document.getElementById('cardCauze').textContent = ev.cauze;
+  document.getElementById('cardDesf').textContent = ev.desf;
+  document.getElementById('cardUrm').textContent = ev.urm;
+  cardKnownCheck.checked = isKnown(ev.id);
+
+  // cross-chapter related events: other chapters, close in year
+  const related = ALL_EVENTS
+    .filter(o => o.chapterIdx !== ev.chapterIdx && Math.abs(o.an - ev.an) <= 2)
+    .sort((a,b)=> Math.abs(a.an-ev.an) - Math.abs(b.an-ev.an))
+    .slice(0, 3);
+  relatedChipsEl.innerHTML = '';
+  related.forEach(o=>{
+    const chip = document.createElement('button');
+    chip.className = 'related-chip';
+    chip.textContent = 'Cap. ' + (o.chapterIdx+1) + ' \u00b7 ' + yearLabel(o.an) + ' \u2014 ' + o.titlu;
+    chip.addEventListener('click', ()=>{
+      closeCard();
+      if(o.chapterIdx !== chapterIdx) selectChapter(o.chapterIdx);
+      setTimeout(()=> openCard(o), 60);
+    });
+    relatedChipsEl.appendChild(chip);
+  });
+
+  shade.classList.add('open');
+  card.classList.add('open');
+}
+function closeCard(){
+  shade.classList.remove('open');
+  card.classList.remove('open');
+}
+cardKnownCheck.addEventListener('change', ()=>{
+  if(!currentCardEvent) return;
+  setKnown(currentCardEvent.id, cardKnownCheck.checked);
+  renderEvents();
+});
+shade.addEventListener('click', closeCard);
+document.getElementById('cardClose').addEventListener('click', closeCard);
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeCard(); closeQuiz(); } });
+
+// "doar nerevizuite" toggle
+const unreviewedBtn = document.getElementById('unreviewedBtn');
+unreviewedBtn.addEventListener('click', ()=>{
+  onlyUnreviewed = !onlyUnreviewed;
+  unreviewedBtn.classList.toggle('active', onlyUnreviewed);
+  unreviewedBtn.textContent = (onlyUnreviewed ? '\u2611' : '\u25fb') + ' Doar de revizuit azi';
+  renderEvents();
+});
+
+// search across all chapters
+const searchInput = document.getElementById('searchInput');
+const searchResultsEl = document.getElementById('searchResults');
+searchInput.addEventListener('input', ()=>{
+  const q = stripDiacritics(searchInput.value.trim());
+  if(q.length < 2){ searchResultsEl.classList.remove('open'); searchResultsEl.innerHTML=''; return; }
+  const matches = ALL_EVENTS.filter(ev => stripDiacritics(ev.titlu).includes(q)).slice(0, 8);
+  searchResultsEl.innerHTML = '';
+  if(matches.length === 0){ searchResultsEl.classList.remove('open'); return; }
+  matches.forEach(ev=>{
+    const item = document.createElement('div');
+    item.className = 'search-item';
+    item.innerHTML = `<span class="si-meta">Cap. ${ev.chapterIdx+1} \u00b7 ${yearLabel(ev.an)}</span>${ev.titlu}`;
+    item.addEventListener('click', ()=>{
+      searchResultsEl.classList.remove('open');
+      searchInput.value = '';
+      const jump = ()=>{
+        const x = px(ev.an);
+        const wrap = document.querySelector('.timeline-wrap');
+        wrap.scrollLeft = Math.max(0, x - wrap.clientWidth/2);
+        openCard(ev);
+      };
+      if(ev.chapterIdx !== chapterIdx){ selectChapter(ev.chapterIdx); setTimeout(jump, 60); }
+      else jump();
+    });
+    searchResultsEl.appendChild(item);
+  });
+  searchResultsEl.classList.add('open');
+});
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.search-wrap')) searchResultsEl.classList.remove('open');
+});
+
+// quiz mode
+const quizShade = document.getElementById('quizShade');
+const quizCard = document.getElementById('quizCard');
+const quizBtn = document.getElementById('quizBtn');
+const quizClose = document.getElementById('quizClose');
+const quizAnswer = document.getElementById('quizAnswer');
+const quizRevealBtn = document.getElementById('quizRevealBtn');
+const quizYesBtn = document.getElementById('quizYesBtn');
+const quizNoBtn = document.getElementById('quizNoBtn');
+const quizBtnRowReveal = document.getElementById('quizBtnRowReveal');
+const quizBtnRowJudge = document.getElementById('quizBtnRowJudge');
+let quizEvent = null;
+let quizSeen = 0;
+
+function nextQuizQuestion(){
+  const pool = EVENTS;
+  const duePool = pool.filter(ev => isDue(ev.id));
+  let source;
+  if(duePool.length > 0){
+    source = duePool;
+  } else {
+    // nothing due right now — fall back to the single soonest-due event, so the quiz never stalls
+    const soonest = [...pool].sort((a,b)=> getSrsRecord(a.id).due - getSrsRecord(b.id).due)[0];
+    source = soonest ? [soonest] : pool;
+  }
+  quizEvent = source[Math.floor(Math.random()*source.length)];
+  quizAnswer.classList.remove('shown');
+  quizBtnRowReveal.style.display = '';
+  quizBtnRowJudge.style.display = 'none';
+  document.getElementById('quizMeta').textContent = 'Test cuno\u0219tin\u021be (recapitulare spa\u021biat\u0103) \u00b7 ' + CHAPTERS[chapterIdx].label;
+  document.getElementById('quizTitle').textContent = yearLabel(quizEvent.an) + (quizEvent.anEnd ? '\u2013'+yearLabel(quizEvent.anEnd) : '') + ' \u2014 ' + quizEvent.titlu;
+  document.getElementById('quizCauze').textContent = quizEvent.cauze;
+  document.getElementById('quizDesf').textContent = quizEvent.desf;
+  document.getElementById('quizUrm').textContent = quizEvent.urm;
+  const dueCount = pool.filter(ev => isDue(ev.id)).length;
+  document.getElementById('quizProgress').textContent = 'Rund\u0103 ' + (quizSeen+1) + ' \u00b7 programate pentru azi \u00een acest capitol: ' + dueCount + ' / ' + pool.length;
+}
+function openQuiz(){
+  if(EVENTS.length === 0) return;
+  quizSeen = 0;
+  nextQuizQuestion();
+  quizShade.classList.add('open');
+  quizCard.classList.add('open');
+}
+function closeQuiz(){
+  quizShade.classList.remove('open');
+  quizCard.classList.remove('open');
+}
+quizBtn.addEventListener('click', openQuiz);
+quizClose.addEventListener('click', closeQuiz);
+quizShade.addEventListener('click', closeQuiz);
+quizRevealBtn.addEventListener('click', ()=>{
+  quizAnswer.classList.add('shown');
+  quizBtnRowReveal.style.display = 'none';
+  quizBtnRowJudge.style.display = '';
+});
+quizYesBtn.addEventListener('click', ()=>{
+  setKnown(quizEvent.id, true);
+  quizSeen++;
+  renderEvents();
+  nextQuizQuestion();
+});
+quizNoBtn.addEventListener('click', ()=>{
+  setKnown(quizEvent.id, false);
+  quizSeen++;
+  nextQuizQuestion();
+});
+
+// if linked from another tool with ?search=..., jump straight to the best-matching event
+// (optionally scoped with &chapter=N when the same title text exists in more than one chapter)
+const urlParams = new URLSearchParams(window.location.search);
+const linkedSearch = urlParams.get('search');
+const linkedChapter = urlParams.get('chapter');
+if(linkedSearch){
+  const q = stripDiacritics(linkedSearch.trim());
+  const pool = linkedChapter !== null ? ALL_EVENTS.filter(ev => ev.chapterIdx === parseInt(linkedChapter, 10)) : ALL_EVENTS;
+  const match = pool.find(ev => stripDiacritics(ev.titlu).includes(q));
+  if(match){
+    const jump = ()=>{
+      const x = px(match.an);
+      const wrap = document.querySelector('.timeline-wrap');
+      wrap.scrollLeft = Math.max(0, x - wrap.clientWidth/2);
+      openCard(match);
+    };
+    if(match.chapterIdx !== chapterIdx){ selectChapter(match.chapterIdx); setTimeout(jump, 60); }
+    else jump();
+  }
+}
+</script>
+</body>
+</html>

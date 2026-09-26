@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cronica bătăliilor antiotomane (test)</title>
+<style>
+  :root{
+    --bg:#0c1117; --bg-panel:#131a23; --bg-card:#161e29; --line:#26303c;
+    --ink:#e9e6dd; --ink-dim:#9aa4b0; --gold:#c9a227;
+    --win:#4a8f5c; --loss:#a8503a; --draw:#a89050;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:900px; margin:0 auto; padding:0 16px 50px; }
+  header{ padding:26px 0 10px; }
+  .eyebrow{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 8px; }
+  h1{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-weight:600; font-size:clamp(22px,5.5vw,30px); margin:0 0 8px; }
+  .sub{ color:var(--ink-dim); font-size:13.5px; line-height:1.55; max-width:64ch; margin:0; }
+
+  .legend{ display:flex; gap:16px; margin:20px 0 6px; }
+  .legend-item{ display:flex; align-items:center; gap:6px; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--ink-dim); }
+  .legend-item .sq{ width:10px; height:10px; border-radius:2px; }
+
+  .timeline-wrap{ overflow-x:auto; padding:20px 0 10px; -webkit-overflow-scrolling:touch; }
+  .timeline{ position:relative; min-width:1700px; height:320px; margin:0 20px; }
+  .spine{ position:absolute; top:160px; left:0; right:0; height:2px; background:repeating-linear-gradient(to right, var(--line) 0 6px, transparent 6px 11px); }
+  .battle{ position:absolute; top:160px; transform:translate(-50%,-50%); cursor:pointer; }
+  .battle .marker{ position:absolute; top:0; left:50%; transform:translate(-50%,-50%); width:16px; height:16px; border-radius:50%; border:2px solid var(--bg); display:flex; align-items:center; justify-content:center; font-size:9px; color:#0c1117; font-weight:700; }
+  .battle .label{ position:absolute; left:50%; transform:translate(-50%,0); display:flex; flex-direction:column; align-items:center; white-space:nowrap; }
+  .label.above{ transform:translate(-50%,-100%); }
+  .battle .connector{ position:absolute; left:50%; width:1px; background:var(--line); }
+  .battle.highlighted .marker{ box-shadow:0 0 0 3px var(--gold), 0 0 12px var(--gold); }
+  .battle.highlighted .nm{ color:var(--gold); font-weight:700; }
+  .ruler-filter-banner{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; color:var(--gold);
+    background:rgba(201,162,39,.1); border:1px solid var(--gold); border-radius:5px;
+    padding:9px 14px; margin:14px 0 0;
+  }
+  .battle .yr{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--ink-dim); white-space:nowrap; margin:5px 0; }
+  .battle .nm{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:12px; font-weight:600; white-space:nowrap; max-width:120px; overflow:hidden; text-overflow:ellipsis; text-align:center; }
+
+  .score{
+    display:flex; gap:20px; margin-top:16px; padding:14px 18px;
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:6px;
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px;
+  }
+  .score .n{ font-size:22px; font-weight:700; font-family:'Spectral',Georgia,'Times New Roman',serif; }
+
+  /* ---- drag & drop game ---- */
+  .game-section{ margin-top:44px; padding-top:28px; border-top:1px solid var(--line); }
+  .game-intro{ display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; }
+  .game-score{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12.5px; color:var(--ink-dim); }
+  .game-score b{ color:var(--gold); font-size:16px; }
+  .reset-btn{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11.5px;
+    background:var(--bg-panel); border:1px solid var(--line); color:var(--ink-dim);
+    padding:7px 12px; border-radius:4px; cursor:pointer;
+  }
+  .pool{
+    display:flex; flex-wrap:wrap; gap:10px;
+    margin-top:16px; padding:14px; min-height:64px;
+    background:var(--bg-panel); border:1px dashed var(--line); border-radius:8px;
+  }
+  .pool:empty::after{ content:'Toate bătăliile au fost sortate — bravo!'; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; color:var(--ink-dim); }
+  .card-chip{
+    touch-action:none; user-select:none; -webkit-user-select:none;
+    background:var(--bg-card); border:1px solid var(--line); border-radius:6px;
+    padding:10px 13px; cursor:grab; font-size:12.5px;
+    box-shadow:0 2px 6px rgba(0,0,0,.3);
+    transition:box-shadow .12s, transform .12s;
+  }
+  .card-chip:active{ cursor:grabbing; }
+  .card-chip .cy{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10px; color:var(--ink-dim); }
+  .card-chip .cn{ font-weight:600; margin-top:2px; }
+  .card-chip.dragging{ opacity:.35; }
+  .card-chip.floating{
+    position:fixed; z-index:200; pointer-events:none;
+    box-shadow:0 10px 30px rgba(0,0,0,.5); transform:scale(1.05) rotate(-2deg);
+  }
+  .card-chip.correct{ border-color:var(--win); box-shadow:0 0 0 2px var(--win); }
+  .card-chip.incorrect{ border-color:var(--loss); box-shadow:0 0 0 2px var(--loss); animation:shake .3s; }
+  @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
+
+  .zones{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:14px; }
+  @media (max-width:560px){ .zones{ grid-template-columns:1fr; } }
+  .zone{
+    min-height:120px; border-radius:8px; padding:12px;
+    border:2px dashed var(--line); background:rgba(255,255,255,.02);
+    transition:background .15s, border-color .15s;
+  }
+  .zone.over{ background:rgba(201,162,39,.08); border-color:var(--gold); }
+  .zone-title{
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+    display:flex; align-items:center; gap:6px; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+  .zone-title .sq{ width:9px; height:9px; border-radius:2px; }
+  .zone .card-chip{ margin-bottom:8px; width:100%; }
+  .zone .card-chip:last-child{ margin-bottom:0; }
+
+  footer{ padding:24px 0 10px; color:var(--ink-dim); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; text-align:center; }
+</style>
+
+<script>
+// shared visit-tracking for the unified progress page — writes only, never reads elsewhere in this tool
+try {
+  const gbVisited = JSON.parse(localStorage.getItem('gb_progress_visited') || '{}');
+  gbVisited['cap3'] = new Date().toISOString();
+  localStorage.setItem('gb_progress_visited', JSON.stringify(gbVisited));
+} catch(e) {}
+</script>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Materie · Diplomație și Conflict în Evul Mediu</p>
+    <h1>Cronica bătăliilor antiotomane</h1>
+    <p class="sub">Trei secole de confruntare — victorii, înfrângeri și rezultate tactice mixte, de la Mircea cel Bătrân la Dimitrie Cantemir. Click pe fiecare bătălie pentru detalii.</p>
+  </header>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="timeline-wrap">
+    <div class="timeline" id="timeline">
+      <div class="spine"></div>
+    </div>
+  </div>
+
+  <div class="score" id="score"></div>
+
+  <section class="game-section">
+    <div class="game-intro">
+      <div>
+        <h2 style="font-family:'Spectral',Georgia,'Times New Roman',serif;font-size:19px;font-weight:600;margin:0 0 4px;">🎮 Joc: sortează bătăliile</h2>
+        <p class="sub" style="margin:0;">Trage fiecare bătălie în coloana potrivită, înainte să-ți amintești răspunsul din cronologia de mai sus.</p>
+      </div>
+      <button class="reset-btn" id="resetGame">↺ Reia jocul</button>
+    </div>
+    <div class="game-score" id="gameScore"></div>
+    <div class="pool" id="pool"></div>
+    <div class="zones" id="zones"></div>
+  </section>
+
+  <footer>geo-bac · test intern — nu e integrat în site</footer>
+</div>
+
+<div id="shade" style="position:fixed;inset:0;background:rgba(6,9,13,.72);opacity:0;pointer-events:none;transition:opacity .18s;z-index:50;"></div>
+<div id="card" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,92vw);background:#161e29;border:1px solid #26303c;border-radius:6px;padding:22px;z-index:51;opacity:0;pointer-events:none;transition:opacity .18s;">
+  <button id="cardClose" style="float:right;background:#131a23;border:1px solid #26303c;color:#9aa4b0;width:26px;height:26px;border-radius:50%;cursor:pointer;">✕</button>
+  <p id="cardResult" style="font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:11px;margin:0 0 6px;clear:right;"></p>
+  <h3 id="cardTitle" style="font-family:'Spectral',Georgia,'Times New Roman',serif;font-size:18px;margin:0 0 4px;"></h3>
+  <p id="cardYear" style="font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:12px;color:#9aa4b0;margin:0 0 12px;"></p>
+  <p id="cardDesc" style="font-size:13px;line-height:1.6;margin:0;"></p>
+</div>
+
+<script>
+const RESULTS = {
+  win:  { label:'Victorie',          color:'var(--win)',  symbol:'✓' },
+  loss: { label:'Înfrângere',        color:'var(--loss)', symbol:'✕' },
+  draw: { label:'Rezultat mixt / tactic', color:'var(--draw)', symbol:'≈' }
+};
+
+const BATTLES = [
+  { year:1395, name:'Rovine', ruler:'Mircea cel Bătrân', result:'win',
+    desc:'Mircea cel Bătrân învinge pe Baiazid I prin tactici de pădure și teren mlăștinos.' },
+  { year:1396, name:'Nicopole', ruler:'Coaliție europeană', result:'loss',
+    desc:'Cruciadă europeană antiotomană, cu participare românească — înfrântă la Dunăre.' },
+  { year:1420, name:'Cetatea Albă', ruler:'Alexandru cel Bun', result:'win',
+    desc:'Apărare eroică în fața unui atac otoman asupra cetății.' },
+  { year:1442, name:'Sântimbru și Sibiu', ruler:'Iancu de Hunedoara', result:'win',
+    desc:'Eliberarea Transilvaniei de sub ofensiva otomană.' },
+  { year:1444, name:'Varna', ruler:'Iancu de Hunedoara', result:'loss',
+    desc:'Coaliția creștină e înfrântă dezastruos, moare regele Vladislav — eșecul cruciadei antiotomane a Europei Centrale.' },
+  { year:1456, name:'Belgrad', ruler:'Iancu de Hunedoara', result:'win',
+    desc:'Apărare de succes care stopează înaintarea otomană spre Europa Centrală. Iancu moare la scurt timp după victorie.' },
+  { year:1462, name:'Atacul de noapte, Târgoviște', ruler:'Vlad Țepeș', result:'draw',
+    desc:'Atac-surpriză nocturn asupra taberei lui Mahomed al II-lea — succes tactic, dar nu oprește definitiv campania otomană.' },
+  { year:1475, name:'Vaslui (Podul Înalt)', ruler:'Ștefan cel Mare', result:'win',
+    desc:'Cea mai mare victorie antiotomană a Moldovei medievale — Ștefan e proclamat „atlet al creștinătății” de Papă.' },
+  { year:1476, name:'Valea Albă (Războieni)', ruler:'Ștefan cel Mare', result:'draw',
+    desc:'Înfrângere tactică, dar otomanii se retrag fără a cuceri Moldova — statul e salvat, deși grav afectat.' },
+  { year:1595, name:'Călugăreni', ruler:'Mihai Viteazul', result:'win',
+    desc:'Victorie tactică importantă în cadrul răscoalei antiotomane a lui Mihai Viteazul.' },
+  { year:1711, name:'Stănilești', ruler:'Dimitrie Cantemir', result:'loss',
+    desc:'Înfrângere moldo-rusă în fața otomanilor — grăbește instaurarea domniilor fanariote în Moldova.' }
+];
+
+const YEAR_MIN = 1380, YEAR_MAX = 1730;
+const TIMELINE_W = 1660;
+const px = (yr) => 40 + ((yr - YEAR_MIN) / (YEAR_MAX - YEAR_MIN)) * (TIMELINE_W - 80);
+
+const legendEl = document.getElementById('legend');
+Object.values(RESULTS).forEach(r=>{
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.innerHTML = `<span class="sq" style="background:${r.color}"></span>${r.label}`;
+  legendEl.appendChild(item);
+});
+
+const timelineEl = document.getElementById('timeline');
+const urlParams = new URLSearchParams(window.location.search);
+const highlightRuler = urlParams.get('ruler');
+
+// greedy collision-avoidance: alternate above/below, and within each side, only reuse a tier
+// once the previous marker placed there is far enough away — otherwise stack a tier further out.
+const MIN_GAP = 100;
+const TIER_STEP = 44;
+const lastXAtTier = { above: [], below: [] };
+function assignSlot(x, preferredSide){
+  const sides = preferredSide === 'above' ? ['above','below'] : ['below','above'];
+  for(const side of sides){
+    const tiers = lastXAtTier[side];
+    for(let t=0; t<tiers.length; t++){
+      if(x - tiers[t] >= MIN_GAP){ tiers[t] = x; return { side, tier: t }; }
+    }
+    tiers.push(x);
+    return { side, tier: tiers.length - 1 };
+  }
+}
+
+BATTLES.forEach((b, i)=>{
+  const r = RESULTS[b.result];
+  const x = px(b.year);
+  const { side, tier } = assignSlot(x, i % 2 === 0 ? 'above' : 'below');
+  const isHighlighted = highlightRuler && b.ruler === highlightRuler;
+
+  const node = document.createElement('div');
+  node.className = 'battle' + (isHighlighted ? ' highlighted' : '');
+  node.style.left = x + 'px';
+
+  const labelDist = 20 + tier * TIER_STEP; // distance of the label block's near edge from the spine
+  const sign = side === 'above' ? -1 : 1;
+
+  let connectorHTML = '';
+  if(tier > 0){
+    const connLen = tier * TIER_STEP;
+    const connTop = side === 'above' ? -(20 + connLen) : 20;
+    connectorHTML = `<div class="connector" style="top:${connTop}px;height:${connLen}px;"></div>`;
+  }
+
+  node.innerHTML = `
+    <div class="marker" style="background:${r.color}">${r.symbol}</div>
+    ${connectorHTML}
+    <div class="label ${side}" style="top:${sign*labelDist}px;">
+      <div class="yr">${b.year}</div>
+      <div class="nm">${b.name}</div>
+    </div>
+  `;
+  node.addEventListener('click', ()=> openCard(b));
+  timelineEl.appendChild(node);
+});
+
+if(highlightRuler){
+  const banner = document.createElement('p');
+  banner.className = 'ruler-filter-banner';
+  banner.textContent = `Bătăliile lui ${highlightRuler} sunt evidențiate mai jos (marcate cu contur auriu).`;
+  document.querySelector('.sub').insertAdjacentElement('afterend', banner);
+  const firstMatch = BATTLES.find(b=>b.ruler === highlightRuler);
+  if(firstMatch) setTimeout(()=> openCard(firstMatch), 300);
+}
+
+const wins = BATTLES.filter(b=>b.result==='win').length;
+const losses = BATTLES.filter(b=>b.result==='loss').length;
+const draws = BATTLES.filter(b=>b.result==='draw').length;
+document.getElementById('score').innerHTML = `
+  <div><div class="n" style="color:var(--win)">${wins}</div>victorii</div>
+  <div><div class="n" style="color:var(--loss)">${losses}</div>înfrângeri</div>
+  <div><div class="n" style="color:var(--draw)">${draws}</div>rezultate mixte</div>
+`;
+
+const shade = document.getElementById('shade');
+const card = document.getElementById('card');
+function openCard(b){
+  const r = RESULTS[b.result];
+  document.getElementById('cardResult').textContent = r.symbol + ' ' + r.label;
+  document.getElementById('cardResult').style.color = r.color;
+  document.getElementById('cardTitle').textContent = b.name;
+  document.getElementById('cardYear').textContent = b.year + ' · ' + b.ruler;
+  document.getElementById('cardDesc').textContent = b.desc;
+  shade.style.opacity = '1'; shade.style.pointerEvents = 'auto';
+  card.style.opacity = '1'; card.style.pointerEvents = 'auto';
+}
+function closeCard(){
+  shade.style.opacity = '0'; shade.style.pointerEvents = 'none';
+  card.style.opacity = '0'; card.style.pointerEvents = 'none';
+}
+shade.addEventListener('click', closeCard);
+document.getElementById('cardClose').addEventListener('click', closeCard);
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeCard(); });
+
+// ---------- drag & drop game (Pointer Events — works with mouse, touch, and pen) ----------
+const poolEl = document.getElementById('pool');
+const zonesEl = document.getElementById('zones');
+const gameScoreEl = document.getElementById('gameScore');
+let correctCount = 0;
+let attemptedCount = 0;
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function buildZones(){
+  zonesEl.innerHTML = '';
+  Object.entries(RESULTS).forEach(([key, r])=>{
+    const z = document.createElement('div');
+    z.className = 'zone';
+    z.dataset.result = key;
+    z.innerHTML = `<div class="zone-title" style="color:${r.color}"><span class="sq" style="background:${r.color}"></span>${r.label}</div>`;
+    zonesEl.appendChild(z);
+  });
+}
+
+function buildPool(){
+  poolEl.innerHTML = '';
+  shuffle(BATTLES).forEach(b=>{
+    const chip = document.createElement('div');
+    chip.className = 'card-chip';
+    chip.dataset.result = b.result;
+    chip.innerHTML = `<div class="cy">${b.year}</div><div class="cn">${b.name}</div>`;
+    wireDrag(chip, b);
+    poolEl.appendChild(chip);
+  });
+}
+
+function updateScore(){
+  gameScoreEl.innerHTML = `Corecte: <b>${correctCount}</b> / ${BATTLES.length}${attemptedCount > BATTLES.length ? ' · încercări: '+attemptedCount : ''}`;
+}
+
+function wireDrag(chip, battle){
+  let dx = 0, dy = 0, dragging = false;
+
+  chip.addEventListener('pointerdown', (e)=>{
+    dragging = true;
+    const rect = chip.getBoundingClientRect();
+    dx = e.clientX - rect.left;
+    dy = e.clientY - rect.top;
+    chip.style.width = rect.width + 'px';
+    chip.classList.add('floating');
+    chip.style.left = rect.left + 'px';
+    chip.style.top = rect.top + 'px';
+    if(chip.setPointerCapture) chip.setPointerCapture(e.pointerId);
+  });
+
+  chip.addEventListener('pointermove', (e)=>{
+    if(!dragging) return;
+    chip.style.left = (e.clientX - dx) + 'px';
+    chip.style.top = (e.clientY - dy) + 'px';
+
+    // highlight zone under pointer
+    chip.classList.add('floating'); // stays floating, but hide temporarily to probe element beneath
+    chip.style.pointerEvents = 'none';
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    chip.style.pointerEvents = '';
+    document.querySelectorAll('.zone').forEach(z=>z.classList.remove('over'));
+    const zone = under ? under.closest('.zone') : null;
+    if(zone) zone.classList.add('over');
+  });
+
+  chip.addEventListener('pointerup', (e)=>{
+    if(!dragging) return;
+    dragging = false;
+    chip.classList.remove('floating');
+    chip.style.width = '';
+    chip.style.pointerEvents = '';
+
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    const zone = under ? under.closest('.zone') : null;
+    document.querySelectorAll('.zone').forEach(z=>z.classList.remove('over'));
+
+    attemptedCount++;
+    if(zone && zone.dataset.result === battle.result){
+      chip.classList.add('correct');
+      chip.style.cursor = 'default';
+      zone.appendChild(chip);
+      correctCount++;
+    } else if(zone){
+      chip.classList.add('incorrect');
+      poolEl.appendChild(chip);
+      setTimeout(()=> chip.classList.remove('incorrect'), 350);
+    } else {
+      // dropped outside any zone — just return to pool
+      poolEl.appendChild(chip);
+    }
+    updateScore();
+  });
+}
+
+buildZones();
+buildPool();
+updateScore();
+
+document.getElementById('resetGame').addEventListener('click', ()=>{
+  correctCount = 0;
+  attemptedCount = 0;
+  buildZones();
+  buildPool();
+  updateScore();
+});
+</script>
+</body>
+</html>

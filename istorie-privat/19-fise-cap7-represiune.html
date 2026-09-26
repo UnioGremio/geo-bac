@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Curba represiunii — România comunistă (test)</title>
+<style>
+  :root{
+    --bg:#0c1117; --bg-panel:#131a23; --bg-card:#161e29; --line:#26303c;
+    --ink:#e9e6dd; --ink-dim:#9aa4b0; --gold:#c9a227; --red:#a8503a;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:920px; margin:0 auto; padding:0 16px 50px; }
+  header{ padding:26px 0 10px; }
+  .eyebrow{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 8px; }
+  h1{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-weight:600; font-size:clamp(22px,5.5vw,30px); margin:0 0 8px; }
+  .sub{ color:var(--ink-dim); font-size:13.5px; line-height:1.55; max-width:64ch; margin:0; }
+
+  .chart-wrap{ overflow-x:auto; padding:24px 0 6px; -webkit-overflow-scrolling:touch; }
+  .chart{ position:relative; min-width:980px; height:280px; margin:0 10px; }
+  .gridline{ position:absolute; left:0; right:0; height:1px; background:var(--line); }
+  .gridlabel{ position:absolute; left:0; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:9.5px; color:var(--ink-dim); transform:translateY(-50%); }
+  .pt{ position:absolute; width:11px; height:11px; border-radius:50%; background:var(--red); border:2px solid var(--bg); transform:translate(-50%,-50%); cursor:pointer; z-index:2; }
+  .pt:hover{ transform:translate(-50%,-50%) scale(1.3); }
+  .pt-label{
+    position:absolute; transform:translate(-50%,0); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10px;
+    color:var(--ink-dim); white-space:nowrap; text-align:center; max-width:110px;
+  }
+  .axis-years{ position:relative; height:20px; min-width:980px; margin:4px 10px 0; }
+  .axis-years span{ position:absolute; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10px; color:var(--ink-dim); transform:translateX(-50%); }
+
+  footer{ padding:24px 0 10px; color:var(--ink-dim); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; text-align:center; }
+</style>
+
+<script>
+// shared visit-tracking for the unified progress page — writes only, never reads elsewhere in this tool
+try {
+  const gbVisited = JSON.parse(localStorage.getItem('gb_progress_visited') || '{}');
+  gbVisited['cap7'] = new Date().toISOString();
+  localStorage.setItem('gb_progress_visited', JSON.stringify(gbVisited));
+} catch(e) {}
+</script>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Materie · România Postbelică și Regimul Comunist</p>
+    <h1>Curba represiunii, 1944–1989</h1>
+    <p class="sub">Regimul comunist nu a fost uniform apăsător — a avut vârfuri de teroare (1948–1953, sfârșitul anilor '80) și perioade de relativă relaxare (1965–1971). Click pe fiecare punct pentru context.</p>
+    <p class="sub" style="margin-top:8px;font-size:11.5px;color:var(--red);opacity:.85;">⚠️ Valorile de intensitate (0-100) sunt o estimare a tendinței istorice, nu cifre exacte dintr-o sursă — evenimentele și anii sunt reali, scala e ilustrativă.</p>
+  </header>
+
+  <div class="chart-wrap">
+    <div class="chart" id="chart"></div>
+    <div class="axis-years" id="axisYears"></div>
+  </div>
+
+  <footer>geo-bac · test intern — nu e integrat în site</footer>
+</div>
+
+<div id="shade" style="position:fixed;inset:0;background:rgba(6,9,13,.72);opacity:0;pointer-events:none;transition:opacity .18s;z-index:50;"></div>
+<div id="card" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,92vw);background:#161e29;border:1px solid #26303c;border-radius:6px;padding:22px;z-index:51;opacity:0;pointer-events:none;transition:opacity .18s;">
+  <button id="cardClose" style="float:right;background:#131a23;border:1px solid #26303c;color:#9aa4b0;width:26px;height:26px;border-radius:50%;cursor:pointer;">✕</button>
+  <p id="cardIntensity" style="font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:11px;color:#a8503a;margin:0 0 6px;clear:right;"></p>
+  <h3 id="cardTitle" style="font-family:'Spectral',Georgia,'Times New Roman',serif;font-size:18px;margin:0 0 4px;"></h3>
+  <p id="cardYear" style="font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:12px;color:#9aa4b0;margin:0 0 12px;"></p>
+  <p id="cardDesc" style="font-size:13px;line-height:1.6;margin:0;"></p>
+  <div id="cardLinkWrap"></div>
+</div>
+
+<script>
+const YEAR_MIN = 1944, YEAR_MAX = 1989;
+const CHART_W = 960, CHART_H = 260;
+const px = (yr) => 10 + ((yr - YEAR_MIN)/(YEAR_MAX - YEAR_MIN)) * CHART_W;
+const py = (intensity) => CHART_H - (intensity/100) * CHART_H;
+
+const POINTS = [
+  { year:1944, intensity:20, title:'Actul de la 23 august', timelineTitle:'Actul de la 23 august 1944', timelineChapter:6, desc:'Lovitura de stat deschide calea ocupației sovietice — controlul politic e încă disputat între forțele democratice și comuniști.' },
+  { year:1948, intensity:82, title:'Represiunea stalinistă începe', timelineTitle:'Formarea Securității și represiunea stalinistă', timelineChapter:6, desc:'Formarea Securității, închisori politice (Sighet, Pitești, Gherla) — regimul trece la represiune sistematică.' },
+  { year:1951, intensity:92, title:'Deportările în Bărăgan', timelineTitle:'Deportările în Bărăgan', timelineChapter:6, desc:'Una dintre cele mai mari operațiuni de deportare internă din istoria comunistă românească — vârful terorii staliniste.' },
+  { year:1953, intensity:70, title:'Moartea lui Stalin', desc:'Destindere relativă în tot blocul sovietic, resimțită și în România.' },
+  { year:1958, intensity:50, title:'Retragerea Armatei Roșii', timelineTitle:'Retragerea Armatei Roșii din România', timelineChapter:7, desc:'Loialitatea din 1956 e „răsplătită” cu retragerea trupelor sovietice — prima etapă a distanțării de Moscova.' },
+  { year:1965, intensity:32, title:'Ceaușescu — liberalizare inițială', timelineTitle:'Nicolae Ceaușescu preia conducerea partidului', timelineChapter:6, desc:'Limba rusă nu mai e obligatorie, reintroducerea limbilor occidentale, reabilitarea unor lideri excluși — punctul cel mai „deschis” al regimului.' },
+  { year:1971, intensity:55, title:'Tezele din iulie', timelineTitle:'Vizitele în China și Coreea de Nord; Tezele din iulie', timelineChapter:6, desc:'Impresionat de China și Coreea de Nord, Ceaușescu relansează ideologizarea culturii — începe etapa neostalinistă.' },
+  { year:1974, intensity:65, title:'Cumulul de funcții', timelineTitle:'Cumulul de funcții al lui Ceaușescu', timelineChapter:6, desc:'Ceaușescu devine simultan Președinte, Secretar General și Comandant Suprem — cultul personalității ia amploare.' },
+  { year:1977, intensity:60, title:'Greva minerilor din Valea Jiului', timelineTitle:'Greva minerilor din Valea Jiului', timelineChapter:6, desc:'35.000 de mineri sistează activitatea — semn al nemulțumirii, urmat de represiune asupra liderilor grevei.' },
+  { year:1985, intensity:88, title:'Decretul 408', timelineTitle:'Decretul 408 — obligativitatea raportării la Securitate', timelineChapter:6, desc:'Obligativitatea raportării la Securitate a oricărei convorbiri cu un străin — supraveghere generalizată, pe fondul austerității.' },
+  { year:1989, intensity:97, title:'Revoluția Română', timelineTitle:'Timișoara — 15-17 decembrie 1989', timelineChapter:6, desc:'Criza economică, sărăcia extremă și represiunea ajung la punctul de rupere — regimul se prăbușește în decembrie.' }
+];
+
+const chartEl = document.getElementById('chart');
+[0,25,50,75,100].forEach(v=>{
+  const gl = document.createElement('div');
+  gl.className = 'gridline';
+  gl.style.top = py(v) + 'px';
+  chartEl.appendChild(gl);
+  const lbl = document.createElement('div');
+  lbl.className = 'gridlabel';
+  lbl.style.top = py(v) + 'px';
+  lbl.textContent = v;
+  chartEl.appendChild(lbl);
+});
+
+// SVG line connecting points
+const svgNS = 'http://www.w3.org/2000/svg';
+const svg = document.createElementNS(svgNS, 'svg');
+svg.setAttribute('width', CHART_W + 20);
+svg.setAttribute('height', CHART_H);
+svg.style.position = 'absolute';
+svg.style.left = '0';
+svg.style.top = '0';
+const pathD = POINTS.map((p,i)=> (i===0?'M':'L') + px(p.year) + ',' + py(p.intensity)).join(' ');
+const path = document.createElementNS(svgNS, 'path');
+path.setAttribute('d', pathD);
+path.setAttribute('fill', 'none');
+path.setAttribute('stroke', '#a8503a');
+path.setAttribute('stroke-width', '2');
+path.setAttribute('opacity', '0.6');
+svg.appendChild(path);
+chartEl.appendChild(svg);
+
+POINTS.forEach((p, i)=>{
+  const dot = document.createElement('div');
+  dot.className = 'pt';
+  dot.style.left = px(p.year) + 'px';
+  dot.style.top = py(p.intensity) + 'px';
+  dot.addEventListener('click', ()=> openCard(p));
+  chartEl.appendChild(dot);
+
+  const lbl = document.createElement('div');
+  lbl.className = 'pt-label';
+  lbl.style.left = px(p.year) + 'px';
+  lbl.style.top = (i % 2 === 0 ? py(p.intensity) - 34 : py(p.intensity) + 14) + 'px';
+  lbl.textContent = p.year;
+  chartEl.appendChild(lbl);
+});
+
+const axisEl = document.getElementById('axisYears');
+[1944,1950,1960,1970,1980,1989].forEach(y=>{
+  const s = document.createElement('span');
+  s.style.left = px(y) + 'px';
+  s.textContent = y;
+  axisEl.appendChild(s);
+});
+
+const shade = document.getElementById('shade');
+const card = document.getElementById('card');
+function openCard(p){
+  document.getElementById('cardIntensity').textContent = 'Intensitate represiune: ' + p.intensity + '/100';
+  document.getElementById('cardTitle').textContent = p.title;
+  document.getElementById('cardYear').textContent = p.year;
+  document.getElementById('cardDesc').textContent = p.desc;
+  document.getElementById('cardLinkWrap').innerHTML = p.timelineTitle
+    ? `<a href="istorie-timeline-test.html?search=${encodeURIComponent(p.timelineTitle)}&chapter=${p.timelineChapter}" target="_blank" rel="noopener"
+         style="display:block;margin-top:14px;padding:10px 13px;background:#131a23;border:1px solid #c9a227;border-radius:5px;color:#c9a227;font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:11.5px;text-align:center;text-decoration:none;">
+         🕐 Vezi pe cronologie →</a>`
+    : '';
+  shade.style.opacity = '1'; shade.style.pointerEvents = 'auto';
+  card.style.opacity = '1'; card.style.pointerEvents = 'auto';
+}
+function closeCard(){
+  shade.style.opacity = '0'; shade.style.pointerEvents = 'none';
+  card.style.opacity = '0'; card.style.pointerEvents = 'none';
+}
+shade.addEventListener('click', closeCard);
+document.getElementById('cardClose').addEventListener('click', closeCard);
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeCard(); });
+</script>
+</body>
+</html>

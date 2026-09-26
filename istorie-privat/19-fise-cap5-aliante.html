@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alianțele României — 1883-1947 (test)</title>
+<style>
+  :root{
+    --bg:#0c1117; --bg-panel:#131a23; --bg-card:#161e29; --line:#26303c;
+    --ink:#e9e6dd; --ink-dim:#9aa4b0; --gold:#c9a227;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:920px; margin:0 auto; padding:0 16px 50px; }
+  header{ padding:26px 0 10px; }
+  .eyebrow{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 8px; }
+  h1{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-weight:600; font-size:clamp(22px,5.5vw,30px); margin:0 0 8px; }
+  .sub{ color:var(--ink-dim); font-size:13.5px; line-height:1.55; max-width:64ch; margin:0; }
+
+  .bands-wrap{ overflow-x:auto; padding:26px 0 10px; -webkit-overflow-scrolling:touch; }
+  .bands{ position:relative; min-width:1000px; height:90px; margin:0 20px; }
+  .band{
+    position:absolute; top:20px; height:50px; border-radius:5px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; font-weight:600;
+    color:#0c1117; text-align:center; padding:0 6px; overflow:hidden; white-space:nowrap;
+    transition:transform .12s;
+  }
+  .band:hover{ transform:translateY(-3px); }
+  .axis-years{ position:relative; height:20px; min-width:1000px; margin:0 20px; }
+  .axis-years span{
+    position:absolute; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10px; color:var(--ink-dim);
+    transform:translateX(-50%);
+  }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+  .legend-item{ display:flex; align-items:center; gap:6px; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--ink-dim); }
+  .legend-item .sq{ width:9px; height:9px; border-radius:2px; }
+
+  footer{ padding:24px 0 10px; color:var(--ink-dim); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; text-align:center; }
+</style>
+
+<script>
+// shared visit-tracking for the unified progress page — writes only, never reads elsewhere in this tool
+try {
+  const gbVisited = JSON.parse(localStorage.getItem('gb_progress_visited') || '{}');
+  gbVisited['cap5'] = new Date().toISOString();
+  localStorage.setItem('gb_progress_visited', JSON.stringify(gbVisited));
+} catch(e) {}
+</script>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Materie · România și Concertul European</p>
+    <h1>Alianțele României, în șase decenii</h1>
+    <p class="sub">De la Tripla Alianță secretă la lupta alături de Aliați — cum s-au schimbat, de multe ori radical, partenerii externi ai României. Click pe fiecare bandă pentru context.</p>
+  </header>
+
+  <div class="bands-wrap">
+    <div class="bands" id="bands"></div>
+    <div class="axis-years" id="axisYears"></div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <footer>geo-bac · test intern — nu e integrat în site</footer>
+</div>
+
+<div id="shade" style="position:fixed;inset:0;background:rgba(6,9,13,.72);opacity:0;pointer-events:none;transition:opacity .18s;z-index:50;"></div>
+<div id="card" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,92vw);background:#161e29;border:1px solid #26303c;border-radius:6px;padding:22px;z-index:51;opacity:0;pointer-events:none;transition:opacity .18s;">
+  <button id="cardClose" style="float:right;background:#131a23;border:1px solid #26303c;color:#9aa4b0;width:26px;height:26px;border-radius:50%;cursor:pointer;">✕</button>
+  <h3 id="cardTitle" style="font-family:'Spectral',Georgia,'Times New Roman',serif;font-size:18px;margin:0 0 4px;clear:right;"></h3>
+  <p id="cardYears" style="font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:12px;color:#9aa4b0;margin:0 0 12px;"></p>
+  <p id="cardDesc" style="font-size:13px;line-height:1.6;margin:0;"></p>
+  <div id="cardLinkWrap"></div>
+</div>
+
+<script>
+const YEAR_MIN = 1878, YEAR_MAX = 1947;
+const TRACK_W = 960;
+const px = (yr) => 20 + ((yr - YEAR_MIN) / (YEAR_MAX - YEAR_MIN)) * TRACK_W;
+
+const BANDS = [
+  { from:1883, to:1914, label:'Tripla Alianță (secret)', color:'#a8503a', timelineTitle:'Alianța secretă cu Puterile Centrale',
+    desc:'Alianță secretă cu Germania, Austro-Ungaria și Italia — căutarea unei garanții de securitate față de Rusia. Contrastează cu legăturile culturale ale elitei românești cu Franța.' },
+  { from:1914, to:1916, label:'Neutralitate', color:'#6b7280', timelineTitle:'Neutralitatea României',
+    desc:'România era aliată formal cu Puterile Centrale, dar opinia publică era pro-Antantă. Alege neutralitatea la începutul Primului Război Mondial.' },
+  { from:1916, to:1918, label:'Antanta', color:'#3a6ea8', timelineTitle:'Intrarea în război de partea Antantei',
+    desc:'27 august 1916 — România intră în război de partea Antantei, cu obiectivul unirii Transilvaniei.' },
+  { from:1918, to:1939, label:'Mica Înțelegere / Înțelegerea Balcanică', color:'#3a8f5c', timelineTitle:'Mica Înțelegere',
+    desc:'1921 — Mica Înțelegere (Cehoslovacia, Iugoslavia), împotriva revizionismului ungar. 1934 — Înțelegerea Balcanică (Iugoslavia, Grecia, Turcia), pentru menținerea statu-quo-ului teritorial.' },
+  { from:1939, to:1940, label:'Neutralitate', color:'#6b7280', timelineTitle:'Neutralitatea României la începutul celui de-al Doilea Război Mondial',
+    desc:'România încearcă să rămână neutră la începutul celui de-al Doilea Război Mondial, dar suferă presiuni teritoriale din toate direcțiile.' },
+  { from:1941, to:1944, label:'Alianța cu Axa', color:'#7a2020', timelineTitle:'Alianța cu Axa',
+    desc:'Dorința recuperării Basarabiei determină alianța cu Germania — participare la asediul Odessei și la Stalingrad, cu pierderi uriașe.' },
+  { from:1944, to:1947, label:'Alături de Aliați', color:'#c9a227', timelineTitle:'Întoarcerea armelor',
+    desc:'23 august 1944 — România întoarce armele împotriva Germaniei, participă la eliberarea Transilvaniei, Ungariei și Cehoslovaciei. 1947 — Tratatul de Pace de la Paris confirmă granițele postbelice.' }
+];
+
+const bandsEl = document.getElementById('bands');
+BANDS.forEach(b=>{
+  const div = document.createElement('div');
+  div.className = 'band';
+  div.style.left = px(b.from) + 'px';
+  div.style.width = (px(b.to) - px(b.from)) + 'px';
+  div.style.background = b.color;
+  div.textContent = b.label;
+  div.addEventListener('click', ()=> openCard(b));
+  bandsEl.appendChild(div);
+});
+
+const axisEl = document.getElementById('axisYears');
+[1880,1890,1900,1910,1920,1930,1940].forEach(y=>{
+  const s = document.createElement('span');
+  s.style.left = px(y) + 'px';
+  s.textContent = y;
+  axisEl.appendChild(s);
+});
+
+const legendEl = document.getElementById('legend');
+BANDS.forEach(b=>{
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.innerHTML = `<span class="sq" style="background:${b.color}"></span>${b.from}–${b.to}: ${b.label}`;
+  legendEl.appendChild(item);
+});
+
+const shade = document.getElementById('shade');
+const card = document.getElementById('card');
+function openCard(b){
+  document.getElementById('cardTitle').textContent = b.label;
+  document.getElementById('cardYears').textContent = b.from + '–' + b.to;
+  document.getElementById('cardDesc').textContent = b.desc;
+  document.getElementById('cardLinkWrap').innerHTML = b.timelineTitle
+    ? `<a href="istorie-timeline-test.html?search=${encodeURIComponent(b.timelineTitle)}&chapter=4" target="_blank" rel="noopener"
+         style="display:block;margin-top:14px;padding:10px 13px;background:#131a23;border:1px solid #c9a227;border-radius:5px;color:#c9a227;font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:11.5px;text-align:center;text-decoration:none;">
+         🕐 Vezi pe cronologie →</a>`
+    : '';
+  shade.style.opacity = '1'; shade.style.pointerEvents = 'auto';
+  card.style.opacity = '1'; card.style.pointerEvents = 'auto';
+}
+function closeCard(){
+  shade.style.opacity = '0'; shade.style.pointerEvents = 'none';
+  card.style.opacity = '0'; card.style.pointerEvents = 'none';
+}
+shade.addEventListener('click', closeCard);
+document.getElementById('cardClose').addEventListener('click', closeCard);
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeCard(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marea Unire — trei drumuri, un singur an (test)</title>
+<style>
+  :root{
+    --bg:#0c1117; --bg-panel:#131a23; --bg-card:#161e29; --line:#26303c;
+    --ink:#e9e6dd; --ink-dim:#9aa4b0; --gold:#c9a227;
+    --basarabia:#a8503a; --bucovina:#4a7a8f; --transilvania:#3a8f5c;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:900px; margin:0 auto; padding:0 16px 50px; }
+  header{ padding:26px 0 10px; }
+  .eyebrow{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 8px; }
+  h1{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-weight:600; font-size:clamp(22px,5.5vw,30px); margin:0 0 8px; }
+  .sub{ color:var(--ink-dim); font-size:13.5px; line-height:1.55; max-width:64ch; margin:0; }
+
+  .columns{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:28px; }
+  @media (max-width:640px){ .columns{ grid-template-columns:1fr; } }
+  .col-header{
+    font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:15px; font-weight:600;
+    padding:10px 12px; border-radius:6px 6px 0 0; text-align:center;
+  }
+  .col-body{ background:var(--bg-panel); border:1px solid var(--line); border-top:none; border-radius:0 0 6px 6px; padding:12px 10px; min-height:100%; }
+  .step{
+    background:var(--bg-card); border:1px solid var(--line); border-left:3px solid var(--c);
+    border-radius:4px; padding:9px 11px; margin-bottom:8px; cursor:pointer; font-size:12px;
+  }
+  .step:last-child{ margin-bottom:0; }
+  .step .d{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10px; color:var(--ink-dim); }
+  .step .t{ font-weight:600; margin-top:2px; line-height:1.3; }
+
+  .convergence{
+    margin-top:18px; text-align:center; padding:22px 20px;
+    background:linear-gradient(135deg, rgba(168,80,58,.12), rgba(74,122,143,.12), rgba(58,143,92,.12));
+    border:1px solid var(--gold); border-radius:8px;
+  }
+  .convergence .yr{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:26px; font-weight:700; color:var(--gold); }
+  .convergence p{ font-size:13px; color:var(--ink-dim); margin:6px 0 0; max-width:50ch; margin-left:auto; margin-right:auto; }
+
+  footer{ padding:24px 0 10px; color:var(--ink-dim); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; text-align:center; }
+</style>
+
+<script>
+// shared visit-tracking for the unified progress page — writes only, never reads elsewhere in this tool
+try {
+  const gbVisited = JSON.parse(localStorage.getItem('gb_progress_visited') || '{}');
+  gbVisited['cap4'] = new Date().toISOString();
+  localStorage.setItem('gb_progress_visited', JSON.stringify(gbVisited));
+} catch(e) {}
+</script>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Materie · Statul Român Modern — România Mare</p>
+    <h1>Trei drumuri, un singur an</h1>
+    <p class="sub">Basarabia, Bucovina și Transilvania parcurg, simultan și separat, drumul spre unire — toate se încheie în 1918. Click pe fiecare etapă pentru detalii.</p>
+  </header>
+
+  <div class="columns" id="columns"></div>
+
+  <div class="convergence">
+    <div class="yr">1918</div>
+    <p>Trei procese naționale distincte, pornite din contexte diferite (destrămarea Imperiului Rus, a Imperiului Austro-Ungar), converg în același an — România Mare se formează din unirea celor trei provincii istorice.</p>
+    <a href="istorie-harta-test.html?year=1920" target="_blank" rel="noopener"
+       style="display:inline-block;margin-top:14px;padding:11px 16px;background:var(--bg-panel);border:1px solid var(--gold);border-radius:5px;color:var(--gold);font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:12px;text-decoration:none;">
+      🗺️ Vezi harta României Mari →
+    </a>
+  </div>
+
+  <footer>geo-bac · test intern — nu e integrat în site</footer>
+</div>
+
+<div id="shade" style="position:fixed;inset:0;background:rgba(6,9,13,.72);opacity:0;pointer-events:none;transition:opacity .18s;z-index:50;"></div>
+<div id="card" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,92vw);background:#161e29;border:1px solid #26303c;border-radius:6px;padding:22px;z-index:51;opacity:0;pointer-events:none;transition:opacity .18s;">
+  <button id="cardClose" style="float:right;background:#131a23;border:1px solid #26303c;color:#9aa4b0;width:26px;height:26px;border-radius:50%;cursor:pointer;">✕</button>
+  <p id="cardRegion" style="font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:11px;margin:0 0 6px;clear:right;"></p>
+  <h3 id="cardTitle" style="font-family:'Spectral',Georgia,'Times New Roman',serif;font-size:18px;margin:0 0 4px;"></h3>
+  <p id="cardDate" style="font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:12px;color:#9aa4b0;margin:0 0 12px;"></p>
+  <p id="cardDesc" style="font-size:13px;line-height:1.6;margin:0;"></p>
+</div>
+
+<script>
+const REGIONS = [
+  { key:'basarabia', label:'Basarabia', color:'var(--basarabia)', steps:[
+    { date:'martie/aprilie 1917', title:'Formarea Partidului Național Moldovenesc', desc:'Destrămarea Imperiului Rus permite constituirea partidului care va conduce mișcarea de emancipare a Basarabiei.' },
+    { date:'sept./oct. 1917', title:'Congresul ostașilor moldoveni', desc:'Congresul de la Chișinău formează Sfatul Țării, condus de Ion Inculeț.' },
+    { date:'2 decembrie 1917', title:'Proclamarea autonomiei', desc:'Sfatul Țării proclamă autonomia Basarabiei.' },
+    { date:'24 ianuarie 1918', title:'Proclamarea independenței', desc:'Sfatul Țării proclamă independența Republicii Democratice Moldovenești.' },
+    { date:'27 martie 1918', title:'„Declarația de unire”', desc:'Sfatul Țării adoptă unirea cu România — Basarabia devine prima provincie istorică unită, în 1918.' }
+  ]},
+  { key:'bucovina', label:'Bucovina', color:'var(--bucovina)', steps:[
+    { date:'toamna 1918', title:'Proclamarea autonomiei', desc:'Consiliul Național Român (deputați români din Parlamentul de la Viena) proclamă autonomia Bucovinei, pe fondul destrămării Austro-Ungariei.' },
+    { date:'14 octombrie 1918', title:'Adunarea Constituantă', desc:'Condusă de Iancu Flondor, cere sprijin militar pe fondul pericolului anexării la Ucraina.' },
+    { date:'15 noiembrie 1918', title:'Congresul Național al Bucovinei', desc:'Declară „unirea necondiționată și pentru vecie” cu România.' }
+  ]},
+  { key:'transilvania', label:'Transilvania', color:'var(--transilvania)', steps:[
+    { date:'29 septembrie 1918', title:'Declarația de la Oradea', desc:'Partidul Național Român revendică dreptul la autodeterminare al românilor din Transilvania.' },
+    { date:'30 octombrie 1918', title:'Consiliul Național Român Central', desc:'Format la Arad, cu 6 reprezentanți ai PNR și 6 ai Partidului Social Democrat — organizează Marea Adunare Națională.' },
+    { date:'1 decembrie 1918', title:'Marea Adunare Națională de la Alba Iulia', desc:'1228 de delegați și peste 100.000 de participanți adoptă Rezoluția Unirii, prezentată de Vasile Goldiș.' },
+    { date:'24 decembrie 1918', title:'Decretul de unire', desc:'Regele Ferdinand I emite decretul de unire — se formează România Mare.' }
+  ]}
+];
+
+const columnsEl = document.getElementById('columns');
+REGIONS.forEach(r=>{
+  const col = document.createElement('div');
+  const header = document.createElement('div');
+  header.className = 'col-header';
+  header.style.background = r.color;
+  header.style.color = '#0c1117';
+  header.textContent = r.label;
+  col.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'col-body';
+  r.steps.forEach(s=>{
+    const step = document.createElement('div');
+    step.className = 'step';
+    step.style.setProperty('--c', r.color);
+    step.innerHTML = `<div class="d">${s.date}</div><div class="t">${s.title}</div>`;
+    step.addEventListener('click', ()=> openCard(r, s));
+    body.appendChild(step);
+  });
+  col.appendChild(body);
+  columnsEl.appendChild(col);
+});
+
+const shade = document.getElementById('shade');
+const card = document.getElementById('card');
+function openCard(r, s){
+  document.getElementById('cardRegion').textContent = r.label;
+  document.getElementById('cardRegion').style.color = r.color;
+  document.getElementById('cardTitle').textContent = s.title;
+  document.getElementById('cardDate').textContent = s.date;
+  document.getElementById('cardDesc').textContent = s.desc;
+  shade.style.opacity = '1'; shade.style.pointerEvents = 'auto';
+  card.style.opacity = '1'; card.style.pointerEvents = 'auto';
+}
+function closeCard(){
+  shade.style.opacity = '0'; shade.style.pointerEvents = 'none';
+  card.style.opacity = '0'; card.style.pointerEvents = 'none';
+}
+shade.addEventListener('click', closeCard);
+document.getElementById('cardClose').addEventListener('click', closeCard);
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeCard(); });
+</script>
+</body>
+</html>

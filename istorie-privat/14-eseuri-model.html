@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eseuri-model — Istorie BAC (test)</title>
+<style>
+  :root{
+    --bg:#0c1117; --bg-panel:#131a23; --bg-card:#161e29; --line:#26303c;
+    --ink:#e9e6dd; --ink-dim:#9aa4b0; --gold:#c9a227; --green:#4a8f5c; --blue:#4a7fc9;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; padding-bottom:50px; }
+  .wrap{ max-width:680px; margin:0 auto; padding:0 18px; }
+
+  header{ padding:26px 0 16px; }
+  .eyebrow{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 8px; }
+  h1{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-weight:600; font-size:clamp(22px,5vw,28px); margin:0 0 10px; }
+  .sub{ color:var(--ink-dim); font-size:13.5px; line-height:1.6; margin:0; }
+  .note-box{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--gold); background:rgba(201,162,39,.08); border:1px solid var(--gold); border-radius:4px; padding:10px 13px; margin:14px 0; line-height:1.55; }
+
+  .tabs{ display:flex; gap:6px; margin:18px 0; flex-wrap:wrap; }
+  .tab{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; background:var(--bg-panel); border:1px solid var(--line); color:var(--ink-dim); padding:9px 13px; border-radius:4px; cursor:pointer; text-align:left; }
+  .tab.active{ color:var(--bg); background:var(--gold); border-color:var(--gold); font-weight:600; }
+
+  .essay-view{ display:none; }
+  .essay-view.active{ display:block; }
+
+  .theme-box{ background:var(--bg-panel); border:1px solid var(--line); border-left:3px solid var(--gold); border-radius:4px; padding:16px 18px; margin:16px 0; }
+  .theme-box .label{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--gold); text-transform:uppercase; letter-spacing:.05em; margin:0 0 6px; }
+  .theme-box p{ font-size:14px; line-height:1.5; margin:0; font-family:'Spectral',Georgia,'Times New Roman',serif; }
+
+  .reper-list{ font-size:12.5px; line-height:1.7; color:var(--ink-dim); margin:0 0 20px; padding-left:20px; }
+  .reper-list li{ margin-bottom:4px; }
+  .reper-list .rn{ display:inline-block; width:18px; height:18px; border-radius:50%; background:var(--bg-card); border:1px solid var(--gold); color:var(--gold); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10px; text-align:center; line-height:16px; margin-right:6px; }
+
+  .essay-body{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:15px; line-height:1.85; color:var(--ink); }
+  .essay-body p{ margin:0 0 16px; }
+  .req-mark{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:19px; height:19px; border-radius:50%; background:var(--gold); color:var(--bg);
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; font-weight:700;
+    vertical-align:middle; margin-right:6px; flex:none;
+  }
+  .req-para{ display:flex; align-items:flex-start; gap:2px; }
+  .req-para .req-mark{ margin-top:5px; }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:10px; margin:18px 0; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--ink-dim); }
+  .legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .legend .dot{ width:16px; height:16px; border-radius:50%; background:var(--gold); color:var(--bg); display:inline-flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; }
+
+  .word-count-info{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--ink-dim); margin:16px 0 0; text-align:right; }
+
+  footer{ padding:30px 0 10px; color:var(--ink-dim); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; text-align:center; }
+</style>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">geo-bac · Istorie · Eseuri-model</p>
+    <h1>Eseuri-model complete</h1>
+    <p class="sub">Nu un reper punctat — un eseu întreg, scris, care atinge exact cerințele subiectului real de BAC. Fiecare cerință e marcată în text, ca să vezi cum se leagă structura eseului de barem.</p>
+    <p class="note-box">Aceste eseuri corespund exact temelor de la Subiectul al III-lea din cele două variante reale (2026) din simulatorul de examen. Sunt scrise de la zero, ca exemplu de structură și limbaj — nu sunt lucrări oficiale ale Ministerului Educației.</p>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div id="essayContainer"></div>
+
+  <footer>geo-bac · test intern — nu e integrat în site</footer>
+</div>
+
+<script>
+const ESSAYS = [
+  {
+    id: 'var3',
+    label: '2026 · Varianta 3',
+    theme: 'evoluția politică a României în a doua jumătate a secolului al XX-lea',
+    reper: [
+      'Prezentarea constituției României adoptate în etapa stalinismului, în a doua jumătate a secolului al XX-lea',
+      'Menționarea a două acțiuni politice desfășurate de România în relațiile internaționale din perioada 1955-1969',
+      'Precizarea unei practici politice utilizate în România, în perioada 1970-1988, și menționarea a două aspecte referitoare la aceasta',
+      'Formularea unui punct de vedere referitor la democrația din România în perioada 1990-1997 și susținerea acestuia printr-un argument istoric'
+    ],
+    paragraphs: [
+      { req: 0, text: 'România parcurge, în a doua jumătate a secolului al XX-lea, un traseu politic complex, marcat de instaurarea și consolidarea regimului comunist, de o etapă de relativă autonomie față de Moscova, urmată de radicalizarea național-comunistă, și, în cele din urmă, de tranziția către democrație după 1989.' },
+      { req: 1, text: 'Etapa stalinismului este consacrată juridic prin adoptarea, în 1952, a unei noi Constituții, care desăvârșește instaurarea regimului comunist în România. Documentul consfințește rolul conducător al Partidului Muncitoresc Român în stat și societate și consacră proprietatea socialistă asupra mijloacelor de producție ca formă dominantă a economiei, eliminând practic proprietatea privată drept principiu constituțional. Cauza adoptării acestei constituții rezidă în nevoia regimului de a-și legitima juridic transformările deja produse în plan economic și social prin naționalizare și colectivizare; drept efect, statul român devine, formal și instituțional, o republică populară după modelul sovietic.' },
+      { req: 2, text: 'În plan extern, deceniul care urmează morții lui Stalin aduce o relativă distanțare a României față de Moscova. În 1955, România devine membru fondator al Organizației Tratatului de la Varșovia, alianță militară care o menține însă ferm în sfera de influență sovietică. Ulterior, în 1967, România stabilește relații diplomatice cu Republica Federală Germania, gest de politică externă independentă, contrar liniei sovietice, care refuza recunoașterea RFG-ului. Aceste două acțiuni ilustrează treptata afirmare a unei politici externe naționale în cadrul blocului comunist.' },
+      { req: 3, text: 'În plan intern, perioada 1970-1988 este dominată de accentuarea cultului personalității lui Nicolae Ceaușescu, practică politică specifică etapei național-comuniste. Acest cult se manifestă atât în domeniul cultural, prin protocronism și exaltarea trecutului național, cât și prin intensificarea supravegherii populației de către Securitate, care încalcă sistematic drepturile și libertățile cetățenești.' },
+      { req: 4, text: 'Consider că, în perioada 1990-1997, democrația din România se consolidează treptat, prin măsuri legislative fundamentale. Astfel, adoptarea Constituției din 1991 consacră principiul separării puterilor în stat și garantează pluralismul politic, oferind cadrul juridic necesar organizării de alegeri libere și funcționării unui sistem multipartidist; așadar, România își recuperează, chiar dacă imperfect, statutul de stat democratic.' }
+    ]
+  },
+  {
+    id: 'var2',
+    label: '2026 · Varianta 2',
+    theme: 'acțiunile românilor în relațiile internaționale din a doua jumătate a secolului al XIV-lea – secolul al XVI-lea',
+    reper: [
+      'Prezentarea unui fapt istoric prin care românii se implică în relațiile internaționale din perioada 1380-1400',
+      'Menționarea a două acțiuni militare la care participă românii în perioada 1401-1456',
+      'Precizarea unei acțiuni diplomatice desfășurate de români în perioada 1457-1500 și menționarea a două aspecte cu privire la aceasta',
+      'Formularea unui punct de vedere referitor la participarea românilor la relațiile internaționale din secolul al XVI-lea și susținerea acestuia printr-un argument istoric'
+    ],
+    paragraphs: [
+      { req: 0, text: 'Spațiul românesc extracarpatic se implică activ în relațiile internaționale ale Europei de Est și Sud-Est între a doua jumătate a secolului al XIV-lea și secolul al XVI-lea, într-un context dominat de expansiunea otomană și de rivalitatea marilor puteri vecine — Polonia și Ungaria.' },
+      { req: 1, text: 'În perioada 1380-1400, Petru I Mușat acceptă suzeranitatea regelui Poloniei, prin tratatul semnat la Liov, deoarece Moldova avea nevoie de protecție împotriva vechilor pretenții teritoriale maghiare asupra spațiului est-carpatic; astfel, domnul moldovean își asigură un aliat puternic și consolidează poziția internațională a tânărului stat.' },
+      { req: 2, text: 'În secolul următor, românii participă activ la acțiuni militare cu caracter antiotoman. Astfel, în 1444, Iancu de Hunedoara conduce, alături de forțe maghiare și poloneze, Campania cea lungă împotriva otomanilor, iar în anii următori participă la lupta de la Varna. Aceste acțiuni ilustrează angajamentul românilor în cruciada târzie antiotomană din prima jumătate a secolului al XV-lea.' },
+      { req: 3, text: 'O acțiune diplomatică semnificativă a acestei perioade este Tratatul de la Overchelăuți, încheiat de Ștefan cel Mare cu regele Poloniei. Prin acest tratat, Ștefan cel Mare recunoaște suzeranitatea regelui Poloniei asupra Moldovei, iar cetatea Hotin este cedată regelui polon; în schimb, domnul moldovean obține sprijin militar împotriva amenințării otomane și ungare, tratatul contribuind astfel la consolidarea domniei sale.' },
+      { req: 4, text: 'Consider că, în secolul al XVI-lea, participarea românilor la relațiile internaționale capătă preponderent un caracter defensiv și diplomatic, într-un context de suzeranitate otomană tot mai strânsă. Astfel, domnii Țărilor Române, precum Mihai Viteazul la finalul secolului, recurg la alianțe cu puterile creștine — Imperiul Habsburgic — deoarece resursele proprii nu mai erau suficiente pentru a face față presiunii otomane; așadar, diplomația devine principalul instrument de conservare a autonomiei interne.' }
+    ]
+  }
+];
+
+let current = 'var3';
+
+function renderTabs(){
+  const el = document.getElementById('tabs');
+  el.innerHTML = '';
+  ESSAYS.forEach(e=>{
+    const b = document.createElement('button');
+    b.className = 'tab' + (e.id === current ? ' active' : '');
+    b.textContent = e.label;
+    b.addEventListener('click', ()=>{ current = e.id; renderTabs(); renderEssay(); });
+    el.appendChild(b);
+  });
+}
+
+function renderEssay(){
+  const essay = ESSAYS.find(e => e.id === current);
+  const wordCount = essay.paragraphs.reduce((s,p)=> s + p.text.trim().split(/\s+/).length, 0);
+
+  const reperHTML = essay.reper.map((r,i)=>
+    `<li><span class="rn">${i+1}</span>${r}</li>`
+  ).join('');
+
+  const legendHTML = essay.reper.map((r,i)=>
+    `<span><span class="dot">${i+1}</span>cerința ${i+1}</span>`
+  ).join('');
+
+  const bodyHTML = essay.paragraphs.map(p=>{
+    if(p.req === 0){
+      return `<p>${p.text}</p>`;
+    }
+    return `<div class="req-para"><span class="req-mark">${p.req}</span><p>${p.text}</p></div>`;
+  }).join('');
+
+  document.getElementById('essayContainer').innerHTML = `
+    <div class="theme-box">
+      <p class="label">Tema eseului</p>
+      <p>${essay.theme}</p>
+    </div>
+    <ol class="reper-list">${reperHTML}</ol>
+    <div class="legend">${legendHTML}</div>
+    <div class="essay-body">${bodyHTML}</div>
+    <p class="word-count-info">${wordCount} cuvinte</p>
+  `;
+}
+
+renderTabs();
+renderEssay();
+</script>
+</body>
+</html>

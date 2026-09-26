@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Romanitatea Românilor — straturi și teorii (test)</title>
+<style>
+  :root{
+    --bg:#0c1117; --bg-panel:#131a23; --bg-card:#161e29; --line:#26303c;
+    --ink:#e9e6dd; --ink-dim:#9aa4b0; --gold:#c9a227;
+    --dac:#7a5c3e; --lat:#c9a227; --slav:#5c7a94; --alt:#6b8a5f;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:760px; margin:0 auto; padding:0 16px 50px; }
+  header{ padding:26px 0 10px; }
+  .eyebrow{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 8px; }
+  h1{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-weight:600; font-size:clamp(22px,5.5vw,30px); margin:0 0 8px; }
+  .sub{ color:var(--ink-dim); font-size:13.5px; line-height:1.55; max-width:62ch; margin:0; }
+  section{ margin-top:36px; }
+  h2.sec-title{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:19px; font-weight:600; margin:0 0 4px; }
+  .sec-note{ color:var(--ink-dim); font-size:12.5px; margin:0 0 16px; line-height:1.5; }
+
+  /* layers */
+  .layers-bar{ display:flex; height:56px; border-radius:6px; overflow:hidden; box-shadow:0 0 0 1px var(--line); }
+  .layer{ display:flex; align-items:center; justify-content:center; cursor:pointer; transition:flex-grow .15s; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; font-weight:600; color:#0c1117; }
+  .layer:hover{ filter:brightness(1.15); }
+  .layers-legend{ display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; }
+  .layers-legend .item{ display:flex; align-items:center; gap:6px; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--ink-dim); cursor:pointer; }
+  .layers-legend .dot{ width:9px; height:9px; border-radius:2px; }
+  .layer-detail{
+    margin-top:14px; padding:14px 16px; background:var(--bg-panel); border:1px solid var(--line); border-radius:6px;
+    font-size:13px; line-height:1.6; display:none;
+  }
+  .layer-detail.open{ display:block; }
+
+  /* theories face-off */
+  .faceoff{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:520px){ .faceoff{ grid-template-columns:1fr; } }
+  .theory-col{ background:var(--bg-panel); border:1px solid var(--line); border-radius:6px; padding:16px 18px; }
+  .theory-col h3{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:16px; margin:0 0 8px; color:var(--gold); }
+  .theory-col .historians{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--ink-dim); margin:0 0 10px; }
+  .theory-col p{ font-size:13px; line-height:1.6; margin:0; }
+  .vs{ text-align:center; font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--ink-dim); margin:10px 0; letter-spacing:.1em; }
+
+  /* pendulum */
+  .pendulum{ position:relative; height:130px; margin-top:10px; }
+  .pendulum-line{ position:absolute; left:0; right:0; top:65px; height:2px; background:var(--line); }
+  .pendulum-pt{ position:absolute; top:65px; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; cursor:pointer; }
+  .pendulum-pt .dot{ width:12px; height:12px; border-radius:50%; border:2px solid var(--bg); }
+  .pendulum-pt .yr{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10px; color:var(--ink-dim); margin-top:5px; white-space:nowrap; }
+  .pendulum-pt .lbl{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10px; white-space:nowrap; margin-bottom:5px; max-width:110px; text-align:center; }
+  .pendulum-pt.above{ flex-direction:column-reverse; }
+
+  footer{ padding:24px 0 10px; color:var(--ink-dim); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; text-align:center; }
+</style>
+
+<script>
+// shared visit-tracking for the unified progress page — writes only, never reads elsewhere in this tool
+try {
+  const gbVisited = JSON.parse(localStorage.getItem('gb_progress_visited') || '{}');
+  gbVisited['cap1'] = new Date().toISOString();
+  localStorage.setItem('gb_progress_visited', JSON.stringify(gbVisited));
+} catch(e) {}
+</script>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Materie · Romanitatea Românilor</p>
+    <h1>Straturi, teorii și distorsiuni</h1>
+    <p class="sub">Din ce e făcută limba română, cele două mari teorii istoriografice despre originea românilor, și cum a fost folosită etnogeneza ca instrument de propagandă politică.</p>
+  </header>
+
+  <section>
+    <h2 class="sec-title">Structura vocabularului limbii române</h2>
+    <p class="sec-note">Click pe fiecare strat pentru detalii.</p>
+    <div class="layers-bar" id="layersBar"></div>
+    <div class="layers-legend" id="layersLegend"></div>
+    <div class="layer-detail" id="layerDetail"></div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Teoriile în oglindă</h2>
+    <p class="sec-note">Dezbaterea istoriografică europeană asupra originii românilor.</p>
+    <div class="faceoff">
+      <div class="theory-col">
+        <h3>Teoria imigraționistă</h3>
+        <p class="historians">Sulzer · Engel · Roesler</p>
+        <p>Formarea poporului român are loc la sud de Dunăre, urmată de o migrație spre nord abia în secolul XII. Folosită politic în mediile habsburgice, pentru a contesta drepturile istorice ale românilor din Transilvania.</p>
+      </div>
+      <div class="theory-col">
+        <h3>Teoria continuității</h3>
+        <p class="historians">Xenopol · Hasdeu · Iorga</p>
+        <p>Continuitate daco-romană neîntreruptă la nord de Dunăre, din perioada romanizării până astăzi. Susținută de istoriografia română ca argument al unității și vechimii naționale.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Pendulul distorsiunilor politice</h2>
+    <p class="sec-note">Aceeași etnogeneză, citită diferit de fiecare regim, în funcție de interesul politic al momentului.</p>
+    <div class="pendulum">
+      <div class="pendulum-line"></div>
+      <div id="pendulumPoints"></div>
+    </div>
+  </section>
+
+  <footer>geo-bac · test intern — nu e integrat în site</footer>
+</div>
+
+<div class="shade" id="shade" style="position:fixed;inset:0;background:rgba(6,9,13,.72);opacity:0;pointer-events:none;transition:opacity .18s;z-index:50;"></div>
+<div class="card" id="card" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,92vw);background:#161e29;border:1px solid #26303c;border-radius:6px;padding:22px;z-index:51;opacity:0;pointer-events:none;transition:opacity .18s;">
+  <button id="cardClose" style="float:right;background:#131a23;border:1px solid #26303c;color:#9aa4b0;width:26px;height:26px;border-radius:50%;cursor:pointer;">✕</button>
+  <p id="cardYear" style="font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:11px;color:#c9a227;margin:0 0 6px;clear:right;"></p>
+  <h3 id="cardTitle" style="font-family:'Spectral',Georgia,'Times New Roman',serif;font-size:17px;margin:0 0 10px;"></h3>
+  <p id="cardDesc" style="font-size:13px;line-height:1.6;margin:0;"></p>
+  <div id="cardLinkWrap"></div>
+</div>
+
+<script>
+const LAYERS = [
+  { key:'lat', label:'Strat latin', pct:60, color:'var(--lat)', desc:'Fondul principal al vocabularului românesc, moștenit din latina vorbită de coloniștii, veteranii și administrația romană în Dacia.' },
+  { key:'slav', label:'Adstrat slav', pct:20, color:'var(--slav)', desc:'A doua componentă ca mărime — rezultatul contactului îndelungat cu populațiile slave migratoare, din primul mileniu.' },
+  { key:'dac', label:'Substrat dac', pct:10, color:'var(--dac)', desc:'Cea mai veche componentă — cuvinte moștenite direct de la populația autohtonă geto-dacă, dinainte de cucerirea romană.' },
+  { key:'alt', label:'Alte influențe', pct:10, color:'var(--alt)', desc:'Împrumuturi ulterioare — maghiare, grecești, turcești — acumulate prin contactele istorice cu vecinii.' }
+];
+
+const barEl = document.getElementById('layersBar');
+const legendEl = document.getElementById('layersLegend');
+const detailEl = document.getElementById('layerDetail');
+
+LAYERS.forEach(l=>{
+  const seg = document.createElement('div');
+  seg.className = 'layer';
+  seg.style.width = l.pct + '%';
+  seg.style.background = l.color;
+  seg.textContent = l.pct + '%';
+  seg.addEventListener('click', ()=> showLayer(l));
+  barEl.appendChild(seg);
+
+  const leg = document.createElement('div');
+  leg.className = 'item';
+  leg.innerHTML = `<span class="dot" style="background:${l.color}"></span>${l.label} (${l.pct}%)`;
+  leg.addEventListener('click', ()=> showLayer(l));
+  legendEl.appendChild(leg);
+});
+function showLayer(l){
+  detailEl.innerHTML = `<b>${l.label} — ${l.pct}%.</b> ${l.desc}`;
+  detailEl.classList.add('open');
+}
+
+const PENDULUM = [
+  { year:'1900', timelineTitle:'Exagerarea elementului latin', label:'Exagerarea elementului latin', color:'var(--lat)', desc:'Nicolae Iorga formulează metafora „insulei de latinitate într-o mare slavă” — influențele slave sunt minimizate în istoriografia națională.' },
+  { year:'1950–1965', timelineTitle:'Exagerarea elementului slav', label:'Exagerarea elementului slav', color:'var(--slav)', desc:'Regimul Gheorghiu-Dej, sub influență sovietică directă — rolul slavilor în etnogeneză e supraevaluat, latinitatea minimizată.' },
+  { year:'1970–1989', timelineTitle:'Exagerarea elementului dac', label:'Exagerarea elementului dac', color:'var(--dac)', desc:'„Dacismul” regimului Ceaușescu glorifică civilizația dacică drept rol primordial în formarea națiunii — a treia mare distorsiune ideologică.' }
+];
+const pendEl = document.getElementById('pendulumPoints');
+PENDULUM.forEach((p,i)=>{
+  const node = document.createElement('div');
+  node.className = 'pendulum-pt' + (i%2===0 ? ' above' : '');
+  node.style.left = (15 + i*35) + '%';
+  node.innerHTML = `<div class="dot" style="background:${p.color}"></div><div class="yr">${p.year}</div><div class="lbl">${p.label}</div>`;
+  node.addEventListener('click', ()=> openCard(p.year, p.label, p.desc, p.timelineTitle));
+  pendEl.appendChild(node);
+});
+
+const shade = document.getElementById('shade');
+const card = document.getElementById('card');
+function openCard(year, title, desc, timelineTitle){
+  document.getElementById('cardYear').textContent = year;
+  document.getElementById('cardTitle').textContent = title;
+  document.getElementById('cardDesc').textContent = desc;
+  document.getElementById('cardLinkWrap').innerHTML = timelineTitle
+    ? `<a href="istorie-timeline-test.html?search=${encodeURIComponent(timelineTitle)}&chapter=0" target="_blank" rel="noopener"
+         style="display:block;margin-top:14px;padding:10px 13px;background:#131a23;border:1px solid #c9a227;border-radius:5px;color:#c9a227;font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;font-size:11.5px;text-align:center;text-decoration:none;">
+         🕐 Vezi pe cronologie →</a>`
+    : '';
+  shade.style.opacity = '1'; shade.style.pointerEvents = 'auto';
+  card.style.opacity = '1'; card.style.pointerEvents = 'auto';
+}
+function closeCard(){
+  shade.style.opacity = '0'; shade.style.pointerEvents = 'none';
+  card.style.opacity = '0'; card.style.pointerEvents = 'none';
+}
+shade.addEventListener('click', closeCard);
+document.getElementById('cardClose').addEventListener('click', closeCard);
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeCard(); });
+</script>
+</body>
+</html>

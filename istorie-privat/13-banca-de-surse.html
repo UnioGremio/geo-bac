@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Banca de surse istorice — Istorie BAC (test)</title>
+<style>
+  :root{
+    --bg:#0c1117; --bg-panel:#131a23; --bg-card:#161e29; --line:#26303c;
+    --ink:#e9e6dd; --ink-dim:#9aa4b0; --gold:#c9a227; --green:#4a8f5c; --blue:#4a7fc9;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; padding-bottom:50px; }
+  .wrap{ max-width:680px; margin:0 auto; padding:0 18px; }
+
+  header{ padding:26px 0 16px; }
+  .eyebrow{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 8px; }
+  h1{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-weight:600; font-size:clamp(22px,5vw,28px); margin:0 0 10px; }
+  .sub{ color:var(--ink-dim); font-size:13.5px; line-height:1.6; margin:0; }
+  .note-box{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; color:var(--gold); background:rgba(201,162,39,.08); border:1px solid var(--gold); border-radius:4px; padding:10px 13px; margin:14px 0; line-height:1.55; }
+
+  .chap-filter{ display:flex; gap:6px; margin:18px 0; flex-wrap:wrap; }
+  .chap-btn{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:11px; background:var(--bg-panel); border:1px solid var(--line); color:var(--ink-dim); padding:7px 11px; border-radius:4px; cursor:pointer; }
+  .chap-btn.active{ color:var(--bg); background:var(--gold); border-color:var(--gold); font-weight:600; }
+
+  .source-card{ background:var(--bg-card); border:1px solid var(--line); border-radius:6px; margin-bottom:14px; overflow:hidden; }
+  .source-card.hidden{ display:none; }
+  .source-head{ padding:14px 16px; cursor:pointer; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .source-head .chap-tag{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10px; color:var(--gold); text-transform:uppercase; letter-spacing:.04em; margin:0 0 4px; }
+  .source-head .src-title{ font-family:'Spectral',Georgia,'Times New Roman',serif; font-size:14.5px; font-weight:600; margin:0; line-height:1.4; }
+  .source-head .chev{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; color:var(--ink-dim); flex:none; transition:transform .15s; }
+  .source-card.open .chev{ transform:rotate(180deg); }
+
+  .source-body{ display:none; padding:0 16px 16px; }
+  .source-card.open .source-body{ display:block; }
+  .source-body .text{ font-size:13.5px; line-height:1.7; font-style:italic; margin:0 0 8px; border-left:2px solid var(--gold); padding-left:12px; }
+  .source-body .credit{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--ink-dim); text-align:right; margin:0 0 14px; }
+  .source-body .origin{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10px; color:var(--ink-dim); margin:0 0 14px; padding:8px 10px; background:var(--bg-panel); border-radius:4px; }
+
+  .practice-title{ font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; color:var(--gold); text-transform:uppercase; letter-spacing:.04em; margin:14px 0 8px; }
+  .practice-q{ font-size:12.5px; line-height:1.6; margin:0 0 8px; color:var(--ink); }
+  .practice-q b{ color:var(--gold); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-weight:600; }
+
+  footer{ padding:30px 0 10px; color:var(--ink-dim); font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:10.5px; text-align:center; }
+</style>
+  <meta name="theme-color" content="#0f0b06">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BAC Istorie">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">geo-bac · Istorie · Bancă de surse</p>
+    <h1>Banca de surse istorice</h1>
+    <p class="sub">Surse reale, extrase din subiecte oficiale de BAC — nu inventate. Citește-le fără presiunea unui examen, ca să te obișnuiești cu tipul de text pe care îl vei primi.</p>
+    <p class="note-box">Fiecare sursă e însoțită de întrebările reale puse despre ea la examen (fără punctaj — sunt aici doar ca exercițiu de citire atentă, nu ca test cronometrat).</p>
+  </header>
+
+  <div class="chap-filter" id="chapFilter"></div>
+  <div id="sourceList"></div>
+
+  <footer>geo-bac · test intern — nu e integrat în site</footer>
+</div>
+
+<script>
+const SOURCES = [
+  {
+    id: 's1', chapter: 'Cap.2 — Autonomii Locale', title: 'Fondarea Moldovei — Dragoș, Bogdan, Petru I Mușat (sec. XIV)',
+    text: `Pentru a nu permite pătrunderea tătarilor în Transilvania, regele Ungariei, Ludovic de Anjou a hotărât să înființeze pe versantul estic al Carpaților o marcă, adică o formațiune politico-militară de apărare. În fruntea acestei formațiuni l-a numit pe Dragoș. [...] Fondarea statului independent Moldova este legată de numele voievodului Bogdan. [...] Bogdan, probabil cu susținerea românilor din Estul Carpaților, l-a îndepărtat pe Balc, urmașul lui Dragoș, de la putere, forțându-l să plece din Moldova. [...] În anul 1364 Ludovic I a trimis o oaste împotriva lui Bogdan, care a fost înfrântă de acesta, astfel că Moldova ieșea de sub dominație ungară. [...] Evenimentul cel mai important în politica externă a lui Petru I Mușat a fost semnarea Tratatului moldo-polon de la Lemberg (Liov). Pentru Moldova, importanța politică a acestui tratat consta în faptul că Petru I Mușat își asigura astfel protecția Poloniei împotriva vechilor pretenții maghiare la pământurile est-carpatice.`,
+    credit: 'I. Țurcanu, Istoria românilor',
+    origin: 'Din subiectul BAC Istorie 2026, Varianta 3 (Subiectul al II-lea)',
+    practice: [
+      'Numiți capitala Moldovei, precizată în sursă (indiciu: Siret).',
+      'Precizați secolul la care se referă sursa.',
+      'Menționați conducătorul răscoalei din Țara Maramureșului și o acțiune a acestuia în Moldova.',
+      'Formulați un punct de vedere referitor la acțiunile conducătorilor Moldovei în perioada 1369-1391, susținut cu două informații din sursă.'
+    ]
+  },
+  {
+    id: 's2', chapter: 'Cap.2 — Autonomii Locale', title: 'Petru Rareș și Moldova în context internațional (sec. XVI)',
+    text: `În Moldova, Petru Rareș (1527-1538, 1541-1546) a întărit domnia, a limitat imunitățile marii boierimi, a sporit siguranța drumurilor, a ridicat importante edificii de apărare și de închinăciune. [...] În conflictul izbucnit în Ungaria după bătălia de la Mohács (1526), domnul a luat inițial partea lui Ferdinand de Habsburg. Când a realizat că acesta ar putea dori și Moldova, Rareș a trecut de partea lui Ioan Zápolya. [...] Ca urmare, în lupta de la Feldioara, din 22 iunie 1529, oștile moldovene înving armatele lui Ferdinand de Habsburg. [...] În 1538, sultanul Suleiman Magnificul [...] s-a îndreptat spre Moldova cu o armată de 150.000-200.000 de oameni. [...] Otomanii au răpit Moldovei cetatea Tighina, transformând-o în raia cu numele de Bender. Boierii, epuizați de lupte, au predat țara sultanului, care l-a numit domn pe Ștefan Lăcustă, fost ostatic la Poartă.`,
+    credit: 'I.A. Pop, I. Bolovan, Marea istorie ilustrată a României și a Republicii Moldova',
+    origin: 'Din subiectul BAC Istorie 2025, Varianta 1 (Subiectul al II-lea)',
+    practice: [
+      'Numiți un domnitor al Moldovei precizat în sursă.',
+      'Menționați lupta din 1529 și o caracteristică a acesteia.',
+      'Menționați două informații referitoare la măsurile luate de domn în politica internă a Moldovei.',
+      'Formulați un punct de vedere referitor la relațiile dintre Moldova și Imperiul Otoman, susținut cu două informații din sursă.'
+    ]
+  },
+  {
+    id: 's3', chapter: 'Cap.4 — Statul Modern', title: 'Convenția de la Paris (1858) — compromisul unirii',
+    text: `În 1858, cele șapte puteri au semnat Convenția de la Paris. [...] Menținute sub suzeranitatea Porții și sub „garanția colectivă” a puterilor, cele două țări urmau „să se administreze liber și în afara oricărei ingerințe a Înaltei Porți”, purtând denumirea de „Principatele Unite ale Moldovei și Țării Românești”, separația administrativ-politică fiind însă menținută mai departe. Fiecare Principat urma să fie condus de câte un domn și miniștrii săi. [...] Domnul urma să fie ales în fiecare țară pe viață de către Adunarea electivă. [...] În ansamblu, Convenția de la Paris, deși nu acorda Unirea, apropia pe români de momentul realizării unificării celor două Principate.`,
+    credit: 'D. Berindei, Istoria românilor',
+    origin: 'Din subiectul BAC Istorie 2026, Varianta 3 (Subiectul I)',
+    practice: [
+      'Precizați, din sursă, o informație referitoare la domn.',
+      'Menționați două spații istorice precizate în sursă.',
+      'Scrieți o relație cauză-efect stabilită între două informații din sursă.'
+    ]
+  },
+  {
+    id: 's4', chapter: 'Cap.4 — Statul Modern', title: 'Domnia lui Cuza — Legea rurală și secularizarea',
+    text: `Începuturile domniei lui Al. I. Cuza au fost anevoioase fiindcă domnul era obligat să colaboreze cu două guverne, unul la Iaşi şi celălalt la Bucureşti. Abia la sfârșitul anului 1861, Imperiul Otoman a recunoscut unirea politico-administrativă a Moldovei cu Țara Românească. [...] O problemă a estompat temporar confruntarea în jurul Legii rurale: secularizarea averilor mănăstirești. Prin legea din 1863 au fost trecute în proprietatea statului „toate averile mănăstirești”. Ca urmare, aproximativ un sfert din teritoriul țării a devenit patrimoniu al statului. [...] Cu scopul de a elimina obstacolele din calea împroprietăririi, Cuza a promulgat o nouă constituție (Statutul Dezvoltător), care întărea puterea domnului în detrimentul legislativului.`,
+    credit: 'F. Constantiniu, O istorie sinceră a poporului român',
+    origin: 'Din subiectul BAC Istorie 2026, Varianta 3 (Subiectul I)',
+    practice: [
+      'Numiți noua constituție precizată în sursă.',
+      'Menționați două spații istorice precizate atât în această sursă, cât și în cea despre Convenția de la Paris.',
+      'Scrieți o relație cauză-efect stabilită între două informații din sursă.'
+    ]
+  },
+  {
+    id: 's5', chapter: 'Cap.4 — Statul Modern', title: 'Revoluția de la 1848 — Proclamația de la Islaz',
+    text: `La 12 mai 1848, la Brașov, revoluționarii moldoveni au redactat programul Prințipiile noastre pentru reformarea patriei, care prevedea împroprietărirea țăranilor fără despăgubire și „unirea Moldovei și a Valahiei într-un singur stat neatârnat românesc”. [...] Declanșarea revoluției la Islaz s-a putut realiza în condiții optime. Au fost de față Ion Heliade Rădulescu, Ștefan Golescu și preotul Radu Șapcă, cel dintâi citind Proclamația. [...] Țara Românească își proclama deplina „neatârnare administrativă și legislativă”. [...] Egalitatea politică a cetățenilor, libertatea „absolută” a tiparului și desființarea rangurilor boierești ofereau temeiul social noii construcții a societății. [...] În fruntea statului rămânea, potrivit Proclamației, un domn, dar „responsabil” și ales pe cinci ani din toate categoriile sociale.`,
+    credit: 'Istoria românilor',
+    origin: 'Din subiectul BAC Istorie 2026, Varianta 2 (sesiune specială, Subiectul al II-lea)',
+    practice: [
+      'Numiți un revoluționar din Țara Românească precizat în sursă.',
+      'Menționați programul elaborat de revoluționarii moldoveni și o prevedere a acestuia.',
+      'Menționați două informații referitoare la Comitetul revoluționar.',
+      'Formulați un punct de vedere referitor la Proclamația de la Islaz, susținut cu două informații din sursă.'
+    ]
+  },
+  {
+    id: 's6', chapter: 'Cap.7 — România Postbelică', title: 'Reforma agrară și industrializarea (guvernul Groza, 1945)',
+    text: `La două săptămâni după instalarea în funcție a guvernului condus de P. Groza, la 23 martie 1945, acesta a emis un decret-lege cu privire la reforma agrară. Decretul-lege prevedea exproprierea tuturor domeniilor de peste 50 de hectare aflate în proprietatea particulară și [...] nu oferea niciun fel de compensații. Confiscarea tuturor utilajelor de pe moșiile expropriate a constituit un aspect semnificativ al reformei, întrucât acestea au fost folosite pentru dotarea noilor centre de închiriere a mașinilor agricole pentru țărani — un pas important spre colectivizarea forțată de mai târziu. [...] Guvernul Groza a dat o atenție primordială industriei, urmând îndeaproape principiile schițate la Conferința Națională a Partidului Comunist din octombrie 1945.`,
+    credit: 'K. Hitchins, România 1866-1947',
+    origin: 'Din subiectul BAC Istorie 2026, Varianta 2 (sesiune specială, Subiectul I)',
+    practice: [
+      'Numiți instituția care a emis decretul-lege din 1945.',
+      'Precizați, din sursă, o informație referitoare la reforma agrară.',
+      'Scrieți o relație cauză-efect stabilită între două informații din sursă.'
+    ]
+  },
+  {
+    id: 's7', chapter: 'Cap.7 — România Postbelică', title: 'Naționalizarea și colectivizarea forțată',
+    text: `În prima etapă, între 1948-1950, s-au „naționalizat”, adică s-au confiscat întreprinderile industriale, bancare, spitale și farmacii, teatre, cinematografe, magazine, locuințe etc. Practic, proprietatea privată a fost desființată. [...] În 1949 a început colectivizarea forțată, adică o confiscare mascată a pământului individual, terminată în 1962, după multe intimidări, abuzuri, arestări și crime. [...] Până la urmă, 96% din pământul arabil făcea parte din „gospodării agricole colective” — G.A.C. [...] Se spunea că pământul și uneltele nu mai aparțineau țăranilor ca persoane, ci comunităților de țărani, când de fapt totul era confiscat și controlat de stat. [...] Partidul Comunist, numit între anii 1948 și 1965 Partidul Muncitoresc Român, controla și dirija totul. În fruntea partidului s-a aflat până în 1965 Gheorghe Gheorghiu-Dej.`,
+    credit: 'I. A. Pop, Scurtă istorie a românilor',
+    origin: 'Din subiectul BAC Istorie 2026, Varianta 2 (sesiune specială, Subiectul I)',
+    practice: [
+      'Menționați un lider politic precizat în sursă.',
+      'Scrieți litera corespunzătoare sursei care susține că planurile cincinale sunt aplicate în domeniul economic (compară cu o altă sursă despre aceeași temă).',
+      'Prezentați două acțiuni desfășurate de România în relațiile internaționale din perioada 1949-1980.'
+    ]
+  },
+  {
+    id: 's8', chapter: 'Cap.8 — Războiul Rece', title: 'Sovietizarea Europei de Est — prudența lui Stalin',
+    text: `Stalin fusese în stare să impună frontierele Europei de Est fără să-și asume un risc ieșit din comun, deoarece armatele sale ocupau deja zonele respective. Însă atunci când a fost vorba să impună regimuri de tip sovietic în aceste teritorii, el s-a dovedit mult mai prudent. Ca urmare, în primii doi ani de după război, numai Iugoslavia și Albania au instituit dictaturi comuniste. Celelalte cinci țări care făceau parte din sfera de influență sovietică — Bulgaria, Cehoslovacia, Polonia, România și Ungaria — au avut guverne de coaliție în care comuniștii erau mai puternici, dar încă nu dețineau supremația. [...] În septembrie 1947, Andrei Jdanov [...] identifica două categorii de state: Iugoslavia, Polonia, Cehoslovacia și Albania erau „noi democrații”; Bulgaria, România și Ungaria erau plasate în altă categorie, fără o etichetă clară.`,
+    credit: 'H. Kissinger, Diplomația',
+    origin: 'Din subiectul BAC Istorie 2025, Varianta 1 (Subiectul I)',
+    practice: [
+      'Numiți un lider politic precizat în sursă.',
+      'Menționați două spații istorice precizate în sursă.',
+      'Scrieți o relație cauză-efect stabilită între două informații din sursă.'
+    ]
+  },
+  {
+    id: 's9', chapter: 'Cap.8 — Războiul Rece', title: 'Fisuri în blocul comunist — Iugoslavia, Albania, România, Praga 1968',
+    text: `Detonatorul primei crize a democrațiilor populare l-a constituit problema iugoslavă. Ruptura dintre Iugoslavia lui Tito și Uniunea Sovietică a devenit evidentă la 1 iulie 1948. [...] În 1961, Albania s-a situat de partea Chinei în conflictul sovieto-chinez şi a rupt relațiile cu URSS. În 1964, conducătorii români au refuzat planul de împărțire a activităților stabilit de Hrușciov, ce condamna România să devină o simplă țară agrară, dezvoltând o critică cu caracter național ce afirma independența României în raport cu URSS. Cu toate acestea, evenimentele cele mai spectaculoase au avut loc în 1968. O viguroasă mișcare de eliberare s-a afirmat chiar în Partidul Comunist Cehoslovac (Primăvara de la Praga). Ca să-i pună capăt, trupe ale Uniunii Sovietice şi a încă patru dintre aliații din Pactul de la Varșovia au invadat Cehoslovacia, pe care au ocupat-o militar.`,
+    credit: 'J. Carpentier, Fr. Lebrun, Istoria Europei',
+    origin: 'Din subiectul BAC Istorie 2025, Varianta 1 (Subiectul I)',
+    practice: [
+      'Precizați, din sursă, o informație referitoare la Primăvara de la Praga.',
+      'Scrieți litera corespunzătoare sursei care susține că planul stabilit de liderul sovietic este refuzat de conducătorii români (compară cu sursa despre Stalin).',
+      'Prezentați două fapte istorice desfășurate în statul român, în perioada 1948-1960.'
+    ]
+  }
+];
+
+const CHAPTERS = [...new Set(SOURCES.map(s => s.chapter))];
+
+function renderFilter(){
+  const el = document.getElementById('chapFilter');
+  el.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'chap-btn active';
+  allBtn.textContent = 'Toate';
+  allBtn.dataset.chap = 'all';
+  allBtn.addEventListener('click', () => selectChapter('all', allBtn));
+  el.appendChild(allBtn);
+
+  CHAPTERS.forEach(ch=>{
+    const b = document.createElement('button');
+    b.className = 'chap-btn';
+    b.textContent = ch;
+    b.dataset.chap = ch;
+    b.addEventListener('click', () => selectChapter(ch, b));
+    el.appendChild(b);
+  });
+}
+function selectChapter(chap, btn){
+  [...document.querySelectorAll('.chap-btn')].forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.source-card').forEach(card=>{
+    card.classList.toggle('hidden', chap !== 'all' && card.dataset.chapter !== chap);
+  });
+}
+
+function renderSources(){
+  const el = document.getElementById('sourceList');
+  el.innerHTML = SOURCES.map(s => `
+    <div class="source-card" id="card-${s.id}" data-chapter="${s.chapter}">
+      <div class="source-head" data-toggle="${s.id}">
+        <div>
+          <p class="chap-tag">${s.chapter}</p>
+          <p class="src-title">${s.title}</p>
+        </div>
+        <span class="chev">▾</span>
+      </div>
+      <div class="source-body">
+        <p class="text">„${s.text}”</p>
+        <p class="credit">${s.credit}</p>
+        <p class="origin">📄 ${s.origin}</p>
+        <p class="practice-title">Întrebări reale puse despre această sursă (practică, fără punctaj)</p>
+        ${s.practice.map((q,i)=>`<p class="practice-q"><b>${i+1}.</b> ${q}</p>`).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('[data-toggle]').forEach(head=>{
+    head.addEventListener('click', ()=>{
+      document.getElementById('card-' + head.dataset.toggle).classList.toggle('open');
+    });
+  });
+}
+
+renderFilter();
+renderSources();
+</script>
+</body>
+</html>
