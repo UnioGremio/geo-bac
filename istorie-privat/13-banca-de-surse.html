@@ -60,11 +60,332 @@
   <div class="chap-filter" id="chapFilter"></div>
   <div id="sourceList"></div>
 
+  <header style="padding-top:34px;border-top:1px solid var(--line);margin-top:26px;">
+    <p class="eyebrow">geo-bac · Istorie · Repere vizuale</p>
+    <h1>Pentru a ști mai mult</h1>
+    <p class="sub">Monumente, obiecte arheologice, clădiri și imagini-document care apar în fotografiile și ilustrațiile manualelor — explicate în câteva propoziții, cu manualul și pagina exacte.</p>
+  </header>
+
+  <div class="chap-filter" id="chapFilter2"></div>
+  <div id="extrasList"></div>
+
   <footer>geo-bac · test intern — nu e integrat în site</footer>
 </div>
 
 <script>
 const SOURCES = [
+  {
+    id: "fix1", chapter: "Cap.7 — România Postbelică",
+    title: "Al. Florian — trenul morții de la Călărași (iulie 1941)",
+    text: `„În noaptea de 6/7 iulie 1941, la Călărași, într-un tren marfar, cu ușile ferecate pentru a ascunde o inimaginabilă încărcătură, după 10 zile de călătorie (...), s-au descărcat în total 1.021 (iudeo-comuniști) ieșeni, dintre care 21 de cadavre și 61 de muribunzi.”`,
+    credit: "Al. Florian, Adevăr istoric și istorie trăită",
+    origin: "Manual Magda Stan, Cristian Vornicu, cls. XII, cap. II — Politica regimurilor autoritare și totalitare (Holocaustul)",
+    practice: []
+  },
+  {
+    id: "fix2", chapter: "Cap.6 — Secolul XX: Democrație și Totalitarism",
+    title: "Poziția Partidului Social Democrat față de actul de la 8 iunie 1930",
+    text: `„[...] muncitorimea organizată nu are de apărat sau afirmat niciun interes de ordin dinastic. Republicană prin program sau convingere, ea consideră cele petrecute la 8 iunie 1930 un fapt împlinit. Neavând niciun motiv de a opri ordinea constituțională stabilită de liberali, ea nu este împinsă nici la statornicirea ordinei noi statornicite de parlamentul național-țărănesc, după cum pe de altă parte, nimic nou nu o determină să o susțină.”`,
+    credit: "Poziția Partidului Social Democrat față de actul de la 8 iunie 1930 (revenirea lui Carol al II-lea)",
+    origin: "Manual Magda Stan, Cristian Vornicu, cls. XII, cap. II — Studiu de caz, Construcția democrației și ideologia totalitară",
+    practice: []
+  },
+  {
+    id: "zp3_1", chapter: "Cap.6 — Secolul XX: Democrație și Totalitarism",
+    title: "Jean-François Soulet despre „brevetul de democrație” al comunismului",
+    text: `„Adeptă a respectării identității naționale, protectoare a populațiilor oprimate, întemeiată pe egalitate și dreptate, ideologia comunistă apărea, mai ales la sfârșitul celui de-al Doilea Război Mondial, ca un vector privilegiat al democrației. (…) Prin participarea la lupta împotriva regimurilor fasciste, comuniștii primiseră astfel un «brevet de democrație». Regimurile nou-înființate (…) erau, de altfel, calificate drept «democrații populare». Această alunecare terminologică a contribuit mult la aura comunismului imediat după război.”`,
+    credit: "Jean-François Soulet, Istoria comparată a statelor comuniste din 1945 până în zilele noastre",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 2 — Lecție de sinteză, Totalitarism și democrație",
+    practice: []
+  },
+  {
+    id: "zp3_2", chapter: "Cap.7 — România Postbelică",
+    title: "Florin Constantiniu — falsificarea alegerilor din 1946, cifre reale vs. oficiale",
+    text: `„Emil Bodnăraș cunoștea, desigur, principiul lui Stalin: «Nu contează cine și cum votează, contează cine numără voturile» atunci când spunea că, grație unor «tehnici speciale» pot fi obținute 90% din voturi. (…) Lucrețiu Pătrășcanu, care îi ceruse lui Teohari Georgescu (…) să i le arate, a primit răspunsul că ele fuseseră arse și că, de acum înainte, contau numai cifrele comunicate oficial, care atribuiau 79,96% din voturi Blocului Partidelor Democratice. Istoricul Virgiliu Țîrău a descoperit și publicat rezultatele reale pentru județele Cluj, Someș și Turda: pentru Someș, Blocul Partidelor Democratice obținea real 22,8%, cifra oficială fiind 67,9%; PNȚ-Maniu obținea real 51,6%, cifra oficială fiind doar 11,1%.”`,
+    credit: "Florin Constantiniu, România între 1944 și 1989",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 2 — Lecție de sinteză, Totalitarism și democrație",
+    practice: []
+  },
+  {
+    id: "zp3_3", chapter: "Cap.3 — Diplomație și Conflict",
+    title: "Laonic Chalcocondil despre Iancu de Hunedoara",
+    text: `„Și a fost acest bărbat foarte destoinic întru toate și de jos s-a ridicat la mare putere și a săvârșit isprăvi în contra germanilor și a boemilor și, ajungând la conducerea treburilor obștești la peoni, și-a câștigat mare renume. Dar încă și față de turci a săvârșit nu puține isprăvi mari, deși se credea că din cauza mulțimii și vitejiei lor nu o să biruiască niciodată armata împăratului.”`,
+    credit: "Laonic Chalcocondil, Expuneri istorice",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Spațiul românesc între diplomație și conflict",
+    practice: []
+  },
+  {
+    id: "zp3_4", chapter: "Cap.3 — Diplomație și Conflict",
+    title: "Ducas — expediția otomană din 1462 împotriva lui Vlad Țepeș",
+    text: `„Dar vlachul (Vlad Țepeș) și el i-a mutat pe toți supușii lui în locuri strâmte de munte și în locuri acoperite de păduri (…). Tiranul (Mehmet al II-lea), trecând Danubiul, a străbătut loc mai bine de 7 zile și n-a găsit nimic, nici om, nici cel mai neînsemnat animal (…). Și ajungând într-un loc frumos așezat ca o livadă vede mii și mii de pari sădiți în pământ încărcați în loc de fruct cu oameni morți (…). Vlachul însă, sculându-se dis-de-dimineață (…) a năvălit, când era încă întuneric, și (…) până în ziuă a tăiat turci fără de număr.”`,
+    credit: "Ducas, Istoria turco-bizantină (1341-1462)",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Spațiul românesc între diplomație și conflict",
+    practice: []
+  },
+  {
+    id: "zp3_5", chapter: "Cap.3 — Diplomație și Conflict",
+    title: "Ștefan cel Mare — Solia lui Grigore Țamblac la Veneția (1478)",
+    text: `„Nu vreau să mai spun cât de folositoare este pentru treburile creștine această țară a mea; socotesc că este de prisos, fiindcă lucrul e foarte evident, pentru că e seraiul Ungariei și Poloniei și straja acestor două regate. Afară de aceasta, fiindcă turcul s-a împiedicat de mine, de patru ani mulți creștini au rămas în liniște. Așadar, ca domni creștini și cunoscuți ca creștini, eu recurg la ilustra domnia voastră implorând ajutorul vostru creștinesc.”`,
+    credit: "Documentele lui Ștefan cel Mare, publicate de Ioan Bogdan",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Spațiul românesc între diplomație și conflict",
+    practice: []
+  },
+  {
+    id: "zp3_6", chapter: "Cap.3 — Diplomație și Conflict",
+    title: "Ștefan cel Mare — scrisoarea din 25 ianuarie 1475 către principii creștini",
+    text: `„Noi pentru apărare am luat spada în mână și, cu ajutorul domnului Dumnezeu, am mers asupra lor și i-am călcat în picioare (…). Și după ce a auzit de această înfrângere, păgânul împărat al turcilor și-a pus în plan să se răzbune (…) și să supună țara noastră, care e poarta tuturor creștinilor (…). Dacă această poartă va fi pierdută, (…) toată creștinătatea va fi în mare primejdie. De aceea noi ne rugăm la amabilitatea voastră să ne trimiteți în ajutorul nostru pe căpitanii voștri contra dușmanilor creștinătății.”`,
+    credit: "Scrisoarea lui Ștefan cel Mare din 25 ianuarie 1475",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Spațiul românesc între diplomație și conflict",
+    practice: []
+  },
+  {
+    id: "zp3_7", chapter: "Cap.3 — Diplomație și Conflict",
+    title: "Memoriul lui Mihai Viteazul către Rudolf al II-lea (1601)",
+    text: `„Provincia mea, Țara Românească, nu e mai departe de scaunul tiranului, ce se numește Constantinopol, decât cale de cinci zile și numai Dunărea o desparte de teritoriul dușmanului. În această țară aș fi putut trăi liniștit, singur și fără nicio frică, dacă nu mă simțeam chemat de credința mea față de Maiestatea Voastră și față de întreaga Creștinătate. (…) de bună voie m-am arătat gata a lua parte la Liga Creștină, fapt prin care mi l-am făcut pe tiran dușman de moarte și însetat după sângele meu.”`,
+    credit: "Memoriul adresat de Mihai Viteazul în 1601 împăratului Rudolf al II-lea",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Spațiul românesc între diplomație și conflict",
+    practice: []
+  },
+  {
+    id: "zp3_8", chapter: "Cap.3 — Diplomație și Conflict",
+    title: "Baltazar Walter despre lupta de la Călugăreni (1595)",
+    text: `„Era nevoie neapărat în clipa aceea de o acțiune eroică (…). Mărinimosul Ion Mihai, invocând ocrotirea salvatoare a Mântuitorului, a smuls o secure sau suliță ostășească și, pătrunzând el însuși în șirurile sălbatice ale dușmanilor, străpunge pe un stegar al armatei (…). Sinan Pașa (…) cade de pe podul râului Neajlov, pierde doi dinți și se rostogolește fericit scăpând cu viață.”`,
+    credit: "Scurtă și adevărată descriere a faptelor săvârșite de Io Mihai, de Baltazar Walter cel Tânăr Silezianul, Görlitz, 1599",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Spațiul românesc între diplomație și conflict",
+    practice: []
+  },
+  {
+    id: "zp3_9", chapter: "Cap.5 — Concertul European",
+    title: "Rezoluția Adunării ad-hoc a Moldovei (19 octombrie 1857)",
+    text: `„Respectarea drepturilor principatelor și îndeosebi a autonomiei lor, în cuprinderea vechilor capitulații încheiate cu Înalta Poartă. Unirea Principatelor într-un singur stat sub numele de România. Prinț străin cu moștenirea tronului, ales dintr-o dinastie domnitoare a Europei (…). Neutralitatea pământului Principatelor. Puterea legiuitoare încredințată unei obștești adunări (…). Toate acestea sub garanția colectivă a puterilor care au subscris Tratatul de la Paris.”`,
+    credit: "Rezoluția Adunării ad-hoc a Moldovei, 19 octombrie 1857",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — România și concertul european",
+    practice: []
+  },
+  {
+    id: "zp3_10", chapter: "Cap.5 — Concertul European",
+    title: "Memoriul românilor la Congresul de la Berlin (1878)",
+    text: `„România, prin subsemnații, își ia libertatea de a supune plenipotențiarilor Marilor Puteri punctele următoare: 1. Nicio parte a actualului teritoriu să nu fie detașată de România. 2. Pământul românesc să nu fie supus unui drept de trecere în folosul armatei ruse. 3. Principatul (…) să intre în posesia insulelor și gurilor Dunării, inclusiv Insula Șerpilor. (…) 5. Independența sa să fie definitiv consacrată și teritoriul să fie neutralizat.”`,
+    credit: "Memoriu prezentat Congresului de la Berlin de reprezentanții României, 12/24 iunie 1878",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — România și concertul european",
+    practice: []
+  },
+  {
+    id: "zp3_11", chapter: "Cap.5 — Concertul European",
+    title: "Tratatul de la Berlin — recunoașterea independenței României (1878)",
+    text: `„Art. 43. Înaltele părți contractante recunosc independența României. (…) Art. 45. Principatul României retrocedează M.S. împăratului Rusiei porțiunea teritoriului Basarabiei (…). Art. 46. Insulele formând Delta Dunării, precum și Insula Șerpilor (…) sunt întrupate cu România. Principatul mai primește afară de aceasta ținutul situat la sudul Dobrogei.”`,
+    credit: "Tratatul de pace de la Berlin, 1878",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — România și concertul european",
+    practice: []
+  },
+  {
+    id: "zp3_12", chapter: "Cap.5 — Concertul European",
+    title: "Nicolae Iorga despre alianța cu Austro-Ungaria (interviu)",
+    text: `„Eu sunt și acum împotriva unei alianțe cu Austro-Ungaria. Cu cine să te aliezi? Cu jumătatea austriacă, ce nu înseamnă nimic, sau cu jumătatea ungară, care ne este ostilă? (…) Noi nu ne-am menținut prin protecția ei și nici nu vom pieri fără această protecție. «Ajută-te singur, atunci te vor ajuta și aliații tăi», aceasta este linia de orientare pe care trebuie să o urmăm.”`,
+    credit: "Interviu acordat de Nicolae Iorga despre politica externă a României",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — România și concertul european",
+    practice: []
+  },
+  {
+    id: "zp3_13", chapter: "Cap.5 — Concertul European",
+    title: "Tratatul secret România–Austro-Ungaria (1883)",
+    text: `„Art. 1. Înaltele părți contractante își făgăduiesc pace și prietenie (…). Art. 2. Dacă România va fi atacată fără ca din partea ei să fi existat vreo provocare, Austro-Ungaria va trebui să-i acorde în timp util ajutor și asistență împotriva agresorului. (…) va fi îndată «casus foederis» pentru România.”`,
+    credit: "Tratatul secret încheiat între România și Austro-Ungaria, Viena, 18/30 octombrie 1883",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — România și concertul european",
+    practice: []
+  },
+  {
+    id: "zp3_14", chapter: "Cap.5 — Concertul European",
+    title: "Convenția de alianță defensivă România–Polonia (1921)",
+    text: `„Bine hotărâți să apere pacea dobândită cu prețul atâtor sacrificii (…). Art. 1. Polonia și România se obligă să se ajute reciproc în cazul când una din ele ar fi atacată, fără provocare din parte-i, pe frontierele comune de la răsărit. (…) Art. 2. În scop de a coordona sforțările lor pașnice, cele două guverne se obligă să se sfătuiască în privința chestiunilor de politică externă.”`,
+    credit: "Convenția de alianță defensivă între Regatul României și Republica Poloniei, București, 3 martie 1921",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Marile alianțe ale secolului XX",
+    practice: []
+  },
+  {
+    id: "zp3_15", chapter: "Cap.5 — Concertul European",
+    title: "Convenția de alianță defensivă România–Cehoslovacia (1921)",
+    text: `„Bine hotărâți a păstra pacea dobândită cu prețul atâtor sacrificii și prevăzută prin Pactul Societății Națiunilor, precum și ordinea stabilită prin Tratatul încheiat la Trianon (…). Art. 1. În cazul unui atac, neprovocat, din partea Ungariei, contra uneia din Înaltele părți contractante, cealaltă parte se obligă a veni în ajutorul părții atacate. (…) Art. 3. Niciuna din Înaltele părți contractante nu va putea încheia vreo alianță cu o terță putere fără avizul prealabil al celeilalte.”`,
+    credit: "Convenția de alianță defensivă între România și Cehoslovacia, București, 22 aprilie 1921",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Marile alianțe ale secolului XX",
+    practice: []
+  },
+  {
+    id: "zp3_16", chapter: "Cap.5 — Concertul European",
+    title: "Nicolae Titulescu — discurs la Societatea Națiunilor (1930)",
+    text: `„Toate națiunile, fără excepție, întâmpină în clipa de față dificultăți, mai ales de ordin economic, așa încât nesoluționarea unei probleme poate să atragă un regres periculos pentru civilizație. Nu mă îndoiesc nicidecum de triumful cooperării internaționale asupra tuturor năpastelor ce ne amenință din umbră, cu condiția ca fiecare să aducă aici, în opera de colaborare, cele trei elemente fără de care nimic măreț nu poate fi înfăptuit: dorința de înțelegere, voința și generozitatea. A trecut ceasul vorbelor; a sunat ceasul faptelor.”`,
+    credit: "Discursul lui Nicolae Titulescu la deschiderea celei de a XI-a sesiuni a Adunării Societății Națiunilor, Geneva, 10 septembrie 1930",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Voci ale diplomației românești",
+    practice: []
+  },
+  {
+    id: "zp3_17", chapter: "Cap.5 — Concertul European",
+    title: "Mesajul radio Praga despre loialitatea României (1938)",
+    text: `„În aceste clipe grele, politica României a dovedit calități cu adevărat cavalerești. Numai la nevoie se cunosc prietenii adevărați; și poporul ceh împreună cu cel slovac au avut, în nenorocirea lor, mângâierea de a putea constata lealitatea desăvârșită a României și a nobilului ei rege. Cehoslovacii nu vor uita niciodată dovezile de cinste și credință date de poporul român.”`,
+    credit: "Mesajul oficial difuzat de postul de radio Praga în legătură cu poziția României față de Cehoslovacia, 2 noiembrie 1938",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Marile alianțe ale secolului XX",
+    practice: []
+  },
+  {
+    id: "zp3_18", chapter: "Cap.5 — Concertul European",
+    title: "Mihail Manoilescu despre Arbitrajul de la Viena (1940)",
+    text: `„Este îngrozitor, ni se cere un arbitraj pe care trebuie să-l acceptăm până astă seară (…). Dacă nu îl acceptăm, va fi sfârșitul României. Mi-au spus-o clar. (…) Veni apoi momentul culminant. Pe masă stătea împăturită harta, ca o sentință de moarte (…). Am urmărit cu ochii granița care pornea de la Oradea către răsărit (…) și am înțeles că cuprindea și Clujul (…). Când mi-am dat seama că granița coboară ca să cuprindă Secuimea, am mai avut în disperarea mea un singur gând: Brașovul!”`,
+    credit: "Mihail Manoilescu, ministrul de externe al României în 1940, despre Arbitrajul de la Viena",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Marile alianțe ale secolului XX",
+    practice: []
+  },
+  {
+    id: "zp3_19", chapter: "Cap.5 — Concertul European",
+    title: "Regele Carol al II-lea despre cedările teritoriale (jurnal, 1943)",
+    text: `„Am făcut greșeala de a-mi apleca urechea la cei fricoși și îndeosebi la Urdăreanu, care în acel moment se făcuseră campionii închinării, de frică, în fața aroganței germane. E adevărat că România ar fi suferit, dar nu mai mult decât acum, dar cel puțin n-ar fi fost umilită.”`,
+    credit: "Regele Carol al II-lea, Jurnal, 16 octombrie 1943",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Marile alianțe ale secolului XX",
+    practice: []
+  },
+  {
+    id: "zp3_20", chapter: "Cap.5 — Concertul European",
+    title: "Proclamația regelui Mihai I către țară (23 august 1944)",
+    text: `„Români, În ceasul cel mai greu al istoriei noastre, am socotit, în deplină înțelegere cu poporul meu, că nu este decât o singură cale pentru salvarea țării de la o catastrofă totală: ieșirea noastră din alianța cu puterile Axei și imediata încetare a războiului cu Națiunile Unite.”`,
+    credit: "Proclamația regelui Mihai I către țară, 23 august 1944",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Marile alianțe ale secolului XX",
+    practice: []
+  },
+  {
+    id: "zp3_21", chapter: "Cap.5 — Concertul European",
+    title: "Dimitrie Cantemir despre răscumpărarea cu bani a libertății Moldovei",
+    text: `„Din vremea când oștile turcești s-au ivit la malurile Dunării și până în vremea lui Ștefan cel Mare, moldovenii și-au apărat vitejește slobozenia (…). Căci domnii noștri cei înțelepți, având putința să răscumpere cu bani suferințele, urmând pilda senatului venețian, atât de vestit pentru înțelepciunea lui în trebile politicești, mai bucuroși au voit să-și îndurereze punga decât țara și supușii.”`,
+    credit: "Dimitrie Cantemir, Descrierea Moldovei",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Voci ale diplomației românești: Dimitrie Cantemir",
+    practice: []
+  },
+  {
+    id: "zp3_22", chapter: "Cap.5 — Concertul European",
+    title: "Take Ionescu despre constituirea Comitetului Național Român (1918)",
+    text: `„Și acum, iubiți frați, cu gândul îndreptat spre Cer, cu inima întoarsă către frații din toate părțile, înalț o sfântă rugare către Dumnezeul părinților noștri. Îl rog fierbinte să binecuvânteze unirea sacră a tuturor românilor. Înainte, iubiți frați! Înainte, până în ceasul când ochii noștri vor putea vedea tricolorul nostru peste cetatea din Alba-Iulia! Trăiască România Mare!”`,
+    credit: "Take Ionescu, despre constituirea Comitetului Național Român, 6 septembrie 1918, Paris",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Voci ale diplomației românești: Take Ionescu",
+    practice: []
+  },
+  {
+    id: "zp3_23", chapter: "Cap.5 — Concertul European",
+    title: "Take Ionescu despre conceptul Micii Înțelegeri",
+    text: `„O simplă privire pe această nouă hartă (a Europei) arăta până la evidență ce formidabil zid de apărare însemna alianța celor cinci state (…). Germania nu e moartă. O vom găsi în curând iarăși gata de a relua ostilitățile. (…) «crearea – în locul Rusiei anarhizate – a unei alianțe de Răsărit din cele cinci națiuni noi care să închidă drumul Germaniei: Polonia, Cehoslovacia, România, Serbia și Grecia. Unirea între aceste popoare trebuie menținută cu orice preț.»”`,
+    credit: "Constantin Xeni, Take Ionescu",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Voci ale diplomației românești: Take Ionescu",
+    practice: []
+  },
+  {
+    id: "zp3_24", chapter: "Cap.5 — Concertul European",
+    title: "Édouard Herriot despre Nicolae Titulescu",
+    text: `„Acest ministru al unei țări mici face politică în stil mare. Ce om uimitor! În politica externă e îmbarcat pe o firavă luntrișoară, pe care o conduce ca pe un vapor mare, în politica internă stă călare pe o scândură putrezită, căreia până la urmă îi dă o stabilitate de stâncă.”`,
+    credit: "Édouard Herriot, premier francez, despre Nicolae Titulescu",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Voci ale diplomației românești: Nicolae Titulescu",
+    practice: []
+  },
+  {
+    id: "zp3_25", chapter: "Cap.5 — Concertul European",
+    title: "Pactul Înțelegerii Balcanice — text integral articole (1934)",
+    text: `„Art. 1. Grecia, România, Turcia și Iugoslavia își garantează mutual siguranța tuturor fruntariilor lor balcanice. Art. 2. Înaltele părți contractante se obligă să se sfătuiască asupra măsurilor de luat (…) și să nu întreprindă nicio acțiune politică față de orice țară balcanică, nesemnatară a prezentului acord, fără avizul mutual prealabil. Art. 3. Prezentul acord va fi deschis oricărei alte țări balcanice.”`,
+    credit: "Pactul Înțelegerii Balcanice, semnat la 9 februarie 1934 în Aula Academiei din Atena",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Voci ale diplomației românești: Nicolae Titulescu",
+    practice: []
+  },
+  {
+    id: "zp3_26", chapter: "Cap.5 — Concertul European",
+    title: "Nicolae Titulescu — intervenție la Societatea Națiunilor despre Etiopia (1935)",
+    text: `„Domnul Titulescu (România) crede, după ce a ascultat cu atenție pe domnii Eden și Coulondre, că se găsește în fața a două păreri concordante. Se propune, cu titlu de sancțiune economică (…) instituirea embargoului asupra exporturilor italiene de orice fel (…). Cu cât compensațiile care vor fi prevăzute vor fi juste, cu atât țări ca România vor aplica sancțiunile cu o rigoare care le va face eficace pentru cel mai mare bine al păcii.”`,
+    credit: "Nicolae Titulescu, intervenție la Societatea Națiunilor, Geneva, 12 octombrie 1935",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Voci ale diplomației românești: Nicolae Titulescu",
+    practice: []
+  },
+  {
+    id: "zp3_27", chapter: "Cap.8 — Războiul Rece",
+    title: "Tratatul de pace al României cu Puterile Aliate (1947)",
+    text: `„Art. 1. Frontierele României (…) vor fi și cele care erau în ființă la 1 ianuarie 1941, cu excepția frontierei româno-ungare (…). Frontiera sovieto-română este astfel fixată în conformitate cu Acordul sovieto-român din 20 iunie 1940. Art. 2. Hotărârile sentinței de la Viena din 30 august 1940 sunt declarate nule și neavenite. Frontiera dintre România și Ungaria este restabilită (…) cum exista la 1 ianuarie 1938.”`,
+    credit: "Tratatul de pace între România și Puterile Aliate și Asociate, 10 februarie 1947",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — România în perioada Războiului Rece",
+    practice: []
+  },
+  {
+    id: "zp3_28", chapter: "Cap.8 — Războiul Rece",
+    title: "George Marshall — discursul de la Harvard (1947)",
+    text: `„Este logic ca Statele Unite ale Americii să facă tot ce le stă în putere pentru a ajuta lumea să-și regăsească sănătatea economică normală, fără de care aceasta nu poate dobândi nici stabilitatea politică, nici pace asigurată. Acțiunea noastră nu este îndreptată împotriva niciunei țări, niciunei doctrine, ci împotriva foametei, sărăciei, disperării și haosului.”`,
+    credit: "Planul Marshall, discursul secretarului de stat la Universitatea Harvard, iunie 1947",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — România în perioada Războiului Rece",
+    practice: []
+  },
+  {
+    id: "zp3_29", chapter: "Cap.8 — Războiul Rece",
+    title: "Winston Churchill — discursul de la Fulton, „Cortina de Fier” (1946)",
+    text: `„De la Stettin, în Baltica, la Triest, în Adriatica, o cortină de fier a căzut peste continent. În spatele ei se găsesc capitalele tuturor țărilor Europei Orientale: Varșovia, Berlin, Praga, Viena, Budapesta, București, Sofia. Toate aceste orașe celebre, toate aceste națiuni se găsesc în sfera sovietică și toate sunt supuse (…) nu doar unei influențe sovietice, dar și controlului foarte strâns și în continuă creștere al Moscovei.”`,
+    credit: "Winston Churchill, discurs la Universitatea din Fulton, Missouri, 5 martie 1946",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — România în perioada Războiului Rece",
+    practice: []
+  },
+  {
+    id: "zp3_30", chapter: "Cap.8 — Războiul Rece",
+    title: "Statutul CAER (1949)",
+    text: `„1. Consiliul de Ajutor Economic Reciproc are ca scop să contribuie (…) la dezvoltarea planificată a economiei naționale, la accelerarea progresului economic și tehnic în aceste țări (…). 2. CAER este fondat pe baza egalității suverane a tuturor țărilor membre (…) potrivit principiilor egalității depline în drepturi, respectării suveranității și intereselor naționale, ale avantajului reciproc și ajutorului reciproc tovărășesc.”`,
+    credit: "Statutul CAER, Sofia, 14 decembrie 1949",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — România în perioada Războiului Rece",
+    practice: []
+  },
+  {
+    id: "zp3_31", chapter: "Cap.8 — Războiul Rece",
+    title: "Nikita Hrușciov despre retragerea trupelor sovietice din România (memorii)",
+    text: `„Cu cât mă gândeam mai mult la această problemă, cu atât mi se părea mai rațional să retragem cele câteva divizii pe care le aveam în România și să le cantonăm în apropiere, în Moldova și Ucraina (…). I-am informat pe tovarășii români de schimbarea condițiilor și acum ne aflăm în poziția de a retrage trupele din țara lor fără a ne expune.”`,
+    credit: "Nikita Hrușciov, Memorii",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — România în perioada Războiului Rece",
+    practice: []
+  },
+  {
+    id: "zp3_32", chapter: "Cap.8 — Războiul Rece",
+    title: "Declarația din aprilie a PMR (1964) — text extins",
+    text: `„Promovând pe arena internațională un sistem de relații calitativ nou (…), partidele comuniste și muncitorești din țările socialiste au așezat la baza acestor relații principiile independenței și suveranității naționale, egalității în drepturi, avantajului reciproc, întrajutorării tovărășești, neamestecului în treburile interne (…). Dată fiind diversitatea condițiilor de construcție socialistă nu există și nu pot exista tipare sau rețete unice, nimeni nu poate hotărî ce este just și ce nu pentru alte țări sau partide.”`,
+    credit: "Declarația cu privire la poziția PMR în problemele mișcării comuniste și muncitorești internaționale, Plenara CC al PMR, aprilie 1964",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Diplomația românească între Varșovia și UE",
+    practice: []
+  },
+  {
+    id: "zp3_33", chapter: "Cap.8 — Războiul Rece",
+    title: "Imre Nagy — Declarația de neutralitate a Ungariei (1956)",
+    text: `„Poporul ungar dorește să întrețină, în conformitate cu spiritul Cartei Națiunilor Unite, în deplină independență și egalitate, o amiciție sinceră cu vecinii săi, cu Uniunea Sovietică și cu toate popoarele lumii. Poporul ungar dorește să consolideze și să dezvolte rezultatele obținute prin revoluția sa națională, fără a intra într-unul sau altul dintre blocurile conduse de marile puteri.”`,
+    credit: "Declarația de neutralitate a Ungariei, citită la radio de Imre Nagy, 1 noiembrie 1956",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Diplomația românească între Varșovia și UE",
+    practice: []
+  },
+  {
+    id: "zp3_34", chapter: "Cap.8 — Războiul Rece",
+    title: "Raportul Comitetului special al ONU despre Ungaria (1956)",
+    text: `„Studierea mișcărilor de trupe sovietice în Ungaria în perioada 29 octombrie–4 noiembrie arată că, în ciuda asigurărilor date domnului Nagy, președintele Consiliului, de către personalități sovietice, există un plan precis de recucerire și aservire militară a Ungariei. Acest plan a fost integral executat.”`,
+    credit: "Raportul Comitetului special al ONU privind Ungaria, 1956",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Diplomația românească între Varșovia și UE",
+    practice: []
+  },
+  {
+    id: "zp3_35", chapter: "Cap.8 — Războiul Rece",
+    title: "Florin Constantiniu despre Ceaușescu și independență",
+    text: `„Ceaușescu mai păstra din începuturile sale de țăran, devenit cizmar, doar preferințele pentru romanțe și cântece de pahar. Ceea ce la Dej era un capăt de linie, pentru el era începutul. Nicolae Ceaușescu a fost un Ion al Glanetașului în politică. (…) tot astfel Nicolae Ceaușescu a fost un obsedat al independenței, sfârșind prin a face din ea un fetiș, căruia i-a sacrificat în final, primitiv și brutal, interesul național.”`,
+    credit: "Florin Constantiniu, O istorie sinceră a poporului român, 2002",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Diplomația românească între Varșovia și UE",
+    practice: []
+  },
+  {
+    id: "zp3_36", chapter: "Cap.8 — Războiul Rece",
+    title: "Conferința de la Helsinki — Declarația privind principiile (1975)",
+    text: `„Statele participante declară hotărârea lor de a respecta și de a pune în practică principiile următoare: 1. Egalitatea suverană, respectarea drepturilor inerente suveranității. 2. Nerecurgerea la forță sau la amenințarea cu forța. 3. Inviolabilitatea frontierelor. 4. Integritatea teritorială a statelor. (…) 7. Respectarea drepturilor omului și libertăților fundamentale (…). 8. Egalitatea în drepturi a popoarelor și dreptul popoarelor de a dispune de ele însele.”`,
+    credit: "Conferința pentru securitate și cooperare în Europa, Helsinki, 1975",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — România în perioada Războiului Rece",
+    practice: []
+  },
+  {
+    id: "zp3_37", chapter: "Cap.8 — Războiul Rece",
+    title: "Tratatul de la Maastricht — articole fondatoare (1992)",
+    text: `„Art. 1. Prin acest tratat, înaltele părți contractante stabilesc între ele o Uniune Europeană. Acest tratat marchează o nouă etapă în procesul de creare a unei uniuni și mai puternice, între popoarele Europei, în care deciziile sunt luate cât mai aproape de cetățeni. Uniunea se întemeiază pe comunitățile europene, suplimentate prin politici și forme de cooperare instituite de prezentul tratat.”`,
+    credit: "Tratatul de la Maastricht, 1992",
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4 — Studiu de caz, Diplomația românească între Varșovia și UE",
+    practice: []
+  },
   {
     id: "zp2_1", chapter: "Cap.10 — Oamenii, Societatea, Lumea Ideilor",
     title: "Contele d'Hauterive despre „indolența voluntară” a țăranului moldovean (1787)",
@@ -3492,6 +3813,238 @@ Art.24. Divanul, este cea mai înaltă instanță.”`,
   }
 ];
 
+const EXTRAS = [
+  {
+    id: "ex1", chapter: "Cap.1 — Romanitatea",
+    title: "Car recipient de bronz de la Bujoru",
+    text: `Piesă de bronz folosită ca recipient ritual în formă de car, descoperită la Bujoru, jud. Teleorman — ilustrează nivelul tehnic al prelucrării metalelor la geto-daci, înainte de cucerirea romană.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 5"
+  },
+  {
+    id: "ex2", chapter: "Cap.1 — Romanitatea",
+    title: "Structura zidului dacic (murus dacicus)",
+    text: `Reconstituire a tehnicii de construcție a zidului dacic — ziduri din piatră cu umplutură de piatră și lemn între două paramente, folosite la cetățile din Munții Orăștiei; după unii istorici, sistemul nu avea egal în Europa acelor vremuri.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 6"
+  },
+  {
+    id: "ex3", chapter: "Cap.1 — Romanitatea",
+    title: "Colonia Ulpia Traiana Augusta Dacica Sarmizegetusa",
+    text: `Reconstituire virtuală a capitalei provinciei Dacia, fondată de Traian după cucerirea romană — centru administrativ, cu forum, temple și clădiri publice, ridicat în apropierea cetății dacice distruse.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 9"
+  },
+  {
+    id: "ex4", chapter: "Cap.1 — Romanitatea",
+    title: "Ruinele amfiteatrului de la Sarmizegetusa",
+    text: `Rămășițele amfiteatrului roman al capitalei Daciei — construcție publică destinată jocurilor și spectacolelor, dovadă a adaptării vieții provinciale la modelul urban roman.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 11"
+  },
+  {
+    id: "ex5", chapter: "Cap.1 — Romanitatea",
+    title: "Complexul termal roman de la Germisara",
+    text: `Instalații termale romane descoperite la Geoagiu (jud. Hunedoara), alimentate de izvoare calde naturale — exemplu de infrastructură civilă romană de tip balnear în provincia Dacia.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 12"
+  },
+  {
+    id: "ex6", chapter: "Cap.1 — Romanitatea",
+    title: "Fragment din candelabrul de bronz de la Biertan",
+    text: `Piesă de bronz din sec. IV d.Hr. (jud. Sibiu), cu inscripția latină „Ego Zenovius votum posui” („Eu, Zenovius, am pus această ofrandă”) — una dintre cele mai timpurii mărturii ale creștinismului în mediul daco-roman.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 14"
+  },
+  {
+    id: "ex7", chapter: "Cap.1 — Romanitatea",
+    title: "Tezaurul de obiecte liturgice de la Sucidava",
+    text: `Piese de argint din sec. V-VII descoperite la Sucidava — vase și obiecte liturgice creștine care atestă continuitatea vieții religioase organizate la nordul Dunării după retragerea romană.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 15"
+  },
+  {
+    id: "ex8", chapter: "Cap.1 — Romanitatea",
+    title: "Cana de argint din mormântul principelui gepid Omharus",
+    text: `Piesă de argint descoperită la Apahida, în mormântul unui conducător gepid — mărturie arheologică a prezenței populațiilor migratoare în Transilvania secolelor V-VI, coexistând cu populația daco-romană.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 15"
+  },
+  {
+    id: "ex9", chapter: "Cap.1 — Romanitatea",
+    title: "Vasul din aur și argint de la Sânnicolau Mare",
+    text: `Piesă din tezaurul descoperit la Sânnicolau Mare (jud. Timiș), datat în secolele IX-X — unul dintre cele mai valoroase tezaure de orfevrărie din perioada formării limbii și poporului român.`,
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 1, p. 15"
+  },
+  {
+    id: "ex10", chapter: "Cap.1 — Romanitatea",
+    title: "Blazonul dinastiei macedonene",
+    text: `Emblema heraldică a dinastiei macedonene bizantine, din care a făcut parte împăratul Constantin al VII-lea Porfirogenetul (912-959) — autorul primelor scrieri bizantine care amintesc originea romană a poporului român.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 16"
+  },
+  {
+    id: "ex11", chapter: "Cap.1 — Romanitatea",
+    title: "Harta Marea Neagră și Imperiul scitic în antichitate",
+    text: `Hartă istorică reprezentând teritoriile Marii Negre sub stăpânire scitică, cu populațiile vecine (traci, sarmați, asirieni) — folosită pentru a ilustra teza lui Gh. I. Brătianu despre importanța strategică a bazinului pontic.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 25"
+  },
+  {
+    id: "ex12", chapter: "Cap.1 — Romanitatea",
+    title: "Harta marilor descoperiri geografice",
+    text: `Hartă sintetică a principalelor trasee ale exploratorilor europeni (Columb, Vasco da Gama, Magellan, Marco Polo) între secolele XIII-XVI — ilustrează formarea primelor rute comerciale globale.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 29"
+  },
+  {
+    id: "ex13", chapter: "Cap.1 — Romanitatea",
+    title: "Vasul Belgica la plecarea din portul Anvers",
+    text: `Fotografie a navei de expediție Belgica (1897-1899), care a transportat echipajul condus de Adrien de Gerlache, cu biologul român Emil Racoviță la bord, spre Antarctica.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 28"
+  },
+  {
+    id: "ex14", chapter: "Cap.1 — Romanitatea",
+    title: "Cetatea Brașov cu Biserica Neagră",
+    text: `Acuarelă a arhitectului Günther Schuller înfățișând cetatea medievală a Brașovului și Biserica Neagră (sec. XVI) — ilustrează civilizația urbană săsească din Transilvania, descrisă de călătorii străini ai epocii.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 31"
+  },
+  {
+    id: "ex15", chapter: "Cap.1 — Romanitatea",
+    title: "Statuia lui Nicolae Milescu Spătarul",
+    text: `Monument dedicat cărturarului și diplomatului Nicolae Milescu (1636-1708), autorul primului jurnal de călătorie românesc în China (1675-1678), considerat un „Marco Polo al secolului XVII”.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 32"
+  },
+  {
+    id: "ex16", chapter: "Cap.1 — Romanitatea",
+    title: "Statuia lui Dinicu Golescu",
+    text: `Monument dedicat boierului cărturar Dinicu Golescu (1777-1830), autorul primului jurnal de călătorie tipărit din literatura română, Însemnare a călătoriei mele (1826).`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 33"
+  },
+  {
+    id: "ex17", chapter: "Cap.1 — Romanitatea",
+    title: "Statuia lui Badea Cârțan",
+    text: `Monument dedicat ciobanului transilvănean Gheorghe (Badea) Cârțan, care a călătorit pe jos la Roma pentru a vedea Columna lui Traian, devenind un simbol popular al conștiinței romanității.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 34"
+  },
+  {
+    id: "ex18", chapter: "Cap.6 — Secolul XX: Democrație și Totalitarism",
+    title: "Pictura „România rupându-și lanțurile”",
+    text: `Tablou de C.D. Rosenthal, simbol al mișcării revoluționare de la 1848 — alegorie a eliberării naționale, cu personificarea României purtând tricolorul.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. II, p. 48"
+  },
+  {
+    id: "ex19", chapter: "Cap.6 — Secolul XX: Democrație și Totalitarism",
+    title: "Gaspar David Friedrich — Călător admirând norii (1818)",
+    text: `Celebra pictură romantică germană, folosită ca exemplu pentru tema singurătății și contemplării naturii specifică romantismului european din prima jumătate a secolului al XIX-lea.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. II, p. 46"
+  },
+  {
+    id: "ex20", chapter: "Cap.6 — Secolul XX: Democrație și Totalitarism",
+    title: "Gustave Courbet — Bună ziua, domnule Courbet (1854)",
+    text: `Pictură manifest a curentului realist, în care artistul se pictează pe sine întâlnind un colecționar pe un drum de țară — ilustrează respingerea idealizării romantice în favoarea observării directe a realității.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. II, p. 49"
+  },
+  {
+    id: "ex21", chapter: "Cap.6 — Secolul XX: Democrație și Totalitarism",
+    title: "Turnul Eiffel, Paris",
+    text: `Monument-simbol al arhitecturii metalice europene de la finele secolului al XIX-lea (1889), folosit pentru a ilustra avântul tehnologic și estetic al orașelor europene în epoca industrială.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. II, p. 46"
+  },
+  {
+    id: "ex22", chapter: "Cap.6 — Secolul XX: Democrație și Totalitarism",
+    title: "Caricatură despre Uniunea Europeană",
+    text: `Caricatură de Roxana Arama (publicată pe europeanweekly.com), reprezentând simbolic integrarea europeană — folosită pentru exercițiul de identificare a mesajului vizual despre identitatea europeană.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. II, p. 55"
+  },
+  {
+    id: "ex23", chapter: "Cap.9 — Constituțiile României",
+    title: "Parlamentul României la 10 mai 1866",
+    text: `Fotografie/gravură document a primei ședințe solemne a Parlamentului României în contextul adoptării Constituției din 1866, prima constituție modernă a țării.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. II, p. 76"
+  },
+  {
+    id: "ex24", chapter: "Cap.9 — Constituțiile României",
+    title: "Stema României după 1989",
+    text: `Noua stemă de stat adoptată după Revoluția din 1989, revenind la simbolurile tradiționale (acvila cu cruce, scuturile celor trei provincii istorice) — marchează ruptura simbolică față de stema comunistă.`,
+    origin: "Manual Alexandru Barnea ș.a., cls. XII, Modulul II, p. 58"
+  },
+  {
+    id: "ex25", chapter: "Cap.2 — Autonomii Locale",
+    title: "Teatrul Maghiar și Opera din Cluj-Napoca",
+    text: `Clădire reprezentativă pentru viața culturală a minorității maghiare din Transilvania interbelică — exemplu de instituție culturală proprie într-un oraș multietnic.`,
+    origin: "Manual Alexandru Barnea ș.a., cls. XII, Modulul II, p. 64"
+  },
+  {
+    id: "ex26", chapter: "Cap.6 — Secolul XX: Democrație și Totalitarism",
+    title: "Sibiu — orașul cu numeroși etnici germani",
+    text: `Vedere a centrului istoric săsesc al Sibiului, folosită pentru a ilustra prezența minorității germane (sașilor) în Transilvania și arhitectura ei distinctivă.`,
+    origin: "Manual Alexandru Barnea ș.a., cls. XII, Modulul II, p. 65"
+  },
+  {
+    id: "ex27", chapter: "Cap.6 — Secolul XX: Democrație și Totalitarism",
+    title: "Victime ale Holocaustului",
+    text: `Fotografie-document folosită în prezentarea Holocaustului din România (1940-1944), ilustrând persecuția și exterminarea populației evreiești sub regimul Antonescu.`,
+    origin: "Manual Alexandru Barnea ș.a., cls. XII, Modulul II, p. 66"
+  },
+  {
+    id: "ex28", chapter: "Cap.7 — România Postbelică",
+    title: "Manifestații în cinstea conducătorului Ceaușescu",
+    text: `Fotografie document din perioada comunistă, ilustrând manifestațiile de masă organizate pentru cultul personalității lui Nicolae Ceaușescu — exemplu de propagandă vizuală a regimului.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. II, p. 72"
+  },
+  {
+    id: "ex29", chapter: "Cap.4 — Statul Modern",
+    title: "Statuia lui Mihai Viteazul",
+    text: `Monument dedicat domnitorului Mihai Viteazul, care a unit pentru prima dată, pentru o perioadă scurtă (1600), cele trei țări române — simbol al idealului unității naționale invocat de generațiile următoare.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. III, p. 2"
+  },
+  {
+    id: "ex30", chapter: "Cap.4 — Statul Modern",
+    title: "Dimitrie Cantemir",
+    text: `Portret al domnitorului cărturar Dimitrie Cantemir (1673-1723), autorul Hronicului romano-moldo-vlahilor și al Descrierii Moldovei — una dintre cele mai importante figuri ale romanității românești în epoca modernă.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 23"
+  },
+  {
+    id: "ex31", chapter: "Cap.4 — Statul Modern",
+    title: "Enea Silvio Piccolomini (Papa Pius al II-lea)",
+    text: `Portret al umanistului italian Enea Silvio Piccolomini, papă între 1458-1464 sub numele Pius al II-lea — unul dintre primii umaniști care au susținut originea romană a poporului român, pe baza informațiilor misionarilor.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. I, p. 17"
+  },
+  {
+    id: "ex32", chapter: "Cap.4 — Statul Modern",
+    title: "Harta României și provinciile românești sub dominație străină (până în 1918)",
+    text: `Hartă istorică înfățișând teritoriile românești (Transilvania, Banat, Crișana, Maramureș, Bucovina, Basarabia) aflate sub stăpânire austro-ungară, respectiv țaristă, înainte de Marea Unire.`,
+    origin: "Manual Adăscăliței-Lazăr, cls. XII, cap. II, p. 57"
+  },
+  {
+    id: "ex33", chapter: "Cap.6 — Secolul XX: Democrație și Totalitarism",
+    title: "Educația „omului nou”",
+    text: `Fotografie document ilustrând propaganda comunistă axată pe formarea „omului nou” — statuie/manifestație dedicată membrilor Partidului Comunist și misiunii lor educative.`,
+    origin: "Manual Alexandru Barnea ș.a., cls. XII, Modulul II, p. 70"
+  },
+  {
+    id: "ex34", chapter: "Cap.8 — Războiul Rece",
+    title: "Corneliu Mănescu",
+    text: `Portret al lui Corneliu Mănescu, ministru de externe al României (1961-1972) și primul președinte al Adunării Generale a ONU provenit dintr-un stat comunist (1967) — simbol al diplomației românești de deschidere din anii '60.`,
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4, p. 137"
+  },
+  {
+    id: "ex35", chapter: "Cap.8 — Războiul Rece",
+    title: "Vizita președintelui Richard Nixon la București (1969)",
+    text: `Fotografie document a primei vizite a unui președinte american într-o țară din Europa de Est — moment-cheie al politicii externe de deschidere a României față de SUA în plin Război Rece.`,
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4, p. 135"
+  },
+  {
+    id: "ex36", chapter: "Cap.8 — Războiul Rece",
+    title: "Gheorghiu-Dej și Hrușciov (iunie 1962)",
+    text: `Fotografie document a întâlnirii dintre liderii Gheorghe Gheorghiu-Dej și Nikita Hrușciov — ilustrează relația tensionată dintre România și URSS în jurul Planului Valev.`,
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4, p. 132"
+  },
+  {
+    id: "ex37", chapter: "Cap.8 — Războiul Rece",
+    title: "Steagul Uniunii Europene la Parlamentul de la Strasbourg",
+    text: `Fotografie a drapelului UE arborat în fața clădirii Parlamentului European — simbol al integrării României în structurile europene după 2007.`,
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4, p. 141"
+  },
+  {
+    id: "ex38", chapter: "Cap.10 — Oamenii, Societatea, Lumea Ideilor",
+    title: "Harta Europei de Est dincolo de Cortina de Fier",
+    text: `Hartă istorică a blocului comunist european, cu anii instaurării regimurilor comuniste în fiecare țară (Polonia, Cehoslovacia, Ungaria, România, Bulgaria, Iugoslavia, Albania) — ilustrează extinderea „Cortinei de Fier” descrise de Churchill.`,
+    origin: "Manual Zoe Petre ș.a., cls. XII, Cap. 4, p. 136"
+  }
+];
+const CHAPTERS2 = [...new Set(EXTRAS.map(s => s.chapter))];
+
 const CHAPTERS = [...new Set(SOURCES.map(s => s.chapter))];
 
 function renderFilter(){
@@ -3551,6 +4104,61 @@ function renderSources(){
 
 renderFilter();
 renderSources();
+
+function renderFilter2(){
+  const el = document.getElementById('chapFilter2');
+  el.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'chap-btn active';
+  allBtn.textContent = 'Toate';
+  allBtn.dataset.chap = 'all';
+  allBtn.addEventListener('click', () => selectChapter2('all', allBtn));
+  el.appendChild(allBtn);
+
+  CHAPTERS2.forEach(ch=>{
+    const b = document.createElement('button');
+    b.className = 'chap-btn';
+    b.textContent = ch;
+    b.dataset.chap = ch;
+    b.addEventListener('click', () => selectChapter2(ch, b));
+    el.appendChild(b);
+  });
+}
+function selectChapter2(chap, btn){
+  [...document.querySelectorAll('#chapFilter2 .chap-btn')].forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.extra-card').forEach(card=>{
+    card.classList.toggle('hidden', chap !== 'all' && card.dataset.chapter !== chap);
+  });
+}
+
+function renderExtras(){
+  const el = document.getElementById('extrasList');
+  el.innerHTML = EXTRAS.map(s => `
+    <div class="source-card extra-card" id="card-${s.id}" data-chapter="${s.chapter}">
+      <div class="source-head" data-toggle2="${s.id}">
+        <div>
+          <p class="chap-tag">${s.chapter}</p>
+          <p class="src-title">${s.title}</p>
+        </div>
+        <span class="chev">▾</span>
+      </div>
+      <div class="source-body">
+        <p class="text" style="font-style:normal;border-left-color:var(--blue);">${s.text}</p>
+        <p class="origin">🖼️ ${s.origin}</p>
+      </div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('[data-toggle2]').forEach(head=>{
+    head.addEventListener('click', ()=>{
+      document.getElementById('card-' + head.dataset.toggle2).classList.toggle('open');
+    });
+  });
+}
+
+renderFilter2();
+renderExtras();
 </script>
 </body>
 </html>
