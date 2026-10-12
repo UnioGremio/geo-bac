@@ -1,0 +1,31 @@
+/* GeoBac — bară de navigare jos (doar pe telefon) */
+.gb-bottom-nav{display:none;}
+@media (max-width:768px){
+  .gb-bottom-nav{
+    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:95;
+    background:rgba(12,17,23,0.94);
+    -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));
+    font-family:'Outfit',system-ui,-apple-system,sans-serif;
+  }
+  .gb-bn-item{
+    flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    padding:7px 2px;border-radius:12px;text-decoration:none;
+    color:var(--text3,#7d8aa0);font-size:11px;font-weight:600;
+    -webkit-tap-highlight-color:transparent;transition:color .2s,background .2s;
+  }
+  .gb-bn-icon{font-size:20px;line-height:1;filter:grayscale(.6) opacity(.75);transition:filter .2s,transform .2s;}
+  .gb-bn-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  .gb-bn-item.active{color:var(--teal,#00d4aa);background:rgba(0,212,170,0.10);}
+  .gb-bn-item.active .gb-bn-icon{filter:none;transform:translateY(-1px);}
+  .gb-bn-item:active{background:rgba(255,255,255,0.06);}
+  /* spațiu jos ca bara să nu acopere conținutul */
+  body.has-gb-bottom-nav{padding-bottom:calc(68px + env(safe-area-inset-bottom,0px));}
+
+  /* bara de jos înlocuiește pastilele de sus pe mobil */
+  body.has-gb-bottom-nav .pnav-pills{display:none !important;}
+  /* butoanele plutitoare existente se mută deasupra barei */
+  body.has-gb-bottom-nav #classicToggle{bottom:calc(env(safe-area-inset-bottom,0px) + 74px) !important;}
+  body.has-gb-bottom-nav.classic-active #classicFrame{bottom:calc(64px + env(safe-area-inset-bottom,0px)) !important;height:auto !important;}
+}
