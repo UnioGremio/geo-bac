@@ -44,11 +44,11 @@
   --teal:#00d4aa;
   --teal2:#00b894;
   --amber:#f5a623;
-  --coral:#ff6b6b;
-  --blue:#5b9cf6;
-  --purple:#a78bfa;
-  --gold:#c9a84c;
-  --gold2:#a8834a;
+  --coral:#e8891a;
+  --blue:#4fe3c1;
+  --purple:#00b894;
+  --gold:#f5a623;
+  --gold2:#d98f12;
   --font:'Outfit',sans-serif;
   --body:'DM Sans',sans-serif;
   --mono:'JetBrains Mono',monospace;
@@ -60,8 +60,8 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:1
 body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;
   background:
     radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,212,170,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 30%, rgba(91,156,246,0.05) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 50% 90%, rgba(167,139,250,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 80% 30%, rgba(245,166,35,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 60% at 50% 90%, rgba(0,212,170,0.04) 0%, transparent 55%),
     var(--bg);
 }
 
@@ -93,7 +93,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 .hero-badge .pulse{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s ease infinite;}
 .hero h1{font-family:var(--font);font-size:clamp(42px,8vw,80px);font-weight:900;letter-spacing:-2px;line-height:1.05;margin-bottom:20px;
   animation:fadeUp 0.8s 0.1s ease both;}
-.hero h1 .grad{background:linear-gradient(135deg,var(--teal),var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero h1 .grad{background:linear-gradient(135deg,var(--teal),var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .hero p{font-size:clamp(16px,2.5vw,20px);color:var(--text2);max-width:560px;margin:0 auto 40px;line-height:1.7;
   animation:fadeUp 0.8s 0.2s ease both;}
 .hero-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
@@ -132,10 +132,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 .subject-card.s5:hover .card-arrow{background:var(--coral);}
 /* Istorie card */
 .subject-card.s-istorie::before{background:linear-gradient(135deg,var(--gold),var(--amber));}
-.subject-card.s-istorie{border-color:rgba(201,168,76,0.25);}
-.subject-card.s-istorie:hover{border-color:rgba(201,168,76,0.45);}
+.subject-card.s-istorie{border-color:rgba(245,166,35,0.25);}
+.subject-card.s-istorie:hover{border-color:rgba(245,166,35,0.45);}
 .subject-card.s-istorie:hover .card-arrow{background:var(--gold);color:var(--bg);border-color:var(--gold);}
-.free-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:6px;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.35);color:var(--gold);margin-bottom:12px;width:fit-content;}
+.free-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:6px;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.35);color:var(--gold);margin-bottom:12px;width:fit-content;}
 
 .subject-card .card-num{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text3);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;}
 .subject-card h3{font-family:var(--font);font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;}
@@ -195,7 +195,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 .prog-body p{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px;}
 .prog-pages{display:flex;flex-wrap:wrap;gap:5px;}
 .prog-page{font-family:var(--font);font-size:11px;font-weight:600;padding:3px 9px;border-radius:5px;border:1px solid;}
-.prog-page.p-europa{color:var(--blue);background:rgba(91,156,246,0.10);border-color:rgba(91,156,246,0.25);}
+.prog-page.p-europa{color:var(--teal);background:rgba(0,212,170,0.10);border-color:rgba(0,212,170,0.25);}
 .prog-page.p-romania{color:var(--teal);background:rgba(0,212,170,0.10);border-color:rgba(0,212,170,0.25);}
 .prog-page.p-vecini{color:var(--amber);background:rgba(245,166,35,0.10);border-color:rgba(245,166,35,0.25);}
 
@@ -229,7 +229,7 @@ footer a{color:var(--text2);text-decoration:none;}
 .rec-stars{font-size:28px;color:var(--border2);letter-spacing:6px;margin-bottom:14px;cursor:pointer;user-select:none;}
 .rec-stars span.active{color:var(--amber);}
 .rec-msg{font-size:13px;margin-top:10px;color:var(--teal);min-height:1.2em;}
-.rec-msg.err{color:var(--coral);}
+.rec-msg.err{color:#ff6b6b;}
 .recenzii-hint{text-align:center;color:var(--text3);font-size:14px;max-width:480px;margin:0 auto;}
 .recenzii-hint a{color:var(--teal);font-weight:600;text-decoration:none;}
 
@@ -251,25 +251,68 @@ footer a{color:var(--text2);text-decoration:none;}
 footer .social-row{margin:0 0 18px;}
 @media(max-width:480px){.tutor-box{padding:32px 20px;}.tutor-box .btn-primary{width:100%;justify-content:center;}}
 
+
+/* ── Meniu hamburger (mobil) ── */
+.nav-burger{display:none;width:40px;height:40px;border-radius:10px;border:1px solid var(--border2);background:var(--surface);cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0;}
+.nav-burger span{display:block;width:18px;height:2px;border-radius:2px;background:var(--text);transition:transform .25s,opacity .25s;}
+.nav-burger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.nav-burger.open span:nth-child(2){opacity:0;}
+.nav-burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+.nav-menu{display:none;position:absolute;top:100%;left:0;right:0;background:rgba(12,17,23,0.98);border-bottom:1px solid var(--border);padding:12px 20px 20px;flex-direction:column;gap:4px;max-height:calc(100vh - 70px);overflow-y:auto;}
+.nav-menu.open{display:flex;}
+.nav-menu a{padding:13px 14px;border-radius:10px;font-family:var(--font);font-weight:600;font-size:15px;color:var(--text2);text-decoration:none;}
+.nav-menu a:hover,.nav-menu a:active{background:var(--surface2);color:var(--text);}
+.nav-menu .menu-sep{height:1px;background:var(--border);margin:8px 0;}
+.nav-menu a.menu-main{background:var(--teal);color:var(--bg);text-align:center;margin-top:4px;}
+
+/* ── Bară fixă de cumpărare (mobil) ── */
+.sticky-buy{display:none;position:fixed;left:0;right:0;bottom:0;z-index:90;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:rgba(12,17,23,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border2);transform:translateY(110%);transition:transform .35s cubic-bezier(0.16,1,0.3,1);}
+.sticky-buy.show{transform:translateY(0);}
+.sticky-buy a{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;background:var(--amber);color:var(--bg);font-family:var(--font);font-weight:800;font-size:15px;text-decoration:none;}
+@media(max-width:768px){.sticky-buy{display:block;}footer{padding-bottom:90px;}}
+
+.swipe-hint{display:none;font-size:12px;font-weight:600;color:var(--text3);margin:-8px 0 10px;text-align:right;}
+@media(min-width:769px){.prog-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;}}
+
 /* ── Mobile ── */
 @media(max-width:900px){
   .nav-pills{display:none;}
+  .nav-burger{display:flex;}
   .nav-login{display:none;}
   .nav-signup{display:none;}
   .nav-cta .hide-sm{display:none;}
 }
 @media(max-width:768px){
-  .hero{min-height:auto;padding:120px 20px 60px;}
-  .hero-stats{gap:20px;flex-wrap:wrap;justify-content:center;}
+  .hero{min-height:auto;padding:92px 20px 32px;}
+  .hero-stats{gap:14px 24px;flex-wrap:wrap;justify-content:center;margin-top:28px;}
   .hero-stat .num{font-size:22px;}
-  .subjects-grid{grid-template-columns:1fr;}
-  .features-grid{grid-template-columns:1fr 1fr;}
+  .subjects-grid{grid-template-columns:1fr 1fr;gap:10px;}
+  #subiecte{padding-top:36px;}
+  #subiecte .section-desc{display:none;}
+  #subiecte .section-title{margin-bottom:18px;}
+  .subject-card{padding:16px 14px;border-radius:14px;}
+  .subject-card:hover{transform:none;}
+  .subject-card .card-num{font-size:10px;letter-spacing:1px;margin-bottom:6px;}
+  .subject-card h3{font-size:16px;margin-bottom:0;padding-right:22px;}
+  .subject-card .card-sub,.subject-card .card-tags{display:none;}
+  .card-arrow{top:12px;right:12px;width:24px;height:24px;border-radius:7px;font-size:12px;}
+  .free-badge{font-size:10px;padding:2px 7px;margin-bottom:6px;}
+  .features-grid{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:20px;margin:0 -20px;padding:0 20px 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .features-grid::-webkit-scrollbar,.prog-list::-webkit-scrollbar{display:none;}
+  .feature{flex:0 0 76%;scroll-snap-align:start;}
+  .features-grid .reveal{opacity:1;transform:none;}
+  #features .section-desc,#programa .section-desc{margin-bottom:20px;}
+  .swipe-hint{display:block;}
+  .prog-list{flex-direction:row;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:20px;margin:0 -20px;padding:0 20px 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .prog-item{flex:0 0 82%;scroll-snap-align:start;}
+  .prog-item:hover{transform:none;}
+  .prog-chapter{margin-bottom:22px;}
+  .prog-chapter-header::after{content:'glisează →';margin-left:auto;font-size:11px;font-weight:600;color:var(--text3);white-space:nowrap;}
   .scroll-hint{display:none;}
   .section{padding:60px 20px;}
   .nav-cta{padding:7px 12px;font-size:12px;}
 }
 @media(max-width:480px){
-  .features-grid{grid-template-columns:1fr;}
   .hero-actions{flex-direction:column;align-items:center;}
   .btn-primary,.btn-secondary{width:100%;justify-content:center;}
 }
@@ -292,7 +335,19 @@ footer .social-row{margin:0 0 18px;}
       <a href="login.html" class="nav-login">Intră în cont</a>
       <a href="#cumpara" class="nav-signup buy-link" data-buy>Înregistrare</a>
       <a href="#cumpara" class="nav-cta buy-link" data-buy><span class="hide-sm">Abonament</span><span class="price">119,99 lei/lună</span></a>
+      <button class="nav-burger" id="navBurger" type="button" aria-label="Meniu" aria-expanded="false" aria-controls="navMenu"><span></span><span></span><span></span></button>
     </div>
+  </div>
+  <div class="nav-menu" id="navMenu">
+    <a href="europa.html">🌍 Europa</a>
+    <a href="romania.html">🗺 România</a>
+    <a href="vecini.html">🤝 Vecini &amp; Formule</a>
+    <a href="exercitii.html">📝 Exerciții</a>
+    <a href="subiecte-ani-precedenti.html">📄 Subiecte BAC</a>
+    <a href="#sedinte">🎓 Ședințe de pregătire</a>
+    <div class="menu-sep"></div>
+    <a href="login.html">Intră în cont</a>
+    <a href="#cumpara" class="menu-main buy-link" data-buy>Începe abonamentul</a>
   </div>
 </nav>
 
@@ -320,7 +375,7 @@ footer .social-row{margin:0 0 18px;}
 <!-- Subjects -->
 <section class="section" id="subiecte">
   <div class="reveal">
-    <div class="section-label">📚 Cele 5 secțiuni</div>
+    <div class="section-label">📚 Secțiunile platformei</div>
     <h2 class="section-title">Pe care o deschizi prima?</h2>
     <p class="section-desc">Fiecare secțiune e o pagină separată cu hartă, materie și tot ce apare la examen. Intri, explorezi, înveți. Fără blat, fără enunțuri copiate din manual.</p>
   </div>
@@ -406,6 +461,35 @@ footer .social-row{margin:0 0 18px;}
       </div>
     </a>
   </div>
+</section>
+
+<section class="section" id="recenzii">
+  <div class="reveal">
+    <div class="section-label">⭐ Păreri reale</div>
+    <h2 class="section-title">Ce spun cei care au încercat</h2>
+    <p class="section-desc">Recenzii de la utilizatori cu abonament activ — verificate manual, nu postate de oricine.</p>
+  </div>
+
+  <div id="recenzii-lista" class="reviews-grid">
+    <p class="reviews-empty">Se încarcă recenziile…</p>
+  </div>
+
+  <div id="recenzii-form-wrap" class="review-form-wrap" style="display:none">
+    <h4>Lasă o recenzie</h4>
+    <form id="recenzii-form">
+      <input type="text" id="rec-nume" placeholder="Numele tău (cum vrei să apară)" maxlength="60" required>
+      <div id="rec-stars" class="rec-stars" data-val="0">
+        <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+      </div>
+      <textarea id="rec-text" placeholder="Ce părere ai despre GeoBac?" rows="3" maxlength="1000" required></textarea>
+      <button type="submit" class="btn-primary">Trimite recenzia</button>
+      <p id="rec-msg" class="rec-msg"></p>
+    </form>
+  </div>
+
+  <p id="recenzii-login-hint" class="recenzii-hint" style="display:none">
+    <a href="login.html">Autentifică-te</a> cu un cont cu abonament activ ca să lași o recenzie.
+  </p>
 </section>
 
 <!-- Programa -->
@@ -540,6 +624,7 @@ footer .social-row{margin:0 0 18px;}
     <p class="section-desc">Am trecut prin aceleași manuale și aceleași hărți xeroxate. GeoBac e ce mi-aș fi dorit să am eu când învățam pentru BAC.</p>
   </div>
 
+  <p class="swipe-hint">glisează →</p>
   <div class="features-grid">
     <div class="feature reveal">
       <span class="f-icon">🗺</span>
@@ -575,34 +660,6 @@ footer .social-row{margin:0 0 18px;}
 </section>
 
 <!-- Recenzii -->
-<section class="section" id="recenzii">
-  <div class="reveal">
-    <div class="section-label">⭐ Păreri reale</div>
-    <h2 class="section-title">Ce spun cei care au încercat</h2>
-    <p class="section-desc">Recenzii de la utilizatori cu abonament activ — verificate manual, nu postate de oricine.</p>
-  </div>
-
-  <div id="recenzii-lista" class="reviews-grid">
-    <p class="reviews-empty">Se încarcă recenziile…</p>
-  </div>
-
-  <div id="recenzii-form-wrap" class="review-form-wrap" style="display:none">
-    <h4>Lasă o recenzie</h4>
-    <form id="recenzii-form">
-      <input type="text" id="rec-nume" placeholder="Numele tău (cum vrei să apară)" maxlength="60" required>
-      <div id="rec-stars" class="rec-stars" data-val="0">
-        <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
-      </div>
-      <textarea id="rec-text" placeholder="Ce părere ai despre GeoBac?" rows="3" maxlength="1000" required></textarea>
-      <button type="submit" class="btn-primary">Trimite recenzia</button>
-      <p id="rec-msg" class="rec-msg"></p>
-    </form>
-  </div>
-
-  <p id="recenzii-login-hint" class="recenzii-hint" style="display:none">
-    <a href="login.html">Autentifică-te</a> cu un cont cu abonament activ ca să lași o recenzie.
-  </p>
-</section>
 
 <!-- Pricing -->
 <section class="price-section" id="cumpara">
@@ -626,7 +683,6 @@ footer .social-row{margin:0 0 18px;}
       <div class="price-feature"><span class="check">✓</span><span>Conținut actualizat continuu</span></div>
       <div class="price-feature"><span class="check">✓</span><span>Optimizat pentru laptop și PC — hărți interactive la capacitate maximă</span></div>
     </div>
-    
     <a href="#checkout" class="btn-primary buy-link" data-buy>Începe abonamentul — 119,99 lei/lună</a>
     <p class="price-guarantee">🔒 Plată securizată · Acces imediat după plată</p>
   </div>
@@ -652,15 +708,6 @@ footer .social-row{margin:0 0 18px;}
   </div>
 </section>
 
-<!-- CTA -->
-<section class="cta-section">
-  <div class="cta-box reveal">
-    <h2>Deci... începi sau nu? 🤷</h2>
-    <p>Materia nu se învață singură, dar măcar acum arată bine și poți da click pe ea. Decide dacă plătești un meniu la KFC sau îți iei BAC-ul.</p>
-    <a href="#cumpara" class="btn-primary">Bine, hai → 119,99 lei/lună</a>
-  </div>
-</section>
-
 <!-- Footer -->
 <footer>
   <div class="social-row">
@@ -676,6 +723,9 @@ footer .social-row{margin:0 0 18px;}
 </footer>
 
 <!-- Config & scroll reveal -->
+<!-- Bară fixă mobil -->
+<div class="sticky-buy" id="stickyBuy"><a href="#cumpara" class="buy-link" data-buy>Începe abonamentul · 119,99 lei/lună</a></div>
+
 <script>
 // ─── GeoBac config ───
 // 👇 Când ai link-ul Lemon Squeezy, înlocuiește aici:
@@ -875,6 +925,32 @@ reveals.forEach(r=>obs.observe(r));
     };
     xhrUser.send();
   });
+})();
+</script>
+
+<script>
+// Meniu hamburger
+(function(){
+  var b=document.getElementById('navBurger'),m=document.getElementById('navMenu');
+  if(!b||!m)return;
+  function close(){b.classList.remove('open');m.classList.remove('open');b.setAttribute('aria-expanded','false');}
+  b.addEventListener('click',function(){var o=m.classList.toggle('open');b.classList.toggle('open',o);b.setAttribute('aria-expanded',o?'true':'false');});
+  m.addEventListener('click',function(e){if(e.target.closest('a'))close();});
+  window.addEventListener('resize',function(){if(window.innerWidth>900)close();});
+})();
+// Bară fixă de cumpărare: apare după hero, dispare la secțiunea de preț
+(function(){
+  var bar=document.getElementById('stickyBuy'),hero=document.querySelector('.hero'),price=document.getElementById('cumpara');
+  if(!bar||!hero||!price)return;
+  function upd(){
+    var h=hero.getBoundingClientRect().bottom;
+    var pr=price.getBoundingClientRect();
+    var onPrice=pr.top<window.innerHeight*0.85&&pr.bottom>0;
+    bar.classList.toggle('show',h<0&&!onPrice);
+  }
+  window.addEventListener('scroll',upd,{passive:true});
+  window.addEventListener('resize',upd);
+  upd();
 })();
 </script>
 </body>
