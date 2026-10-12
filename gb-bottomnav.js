@@ -19,11 +19,12 @@
   if (SHOW_ON.indexOf(page) === -1) return;
 
   // Încarcă nav.css din același loc cu nav.js
-  var me = document.currentScript || document.querySelector('script[src$="gb-bottomnav.js"]');
+  var me = document.currentScript || document.querySelector('script[src*="gb-bottomnav.js"]');
   var base = me && me.src ? me.src.replace(/gb-bottomnav\.js.*$/, '') : '';
   var css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = base + 'gb-bottomnav.css';
+  var q = me && me.src && me.src.indexOf('?') > -1 ? me.src.slice(me.src.indexOf('?')) : '';
+  css.href = base + 'gb-bottomnav.css' + q;
   document.head.appendChild(css);
 
   function build() {
