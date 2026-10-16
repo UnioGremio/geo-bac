@@ -44,6 +44,14 @@
     });
     document.body.appendChild(nav);
     document.body.classList.add('has-gb-bottom-nav');
+    // buton „Cont" în bara de sus (pagini cu .pnav)
+    var pn = document.querySelector('.pnav');
+    if (pn && !pn.querySelector('.gb-acct')) {
+      var ac = document.createElement('a');
+      ac.className = 'gb-acct'; ac.href = '/cont.html'; ac.setAttribute('aria-label', 'Contul meu');
+      ac.innerHTML = '<span aria-hidden="true">👤</span><span>Cont</span>';
+      pn.appendChild(ac);
+    }
   }
   if (document.body) build(); else document.addEventListener('DOMContentLoaded', build);
 })();

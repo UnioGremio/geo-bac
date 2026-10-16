@@ -955,5 +955,15 @@ reveals.forEach(r=>obs.observe(r));
   upd();
 })();
 </script>
+<script>
+// Elevii logați văd „Contul meu" în loc de „Intră în cont"
+(function(){try{
+  if(localStorage.getItem('sb-bxbefvelonocuheavsri-auth-token')){
+    document.querySelectorAll('a[href="login.html"]').forEach(function(a){
+      if(a.classList.contains('nav-login')||a.closest('.nav-menu')){a.href='cont.html';a.textContent='Contul meu';}
+    });
+  }
+}catch(e){}})();
+</script>
 </body>
 </html>

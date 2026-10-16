@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contul meu — GeoBac</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--bg:#0c1117;--surface:#131b25;--surface2:#1a2431;--border:rgba(255,255,255,0.08);--text:#eef2f7;--text2:#a9b4c4;--text3:#6f7b8c;--teal:#00d4aa;--amber:#f5a623;--red:#ff6b6b;--font:'Outfit',system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;min-height:100vh}
+a{color:inherit}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 18px;background:rgba(12,17,23,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.logo{font-weight:800;font-size:19px;text-decoration:none;letter-spacing:-.4px}.logo span{color:var(--teal)}
+.back{font-size:13px;font-weight:600;color:var(--text2);text-decoration:none}
+main{max-width:760px;margin:0 auto;padding:22px 16px 60px}
+h1{font-size:28px;font-weight:800;letter-spacing:-.6px;margin-bottom:4px}
+.sub{color:var(--text2);font-size:14px;margin-bottom:20px;word-break:break-all}
+.badge{display:inline-block;padding:3px 11px;border-radius:100px;font-size:12px;font-weight:700;vertical-align:middle;margin-left:8px}
+.badge.on{background:rgba(0,212,170,.14);color:var(--teal)}
+.badge.off{background:rgba(245,166,35,.14);color:var(--amber)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px}
+.card h2{font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.big{font-size:22px;font-weight:800;letter-spacing:-.4px}
+.muted{color:var(--text2);font-size:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font:600 14px var(--font);text-decoration:none;cursor:pointer}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#06231d}
+.btn.danger{color:var(--red);border-color:rgba(255,107,107,.3)}
+.bar{height:8px;border-radius:8px;background:var(--surface2);overflow:hidden;margin:8px 0 4px}
+.bar i{display:block;height:100%;background:var(--teal);border-radius:8px}
+.days{display:flex;gap:6px;margin-top:12px}
+.day{flex:1;text-align:center;font-size:11px;color:var(--text3)}
+.day b{display:block;height:28px;border-radius:8px;background:var(--surface2);margin-bottom:4px}
+.day.on b{background:var(--teal)}
+details{border-top:1px solid var(--border);padding:10px 0}
+details:first-of-type{border-top:none}
+summary{cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:15px;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary small{color:var(--text2);font-weight:500}
+ul.chs{list-style:none;margin-top:10px}
+ul.chs li{display:flex;gap:10px;align-items:flex-start;padding:6px 0;font-size:14px;color:var(--text2)}
+ul.chs li.done{color:var(--text)}
+ul.chs li span.ck{flex:0 0 18px;height:18px;border-radius:50%;border:1.5px solid var(--text3);margin-top:2px;position:relative}
+ul.chs li.done span.ck{background:var(--teal);border-color:var(--teal)}
+ul.chs li.done span.ck::after{content:'';position:absolute;left:5px;top:2px;width:4px;height:8px;border:solid #06231d;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.mist{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid var(--border);font-size:15px}
+.mist:first-of-type{border-top:none}
+.chips{display:flex;gap:6px}.chip{font-size:12px;font-weight:600;padding:3px 9px;border-radius:100px;background:rgba(255,107,107,.12);color:var(--red)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+.stats div{background:var(--surface2);border-radius:12px;padding:12px 6px}
+.stats b{display:block;font-size:22px;font-weight:800}.stats span{font-size:12px;color:var(--text2)}
+.ok{color:var(--teal)}.bad{color:var(--red)}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+#msg{margin-top:12px;font-size:14px;color:var(--text2)}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="index.html">Geo<span>Bac</span></a>
+  <a class="back" href="index.html">← Pagina de start</a>
+</header>
+<main id="app"><p class="muted">Se încarcă…</p></main>
+
+<script src="progress.js"></script>
+<script>
+(function () {
+  var EU = [["eu1", "Relieful Major al Europei"], ["eu2", "Hidrografia Europei"], ["eu3", "Clima Europei"], ["eu4", "Vegetația și Fauna Europei"], ["eu5", "Populația și Statele Europei"], ["eu6", "Economia Europei"]];
+  var RO = [["ro1", "Carpații Orientali"], ["ro2", "Carpații Meridionali și Occidentali"], ["ro3", "Dealurile și Podișurile României"], ["ro4", "Câmpiile României"], ["ro5", "Hidrografia României"], ["ro6", "Clima României"], ["ro7", "Vegetația și Fauna României"], ["ro8", "Populația României"], ["ro9", "Solurile și Protecția Mediului"], ["ro10", "Resursele Naturale și Economia României"]];
+  var PAGES = { 'europa': 'Europa — harta', 'romania': 'România — harta', 'vecini': 'Vecini și formule', 'subiecte': 'Teorie', 'exercitii-harta': 'Exerciții pe hartă' };
+  var KEYS = ['geo-bac-eu', 'geo-bac-ro', 'geo-bac-ex-harta', 'geo-bac-greseli', 'geo-bac-ultima', 'geo-bac-zile'];
+  var app = document.getElementById('app');
+
+  var sess = window.GeoProgress && GeoProgress.session();
+  if (!sess) { location.replace('login.html?return=cont'); return; }
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+  function card(title) { var c = el('div', 'card'); if (title) c.appendChild(el('h2', null, title)); app.appendChild(c); return c; }
+  function iso(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function ago(ts) {
+    var m = Math.round((Date.now() - Date.parse(ts)) / 60000);
+    if (isNaN(m)) return '';
+    if (m < 2) return 'acum câteva momente';
+    if (m < 60) return 'acum ' + m + ' min';
+    var h = Math.round(m / 60); if (h < 24) return 'acum ' + h + (h === 1 ? ' oră' : ' ore');
+    var d = Math.round(h / 24); return d === 1 ? 'ieri' : 'acum ' + d + ' zile';
+  }
+  function streak(days) {
+    var set = {}; days.forEach(function (d) { set[d] = 1; });
+    var d = new Date(); var n = 0;
+    if (!set[iso(d)]) { d.setDate(d.getDate() - 1); if (!set[iso(d)]) return 0; }
+    while (set[iso(d)]) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+  function arr(v) { return Array.isArray(v) ? v : []; }
+
+  function render(data, premium) {
+    app.innerHTML = '';
+    var h = el('h1', null, 'Contul meu');
+    var b = el('span', 'badge ' + (premium ? 'on' : 'off'), premium ? 'Abonament activ' : 'Fără abonament');
+    h.appendChild(b); app.appendChild(h);
+    app.appendChild(el('p', 'sub', sess.email || ''));
+
+    // Continuă
+    var last = data['geo-bac-ultima'];
+    if (last && PAGES[last.p]) {
+      var c = card('Continuă de unde ai rămas');
+      var r = el('div', 'row');
+      var l = el('div'); l.appendChild(el('div', 'big', PAGES[last.p])); l.appendChild(el('div', 'muted', 'Ultima vizită: ' + ago(last.ts)));
+      var a = el('a', 'btn primary', 'Continuă →'); a.href = last.p + '.html';
+      r.appendChild(l); r.appendChild(a); c.appendChild(r);
+    }
+    if (!premium) {
+      var cp = card();
+      cp.appendChild(el('p', 'muted', 'Progresul se salvează doar pentru conturile cu abonament activ. Ia accesul la toate hărțile, teoria și exercițiile.'));
+      var ab = el('a', 'btn primary', 'Vezi abonamentul'); ab.href = 'index.html#cumpara'; ab.style.marginTop = '12px'; cp.appendChild(ab);
+    }
+
+    // Serie
+    var days = arr(data['geo-bac-zile']);
+    var s = streak(days);
+    var cs = card('Activitate');
+    var rs = el('div', 'row');
+    var ls = el('div'); ls.appendChild(el('div', 'big', s + (s === 1 ? ' zi la rând' : ' zile la rând')));
+    ls.appendChild(el('div', 'muted', days.length + (days.length === 1 ? ' zi' : ' zile') + ' în care ai învățat'));
+    rs.appendChild(ls); cs.appendChild(rs);
+    var wk = el('div', 'days'); var set = {}; days.forEach(function (d) { set[d] = 1; });
+    var names = ['D', 'L', 'Ma', 'Mi', 'J', 'V', 'S'];
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(); d.setDate(d.getDate() - i);
+      var cell = el('div', 'day' + (set[iso(d)] ? ' on' : '')); cell.appendChild(el('b')); cell.appendChild(document.createTextNode(names[d.getDay()]));
+      wk.appendChild(cell);
+    }
+    cs.appendChild(wk);
+
+    // Teorie
+    var ct = card('Teorie');
+    [['Europa', EU, arr(data['geo-bac-eu'])], ['România', RO, arr(data['geo-bac-ro'])]].forEach(function (g) {
+      var read = g[2], done = g[1].filter(function (x) { return read.indexOf(x[0]) !== -1; }).length;
+      var det = document.createElement('details');
+      var sm = document.createElement('summary');
+      sm.appendChild(el('span', null, g[0])); sm.appendChild(el('small', null, done + ' din ' + g[1].length + ' capitole'));
+      det.appendChild(sm);
+      var bar = el('div', 'bar'); var fill = el('i'); fill.style.width = Math.round(done / g[1].length * 100) + '%'; bar.appendChild(fill); det.appendChild(bar);
+      var ul = el('ul', 'chs');
+      g[1].forEach(function (x) { var li = el('li', read.indexOf(x[0]) !== -1 ? 'done' : ''); li.appendChild(el('span', 'ck')); li.appendChild(el('span', null, x[1])); ul.appendChild(li); });
+      det.appendChild(ul); ct.appendChild(det);
+    });
+    var tl = el('a', 'btn', 'Deschide teoria'); tl.href = 'subiecte.html'; tl.style.marginTop = '12px'; ct.appendChild(tl);
+
+    // Exerciții
+    var sc = data['geo-bac-ex-harta'] || {};
+    var ok = sc.ok | 0, bad = sc.bad | 0, tot = sc.total | 0;
+    var ce = card('Exerciții pe hartă');
+    var st = el('div', 'stats');
+    [[ok, 'Corecte', 'ok'], [bad, 'Greșite', 'bad'], [tot ? Math.round(ok / tot * 100) + '%' : '—', 'Reușită', '']].forEach(function (x) {
+      var d = el('div'); d.appendChild(el('b', x[2], String(x[0]))); d.appendChild(el('span', null, x[1])); st.appendChild(d);
+    });
+    ce.appendChild(st);
+    var ex = el('a', 'btn', 'Deschide exercițiile'); ex.href = 'exercitii-harta.html'; ex.style.marginTop = '12px'; ce.appendChild(ex);
+
+    // Greșeli frecvente
+    var mist = data['geo-bac-greseli'] || {};
+    var list = Object.keys(mist).map(function (k) { return { n: k, t: mist[k].t | 0, c: mist[k].c | 0 }; })
+      .filter(function (x) { return x.t + x.c > 0; }).sort(function (a, b) { return (b.t + b.c) - (a.t + a.c); }).slice(0, 8);
+    var cm = card('Ce te încurcă cel mai des');
+    if (!list.length) cm.appendChild(el('p', 'muted', 'Nicio greșeală salvată încă. Fă exerciții la harta mută a Europei și aici vei vedea ce trebuie repetat.'));
+    else {
+      list.forEach(function (x) {
+        var r = el('div', 'mist'); r.appendChild(el('span', null, x.n));
+        var ch = el('div', 'chips');
+        if (x.t) ch.appendChild(el('span', 'chip', 'țara ×' + x.t));
+        if (x.c) ch.appendChild(el('span', 'chip', 'capitala ×' + x.c));
+        r.appendChild(ch); cm.appendChild(r);
+      });
+      var rep = el('a', 'btn primary', 'Exersează greșitele'); rep.href = 'exercitii-harta.html?mod=greseli'; rep.style.marginTop = '12px'; cm.appendChild(rep);
+    }
+
+    // Date și cont
+    var cd = card('Cont și date');
+    var ac = el('div', 'actions');
+    var out = el('button', 'btn', 'Deconectare'); out.type = 'button';
+    var del = el('button', 'btn danger', 'Șterge progresul meu'); del.type = 'button';
+    ac.appendChild(out); ac.appendChild(del); cd.appendChild(ac);
+    var msg = el('p'); msg.id = 'msg'; cd.appendChild(msg);
+    cd.appendChild(el('p', 'muted', 'Salvăm doar progresul tău (capitole citite, scoruri, greșeli, zile active), nu alte date personale.')).style.marginTop = '12px';
+
+    out.onclick = function () {
+      try { GeoProgress.clearLocal(); } catch (e) {}
+      try { localStorage.removeItem('sb-bxbefvelonocuheavsri-auth-token'); } catch (e) {}
+      document.cookie = 'sb-access-token=; path=/; max-age=0';
+      location.href = 'index.html';
+    };
+    del.onclick = function () {
+      if (!confirm('Sigur ștergi tot progresul? Nu se poate anula.')) return;
+      msg.textContent = 'Se șterge…';
+      GeoProgress.deleteAll().then(function () { location.reload(); })
+        .catch(function () { msg.textContent = 'Nu s-a putut șterge acum. Încearcă din nou mai târziu.'; });
+    };
+  }
+
+  var uid = sess.userId;
+  Promise.all([
+    GeoProgress.fetch(KEYS),
+    GeoProgress.rest('/rest/v1/profiles?id=eq.' + uid + '&select=is_premium&limit=1').then(function (r) { return Array.isArray(r) && r[0] && r[0].is_premium === true; }).catch(function () { return null; })
+  ]).then(function (res) { render(res[0], res[1] !== false); })
+    .catch(function () { app.innerHTML = ''; app.appendChild(el('p', 'muted', 'Nu am putut încărca progresul acum. Încearcă din nou peste puțin timp.')); });
+})();
+</script>
+</body>
+</html>
