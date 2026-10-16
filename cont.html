@@ -181,7 +181,8 @@ ul.chs li.done span.ck::after{content:'';position:absolute;left:5px;top:2px;widt
         if (x.c) ch.appendChild(el('span', 'chip', 'capitala ×' + x.c));
         r.appendChild(ch); cm.appendChild(r);
       });
-      var rep = el('a', 'btn primary', 'Exersează greșitele'); rep.href = 'exercitii-harta.html?mod=greseli'; rep.style.marginTop = '12px'; cm.appendChild(rep);
+      var rep = el('a', 'btn primary', 'Exersează greșitele'); rep.href = 'exercitii-harta.html?mod=greseli'; rep.style.marginTop = '12px';
+      rep.onclick = function () { try { localStorage.setItem('gb-open', 'greseli'); } catch (e) {} }; cm.appendChild(rep);
     }
 
     // Date și cont
