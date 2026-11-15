@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://geo-bac.com/sitemap.xml
