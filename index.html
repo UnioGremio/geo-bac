@@ -317,9 +317,61 @@ footer .social-row{margin:0 0 18px;}
   .hero-actions{flex-direction:column;align-items:center;}
   .btn-primary,.btn-secondary{width:100%;justify-content:center;}
 }
+
+/* ── Black Friday 2026 (activ doar 16–30 nov, vezi scriptul de după <body>) ── */
+.bf-only{display:none}
+body.bf .bf-only{display:block}
+body.bf{--bg:#000;--bg2:#080808;--bg3:#101010;--teal:#ffc233;--teal2:#e6a717;--blue:#ffd97a;--purple:#e6a717;--amber:#ffc233;--glass:rgba(8,8,8,.8)}
+body.bf::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;animation:bfb 5s ease-in-out infinite;
+background:radial-gradient(circle at 12% 18%,rgba(255,194,51,.22) 0 2px,transparent 90px),radial-gradient(circle at 84% 12%,rgba(255,244,214,.18) 0 2px,transparent 110px),radial-gradient(circle at 70% 62%,rgba(255,194,51,.16) 0 2px,transparent 130px),radial-gradient(circle at 20% 78%,rgba(255,244,214,.14) 0 2px,transparent 100px),radial-gradient(circle at 50% 100%,rgba(255,194,51,.2),transparent 380px)}
+.bf-lights{height:14px;background:radial-gradient(circle,#ffc233 0 3px,rgba(255,194,51,.35) 4px,transparent 7px) 0 0/28px 14px repeat-x;animation:bfb 1.8s ease-in-out infinite}
+.bf-lights.b{background-image:radial-gradient(circle,#fff4d6 0 3px,rgba(255,244,214,.35) 4px,transparent 7px);background-position:14px 0;margin-top:-14px;animation-delay:.9s}
+@keyframes bfb{50%{opacity:.3}}
+.bf-banner{background:#000;border-bottom:1px solid rgba(255,194,51,.4);text-align:center;font-family:var(--font)}
+.bf-banner-in{padding:8px 14px 10px;display:flex;flex-wrap:wrap;gap:4px 16px;justify-content:center;align-items:center;font-size:14px;color:#fff4d6}
+.bf-banner-in b{color:#ffc233;font-weight:900;letter-spacing:.04em}
+.bf-banner-in a{color:#ffc233;text-decoration:underline;font-size:12px}
+#bfCd{font-variant-numeric:tabular-nums;font-weight:700}
+.bf-hero{position:relative;text-align:center;margin:0 auto 28px;padding:26px 18px;max-width:560px;border:1px solid rgba(255,194,51,.4);border-radius:18px;background:radial-gradient(ellipse at 50% 0,rgba(255,194,51,.2),transparent 70%),#050505;box-shadow:0 0 60px rgba(255,194,51,.15),inset 0 0 40px rgba(255,194,51,.06)}
+.bf-hero .t{font-family:var(--font);font-weight:700;font-size:15px;color:#fff4d6}
+.bf-hero .big{font-family:var(--font);font-weight:900;font-size:clamp(76px,24vw,132px);line-height:.95;color:#fff4d6;text-shadow:0 0 12px #ffc233,0 0 40px #ffc233,0 0 90px rgba(255,194,51,.6);animation:bfg 3s ease-in-out infinite}
+@keyframes bfg{50%{text-shadow:0 0 6px #ffc233,0 0 24px #ffc233,0 0 50px rgba(255,194,51,.4)}}
+.bf-hero p{color:var(--text2);font-size:14px;margin-top:6px}
+.bf-hero p b{color:#fff4d6}
+.bf-hero small,.bf-price small{display:block;margin-top:10px;color:var(--text3);font-size:11px}
+.bf-hero small a,.bf-price small a{color:#ffc233}
+.bf-code{display:inline-block;margin-top:12px;padding:8px 16px;border:1px dashed #ffc233;border-radius:10px;color:#fff4d6;font-family:var(--font);font-weight:800;letter-spacing:.06em;box-shadow:0 0 18px rgba(255,194,51,.35)}
+.bf-price{text-align:center;margin:6px 0 4px}
+.bf-price .old{font-family:var(--font);font-size:20px;color:var(--text3);text-decoration:line-through}
+.bf-price .new{font-family:var(--font);font-weight:900;font-size:64px;line-height:1;color:#fff4d6;text-shadow:0 0 18px rgba(255,194,51,.7)}
+.bf-price .new span{font-size:18px;font-weight:600;margin-left:6px}
+.bf-price p{font-size:14px;color:var(--text2);margin-top:6px}
+body.bf .price-amount{display:none}
+#termeni-campanie ol{max-width:760px;margin:18px auto 0;padding-left:22px;color:var(--text2);font-size:14px;line-height:1.7}
+#termeni-campanie li{margin-bottom:10px}
+#termeni-campanie li b{color:var(--text)}
+@media(prefers-reduced-motion:reduce){body.bf::before,body.bf *{animation:none!important}}
 </style>
 </head>
 <body>
+<script>
+var BF_CODE='BLACKFRIDAY50';
+var BF_START=Date.UTC(2026,10,15,22,0,0),BF_END=Date.UTC(2026,10,30,21,59,59);/* 16 nov 00:00 – 30 nov 23:59, ora României (UTC+2) */
+var BF_ON=(Date.now()>=BF_START&&Date.now()<=BF_END)||/[?&]bf=1/.test(location.search);
+if(BF_ON)document.body.classList.add('bf');
+document.addEventListener('DOMContentLoaded',function(){
+  if(!BF_ON)return;
+  var P='59,99 lei prima lună';
+  var n=document.querySelector('.nav-cta .price');if(n)n.textContent=P;
+  document.querySelectorAll('.btn-primary[data-buy],.sticky-buy a').forEach(function(a){a.textContent='Profit de ofertă · cod '+BF_CODE});
+  var cd=document.getElementById('bfCd');
+  function t(){var d=Math.max(0,BF_END-Date.now()),z=Math.floor(d/864e5),h=Math.floor(d%864e5/36e5),m=Math.floor(d%36e5/6e4),s=Math.floor(d%6e4/1e3);
+    if(cd)cd.textContent='se termină în '+z+'z '+h+'h '+m+'m '+s+'s';
+    if(d<=0)location.reload();}
+  t();setInterval(t,1000);
+});
+</script>
+<div class="bf-only bf-banner"><div class="bf-lights"></div><div class="bf-lights b"></div><div class="bf-banner-in"><b>BLACK FRIDAY</b><span>Reducere amețitoare 50%</span><span>59,99 lei prima lună</span><span>Cod: <b>BLACKFRIDAY50</b></span><span id="bfCd"></span><a href="#termeni-campanie">Termeni campanie</a></div></div>
 
 <!-- Nav -->
 <nav>
@@ -356,6 +408,7 @@ footer .social-row{margin:0 0 18px;}
 
 <!-- Hero -->
 <section class="hero">
+  <div class="bf-only bf-hero"><div class="t">Black Friday · 16–30 noiembrie 2026</div><div class="big">−50%</div><p>Reducere amețitoare: <b>59,99 lei</b> prima lună, în loc de <s>119,99 lei</s></p><p>De la a doua lună: 119,99 lei/lună.</p><div class="bf-code">Introdu codul BLACKFRIDAY50 la plată</div><p>Scrie-l în câmpul de cod de reducere, înainte de a finaliza comanda.</p><small>Abonament cu reînnoire lunară automată, anulabil oricând. <a href="#termeni-campanie">Termeni și condiții campanie</a></small></div>
   <div class="hero-badge"><span class="pulse"></span> BAC · Geografie</div>
   <p class="hero-kicker">Fii propriul tău profesor!</p>
   <h1>Manualul nu te<br>va salva la <span class="grad">BAC.</span></h1>
@@ -672,6 +725,7 @@ footer .social-row{margin:0 0 18px;}
     <h3>Acces la tot, atâta timp cât ai nevoie</h3>
     <p class="price-sub">Plătești cât folosești. Renunți oricând. Fără bătăi de cap.</p>
     
+    <div class="bf-only bf-price"><span class="old">119,99 lei/lună</span><div class="new">59,99<span>lei prima lună</span></div><p>De la luna a 2-a: 119,99 lei/lună</p><div class="bf-code">Introdu codul BLACKFRIDAY50 la plată</div><p>Scrie-l în câmpul de cod de reducere, înainte de a finaliza comanda.</p><p>Ofertă valabilă 16–30 noiembrie 2026 · reînnoire automată lunară</p><small><a href="#termeni-campanie">Termeni și condiții campanie</a></small></div>
     <div class="price-amount">
       <span class="num">119,99</span>
       <span class="curr">lei/lună</span>
@@ -713,6 +767,22 @@ footer .social-row{margin:0 0 18px;}
 </section>
 
 <!-- Footer -->
+<section class="section bf-only" id="termeni-campanie">
+  <h2 style="text-align:center">Termeni și condiții — campania Black Friday 2026</h2>
+  <ol>
+  <li><b>Organizator.</b> Campania este organizată de operatorul platformei geo-bac.com, identificat în <a href="legal.html" style="color:var(--teal)">Termenii și Condițiile generale</a>, care se aplică și acestei campanii.</li>
+  <li><b>Perioada.</b> Campania se desfășoară între <b>16 noiembrie 2026, ora 00:00</b> și <b>30 noiembrie 2026, ora 23:59</b> (ora României). Oferta se aplică abonamentelor la care plata este confirmată în această perioadă.</li>
+  <li><b>Oferta.</b> Pentru abonamentul lunar: prima lună <b>59,99 lei</b> (−50% față de prețul obișnuit de 119,99 lei). Toate prețurile includ TVA.</li>
+  <li><b>Revenirea la prețul obișnuit.</b> După prima lună promoțională, abonamentul se reînnoiește automat la prețul obișnuit de <b>119,99 lei/lună</b> (prețul afișat pe site în afara campaniei), cu excepția cazului în care a fost anulat anterior.</li>
+  <li><b>Reînnoire și anulare.</b> Abonamentul se reînnoiește automat în fiecare lună. Îl poți anula oricând, iar anularea oprește reînnoirile viitoare; accesul rămâne până la sfârșitul perioadei deja plătite.</li>
+  <li><b>Cine poate beneficia.</b> Oferta se adresează abonaților noi și se aplică o singură dată per cont. Nu se aplică retroactiv abonamentelor deja active și nu se cumulează cu alte coduri sau reduceri.</li>
+  <li><b>Aplicarea reducerii.</b> Pentru a primi reducerea, trebuie să introduci codul <b>BLACKFRIDAY50</b> în câmpul de cod de reducere din pagina de plată, înainte de finalizarea comenzii. Fără cod, reducerea nu se aplică. Prețul final este cel afișat în pagina de plată după introducerea codului.</li>
+  <li><b>Plată și retragere.</b> Plățile sunt procesate prin Lemon Squeezy. Accesul la conținutul digital este oferit imediat după plată; condițiile privind dreptul de retragere sunt cele din Termenii și Condițiile generale.</li>
+  <li><b>Modificări.</b> Organizatorul poate prelungi sau modifica campania doar prin anunț public pe această pagină; comenzile deja plasate rămân neschimbate.</li>
+  <li><b>Contact.</b> <a href="mailto:contact@geo-bac.com" style="color:var(--teal)">contact@geo-bac.com</a></li>
+  </ol>
+</section>
+
 <footer>
   <div class="social-row">
       <a class="social-link" href="https://www.instagram.com/geo.bac.ro" target="_blank" rel="noopener" aria-label="Instagram GeoBac"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 4 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4 6.2 6.2 0 000-12.4zM12 16a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.9 1.4 1.4 0 000-2.9z"/></svg> Instagram</a>
