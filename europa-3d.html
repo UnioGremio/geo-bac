@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Europa – Relief 3D</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+html,body{margin:0;height:100%;background:#0b1220;font-family:system-ui,sans-serif}
+#map{position:absolute;inset:0}
+#ctl{position:absolute;top:env(safe-area-inset-top,8px);left:8px;right:8px;display:flex;flex-wrap:wrap;gap:6px;z-index:5}
+#ctl button,#ctl label{background:rgba(15,23,42,.88);color:#fff;border:1px solid #334155;border-radius:8px;padding:8px 10px;font-size:13px}
+#ctl button.on{background:#2563eb}
+#ex{display:flex;align-items:center;gap:6px}
+#ex input{width:90px}
+.maplibregl-popup-content{font-size:13px;max-width:240px;color:#111}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="ctl">
+  <button id="bRel" class="on">⛰️ Unități relief</button>
+  <button id="bTar" class="on">🗺️ Țări</button>
+  <button id="bRau">🌊 Râuri</button>
+  <button id="bSat">🛰️ Satelit</button>
+  <label id="ex">↕ <input id="exs" type="range" min="1" max="6" step="0.5" value="2.5"></label>
+</div>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+const COL={alpin:'#c2410c',hercinic:'#a16207',caledonic:'#7c3aed',ural:'#0e7490',podis:'#ca8a04',campie:'#16a34a',peninsula:'#db2777',insula:'#0284c7',delta:'#0d9488',geoarea:'#64748b'};
+const colorExpr=['match',['get','cat']];
+Object.entries(COL).forEach(([k,v])=>colorExpr.push(k,v));
+colorExpr.push('#64748b');
+
+const map=new maplibregl.Map({
+  container:'map',
+  center:[15,50],zoom:4.2,pitch:60,bearing:0,maxPitch:85,minZoom:2.5,maxZoom:11,
+  style:{
+    version:8,
+    sources:{
+      dem:{type:'raster-dem',encoding:'terrarium',tileSize:256,maxzoom:12,
+        tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+        attribution:'Elevație: Mapzen/AWS Terrain Tiles'},
+      sat:{type:'raster',tileSize:256,maxzoom:17,
+        tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+        attribution:'Imagini: Esri'}
+    },
+    layers:[
+      {id:'bg',type:'background',paint:{'background-color':'#dfe7d2'}},
+      {id:'sat',type:'raster',source:'sat',layout:{visibility:'none'}},
+      {id:'hill',type:'hillshade',source:'dem',
+        paint:{'hillshade-exaggeration':0.6,'hillshade-shadow-color':'#1f2937','hillshade-highlight-color':'#ffffff'}}
+    ]
+  }
+});
+map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'bottom-right');
+
+map.on('load',async()=>{
+  map.setTerrain({source:'dem',exaggeration:2.5});
+  try{
+    const r=await fetch('https://geo-bac.com/europa_vector.geojson?v=5');
+    const g=await r.json();
+    const by=l=>({type:'FeatureCollection',features:g.features.filter(f=>f.properties&&f.properties.layer===l)});
+    map.addSource('country',{type:'geojson',data:by('country')});
+    map.addSource('relief',{type:'geojson',data:by('relief')});
+    map.addSource('river',{type:'geojson',data:by('river')});
+    map.addLayer({id:'relief-fill',type:'fill',source:'relief',paint:{'fill-color':colorExpr,'fill-opacity':0.45}});
+    map.addLayer({id:'relief-line',type:'line',source:'relief',paint:{'line-color':colorExpr,'line-width':1}});
+    map.addLayer({id:'river',type:'line',source:'river',layout:{visibility:'none'},paint:{'line-color':'#2563eb','line-width':1.5}});
+    map.addLayer({id:'country-line',type:'line',source:'country',paint:{'line-color':'#111827','line-width':1,'line-opacity':0.8}});
+    map.on('click','relief-fill',e=>{
+      const p=e.features[0].properties;
+      new maplibregl.Popup().setLngLat(e.lngLat)
+        .setHTML('<b>'+(p.name||'')+'</b><br>'+(p.info||'')).addTo(map);
+    });
+    map.on('mouseenter','relief-fill',()=>map.getCanvas().style.cursor='pointer');
+    map.on('mouseleave','relief-fill',()=>map.getCanvas().style.cursor='');
+  }catch(err){console.error('GeoJSON',err)}
+});
+
+function toggle(btn,layers){
+  document.getElementById(btn).onclick=function(){
+    this.classList.toggle('on');
+    const v=this.classList.contains('on')?'visible':'none';
+    layers.forEach(l=>map.getLayer(l)&&map.setLayoutProperty(l,'visibility',v));
+  };
+}
+toggle('bRel',['relief-fill','relief-line']);
+toggle('bTar',['country-line']);
+toggle('bRau',['river']);
+toggle('bSat',['sat']);
+document.getElementById('exs').oninput=e=>map.setTerrain({source:'dem',exaggeration:+e.target.value});
+</script>
+</body>
+</html>
